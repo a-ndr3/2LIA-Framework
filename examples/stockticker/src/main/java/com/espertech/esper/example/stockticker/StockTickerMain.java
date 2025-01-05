@@ -38,32 +38,39 @@ public class StockTickerMain implements Runnable {
         Configuration configuration = StockTickerEPLUtil.getConfiguration();
         EPCompiled compiled = StockTickerEPLUtil.compileEPL(configuration);
 
-        log.info("Setting up runtime");
+        System.out.println("Setting up runtime");
+        //log.info("Setting up runtime");
         EPRuntime runtime = EPRuntimeProvider.getRuntime(runtimeURI, configuration);
         runtime.initialize();
 
-        log.info("Deploying compiled EPL");
+        System.out.println("Deploying compiled EPL");
+        //log.info("Deploying compiled EPL");
         StockTickerEPLUtil.deploy(runtime, compiled);
 
-        log.info("Generating test events: 1 million ticks, ratio 2 hits, 100 stocks");
+        System.out.println("Setting up listener");
+        //log.info("Generating test events: 1 million ticks, ratio 2 hits, 100 stocks");
         StockTickerEventGenerator generator = new StockTickerEventGenerator();
         LinkedList stream = generator.makeEventStream(1000000, 500000, 100, 25, 30, 48, 52, false);
-        log.info("Generating " + stream.size() + " events");
-
-        log.info("Sending " + stream.size() + " limit and tick events");
+        //log.info("Generating " + stream.size() + " events");
+        System.out.println("Generating " + stream.size() + " events");
+        System.out.println("Sending " + stream.size() + " limit and tick events");
+        //log.info("Sending " + stream.size() + " limit and tick events");
         for (Object theEvent : stream) {
+            System.out.println("Sending event: " + theEvent);
             runtime.getEventService().sendEventBean(theEvent, theEvent.getClass().getSimpleName());
 
             if (continuousSimulation) {
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
-                    log.debug("Interrupted", e);
+                    System.out.println("Interrupted");
+                    //log.debug("Interrupted", e);
                     break;
                 }
             }
         }
 
-        log.info("Done.");
+        System.out.println("Done.");
+        //log.info("Done.");
     }
 }

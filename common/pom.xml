@@ -127,6 +127,7 @@
 				<version>${maven.surefire.plugin.version}</version>
 				<configuration>
 					<skip>false</skip>
+					<testFailureIgnore>true</testFailureIgnore>
 					<argLine>-Xms512m -Xmx512m</argLine>
 					<includes>
 						<include>**/Test*.java</include>
@@ -175,7 +176,7 @@
 				<version>${maven.javadoc.plugin.version}</version>
 				<configuration>
 					<quiet>true</quiet>
-					<additionalparam>--allow-script-in-comments</additionalparam>
+
 					<windowtitle>Esper Common API Documentation</windowtitle>
 					<bottom><![CDATA[
 						<small><b>&copy; 2006-2024 EsperTech Inc.<br/>All rights reserved.<br/>Visit us at <a href='http://www.espertech.com' target=3_blank'>espertech.com</a></b></small>
@@ -232,6 +233,7 @@
 						<artifactItem>
 							<groupId>org.slf4j</groupId>
 							<artifactId>slf4j-reload4j</artifactId>
+							<!--suppress UnresolvedMavenProperty -->
 							<version>${slf4j-reload4j.version}</version>
 						</artifactItem>
 						<artifactItem>

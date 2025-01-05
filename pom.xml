@@ -17,6 +17,7 @@
 		<module>regression-run</module>
 		<module>esperio</module>
 		<module>examples</module>
+		<module>LSSEventListenerExample</module>
 	</modules>
 	<properties>
 		<rootPath>${basedir}</rootPath>
@@ -112,7 +113,7 @@
 							<encoding>UTF-8</encoding>
 							<consoleOutput>true</consoleOutput>
 							<failsOnError>true</failsOnError>
-							<linkXRef>false</linkXRef>
+
 						</configuration>
 						<goals>
 							<goal>check</goal>
@@ -121,16 +122,11 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>${maven.gpg.plugin.version}</version>
-				<configuration>
-					<passphrase>${gpg.passphrase}</passphrase>
-				</configuration>
+				<groupId>org.simplify4u.plugins</groupId>
+				<artifactId>sign-maven-plugin</artifactId>
+				<version>1.1.0</version>
 				<executions>
 					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
 						<goals>
 							<goal>sign</goal>
 						</goals>

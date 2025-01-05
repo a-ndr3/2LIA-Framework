@@ -174,16 +174,11 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>${maven.gpg.plugin.version}</version>
-				<configuration>
-					<passphrase>${gpg.passphrase}</passphrase>
-				</configuration>
+				<groupId>org.simplify4u.plugins</groupId>
+				<artifactId>sign-maven-plugin</artifactId>
+				<version>1.1.0</version>
 				<executions>
 					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
 						<goals>
 							<goal>sign</goal>
 						</goals>
@@ -196,7 +191,7 @@
 				<version>${maven.javadoc.plugin.version}</version>
 				<configuration>
 					<quiet>false</quiet>
-					<additionalparam>--allow-script-in-comments</additionalparam>
+
 					<windowtitle>Esper Common-Avro API Documentation</windowtitle>
 					<bottom><![CDATA[
 						<small><b>&copy; 2006-2024 EsperTech Inc.<br/>All rights reserved.<br/>Visit us at <a href='http://www.espertech.com' target=3_blank'>espertech.com</a></b></small>

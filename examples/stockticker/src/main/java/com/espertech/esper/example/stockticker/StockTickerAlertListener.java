@@ -35,7 +35,7 @@ public class StockTickerAlertListener implements UpdateListener {
             double upperLimit = (double) event.get("observed.upperLimit");
             double reference = (double) event.get("observed.reference");
 
-            log.debug(".update Alert for stock=" + tick.getSymbol() +
+            System.out.println(".update Alert for stock=" + tick.getSymbol() +
                 "  price=" + tick.getPrice() +
                 "  reference=" + reference +
                 "  lower=" + lowerLimit +

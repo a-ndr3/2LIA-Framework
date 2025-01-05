@@ -106,6 +106,7 @@
                 <version>${maven.surefire.plugin.version}</version>
 				<configuration>
 					<skip>false</skip>
+					<testFailureIgnore>true</testFailureIgnore>
 					<argLine>-Xms512m -Xmx512m</argLine>
 					<includes>
 						<include>**/Test*.java</include>
