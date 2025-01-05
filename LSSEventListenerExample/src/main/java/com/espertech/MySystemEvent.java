@@ -16,4 +16,12 @@ public class MySystemEvent {
     public String getType() {
         return type;
     }
+
+    @Override
+    public String toString() {
+        return "MySystemEvent{" +
+                "systemId='" + systemId + '\'' +
+                ", type='" + type + '\'' +
+                '}';
+    }
 }

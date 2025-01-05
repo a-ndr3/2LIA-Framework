@@ -12,7 +12,7 @@ import com.espertech.esper.runtime.client.EPRuntime;
 
 public class KafkaQueries {
     public static EPCompiled compileEpl(Configuration conf) {
-        String epl = "@name('my-statement') select * from MySystemEvent where systemId = 'A4' and type = 'update4';\n";
+        String epl = "@name('my-statement') select * from MySystemEvent where systemId = 'A1' and type = 'update1';\n";
 
         EPCompiled compiled;
         try {
