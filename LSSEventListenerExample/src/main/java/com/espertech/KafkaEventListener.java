@@ -10,12 +10,16 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.UUID;
 
+@Component
 public class KafkaEventListener {
     private final String topic;
     private final String server;
@@ -25,9 +29,13 @@ public class KafkaEventListener {
     private Configuration configuration;
     private KafkaConsumer<String, String> consumer;
 
-    public KafkaEventListener(String kafkaTopic, String server) {
+    private EsperService esperService;
+
+    @Autowired
+    public KafkaEventListener(String kafkaTopic, String kafkaBootstrapServers, EsperService esperService) {
         this.topic = kafkaTopic;
-        this.server = server;
+        this.server = kafkaBootstrapServers;
+        this.esperService = esperService;
 
         try {
             init();
@@ -50,10 +58,15 @@ public class KafkaEventListener {
 //        this.deployment = runtime.getDeploymentService().deploy(compiled);
 
         configuration = KafkaQueries.getConfiguration();
-        compiled = KafkaQueries.compileEpl(configuration);
         runtime = EPRuntimeProvider.getRuntime("KafkaListener", configuration);
         runtime.initialize();
-        deployment = KafkaQueries.deploy(runtime, compiled);
+        KafkaQueries.compileEpl(runtime, configuration);
+        deployment = runtime.getDeploymentService().getDeployment("myEventQueries3");
+
+        ((EsperServiceImpl) this.esperService).setRuntime(runtime);
+        ((EsperServiceImpl) this.esperService).setDeployment(deployment);
+        //((EsperServiceImpl) this.esperService).setCompiled(compiled);
+        ((EsperServiceImpl) this.esperService).setConfiguration(configuration);
 
         System.out.println("ESPER deployed");
     }
@@ -84,6 +97,10 @@ public class KafkaEventListener {
         } finally {
             consumer.close();
         }
+    }
+
+    public EsperService getEsperService() {
+        return esperService;
     }
 
     private KafkaConsumer<String, String> getKafkaConsumer() throws RuntimeException {

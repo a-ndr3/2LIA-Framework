@@ -6,18 +6,21 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import java.util.Properties;
 import java.util.UUID;
 
+@Component
 public class KafkaEventProducer {
     private final String topic;
     private final String server;
     private KafkaProducer<String, String> producer;
 
-    public KafkaEventProducer(String kafkaTopic, String server) {
+    public KafkaEventProducer(String kafkaTopic, String kafkaBootstrapServers) {
         this.topic = kafkaTopic;
-        this.server = server;
+        this.server = kafkaBootstrapServers;
         init();
     }
 
