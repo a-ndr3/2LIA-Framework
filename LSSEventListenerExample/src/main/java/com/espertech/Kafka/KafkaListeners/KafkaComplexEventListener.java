@@ -28,11 +28,13 @@ public class KafkaComplexEventListener extends AbstractKafkaListener implements 
                 var records = this.consumer.poll(Duration.ofMillis(100));
 
                 for (var record : records) {
-                    //runtime.getEventService().sendEventBean(ComplexEvent.fromByteBuffer(record), "MySystemEvent");
+                    var x = 1;
+                    //runtime.getEventService().sendEventBean(ComplexEvent.fromByteBuffer(record.value()), "ComplexEvent");
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            System.err.println("Error consuming record.");
         } finally {
             consumer.close();
         }

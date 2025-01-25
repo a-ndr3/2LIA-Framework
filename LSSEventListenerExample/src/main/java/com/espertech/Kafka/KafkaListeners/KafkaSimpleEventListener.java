@@ -34,10 +34,10 @@ public class KafkaSimpleEventListener extends AbstractKafkaListener implements L
                 var records = this.consumer.poll(Duration.ofMillis(100));
                 for (var record : records) {
 
-                    var sysId = record.value().split(",")[0].split(":")[1];
-                    var type = record.value().split(",")[1].split(":")[1];
+                    //var sysId = record.value().split(",")[0].split(":")[1];
+                    //var type = record.value().split(",")[1].split(":")[1];
 
-                    runtime.getEventService().sendEventBean(new MySystemEvent(sysId, type), "MySystemEvent");
+                    //runtime.getEventService().sendEventBean(new MySystemEvent(sysId, type), "MySystemEvent");
                 }
             }
         } catch (Exception e) {

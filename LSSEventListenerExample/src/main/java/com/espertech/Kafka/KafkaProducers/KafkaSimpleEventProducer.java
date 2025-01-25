@@ -19,11 +19,11 @@ public class KafkaSimpleEventProducer extends AbstractKafkaProducer implements L
                 e.printStackTrace();
             }
 
-            var record = new ProducerRecord<String,String>(topic, String.format("systemId:A%s,type:update%s", i, i));
-            producer.send(record);
+            //var record = new ProducerRecord<String,String>(topic, String.format("systemId:A%s,type:update%s", i, i));
+            //producer.send(record);
 
             i++;
-            Main.logger.debug("Sent event: {}", record.value());
+            //Main.logger.debug("Sent event: {}", record.value());
         }
     }
 }

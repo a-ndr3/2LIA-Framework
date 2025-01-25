@@ -9,7 +9,7 @@ import com.espertech.esper.runtime.client.DeploymentOptions;
 import com.espertech.esper.runtime.client.EPDeployException;
 import com.espertech.esper.runtime.client.EPDeployment;
 import com.espertech.esper.runtime.client.EPRuntime;
-import com.espertech.events.MySystemEvent;
+import com.espertech.events.ComplexEvent;
 
 public class ComplexEsperQueries implements LSSEsperQueries {
     public static final String staticQueriesDeploymentId = "complexSelectQueries";
@@ -18,7 +18,7 @@ public class ComplexEsperQueries implements LSSEsperQueries {
 
     public void compileEpl(EPRuntime runtime, Configuration conf) {
 
-        String simpleSelect = "@name('my-statement') select * from ComplexEvent where value = 50.1;";
+        String simpleSelect = "@name('my-statement') select * from ComplexEvent where value < 20;";
 
         String timeWindowForDynamicSelection = """
                 @public create context TestContext initiated @now and pattern [every timer:interval(2 min)] terminated after 2 minutes;
@@ -41,7 +41,7 @@ public class ComplexEsperQueries implements LSSEsperQueries {
 
     public Configuration getConfiguration() {
         Configuration configuration = new Configuration();
-        configuration.getCommon().addEventType(MySystemEvent.class);
+        configuration.getCommon().addEventType(ComplexEvent.class);
         return configuration;
     }
 
@@ -56,5 +56,4 @@ public class ComplexEsperQueries implements LSSEsperQueries {
     public String getDeploymentId() {
         return deploymentId;
     }
-
 }

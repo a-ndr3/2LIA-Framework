@@ -10,10 +10,13 @@ import com.espertech.esper.runtime.client.EPDeployException;
 import com.espertech.esper.runtime.client.EPDeployment;
 import com.espertech.esper.runtime.client.EPRuntime;
 import com.espertech.esper.runtime.client.EPRuntimeProvider;
+import com.espertech.events.ComplexEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
 
+import java.nio.ByteBuffer;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -25,7 +28,8 @@ public abstract class AbstractKafkaListener {
     protected EPDeployment deployment;
     protected Configuration configuration;
 
-    protected KafkaConsumer<String, String> consumer;
+    //protected KafkaConsumer<String, String> consumer;
+    protected KafkaConsumer<String, ByteBuffer> consumer;
 
     protected EsperService esperService;
 
@@ -62,14 +66,17 @@ public abstract class AbstractKafkaListener {
         Main.logger.info("ESPER deployed");
     }
 
-    private KafkaConsumer<String, String> getKafkaConsumer() throws RuntimeException {
+    private KafkaConsumer<String, ByteBuffer> getKafkaConsumer() throws RuntimeException {
         var properties = new Properties();
 
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, server);
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, UUID.randomUUID().toString());
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class.getName());
+
+        properties.put("spring.json.value.default.type", ComplexEvent.class.getName());
+        properties.put("spring.json.trusted.packages", "*");
 
         //properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
         //properties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000");
