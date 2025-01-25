@@ -1,0 +1,9 @@
+syntax = "proto3";
+//protoc --java_out=./src/main/java .proto
+option java_package = "com.espertech";
+option java_outer_classname = "SystemEvent";
+
+message MyEventProto {
+  string systemId = 1;
+  string type = 2;
+}

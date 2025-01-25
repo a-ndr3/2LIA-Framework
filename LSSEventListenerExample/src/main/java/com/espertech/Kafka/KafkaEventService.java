@@ -1,12 +1,16 @@
-package com.espertech;
+package com.espertech.Kafka;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
 public class KafkaEventService {
-    private final KafkaEventProducer producer;
-    private final KafkaEventListener listener;
+    private final LSSKafkaProducer producer;
+    private final LSSKafkaListener listener;
 
-    public KafkaEventService(KafkaEventProducer producer, KafkaEventListener listener) {
+    public KafkaEventService(
+            LSSKafkaProducer producer,
+            LSSKafkaListener listener) {
         this.producer = producer;
         this.listener = listener;
         startThreads();

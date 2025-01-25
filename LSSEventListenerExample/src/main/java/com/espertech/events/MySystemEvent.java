@@ -1,4 +1,4 @@
-package com.espertech;
+package com.espertech.events;
 
 public class MySystemEvent {
     private String systemId;
