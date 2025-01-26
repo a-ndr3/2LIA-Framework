@@ -1,12 +1,13 @@
 package com.espertech.events;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ComplexEvent {
+public class ComplexEvent implements Serializable {
     public int eventId;
     public String eventName;
     public String eventType;

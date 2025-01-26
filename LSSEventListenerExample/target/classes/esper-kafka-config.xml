@@ -1,0 +1,32 @@
+<esperio-kafka>
+    <kafka-consumer>
+        <id>complexEventConsumer</id>
+        <bootstrap-servers>localhost:9092</bootstrap-servers>
+        <group-id>esper-complex-event-group</group-id>
+        <topics>
+            <topic name="complexEvents"/>
+        </topics>
+        <schema>
+            <object-array>
+                <event-type-name>ComplexEvent</event-type-name>
+                <property-list>
+                    <property name="eventId" type="int"/>
+                    <property name="eventName" type="string"/>
+                    <property name="eventType" type="string"/>
+                    <property name="timestamp" type="long"/>
+                    <property name="value" type="double"/>
+                    <property name="percentage" type="float"/>
+                    <property name="isActive" type="boolean"/>
+                    <property name="level" type="short"/>
+                    <property name="category" type="string"/>
+                    <property name="priority" type="int"/>
+                    <property name="source" type="string"/>
+                    <property name="destination" type="string"/>
+                    <property name="duration" type="int"/>
+                    <property name="metadata" type="map<string,string>"/>
+                    <property name="dataPoints" type="list<int>"/>
+                </property-list>
+            </object-array>
+        </schema>
+    </kafka-consumer>
+</esperio-kafka>

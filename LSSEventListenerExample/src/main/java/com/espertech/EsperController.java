@@ -30,47 +30,47 @@ public class EsperController {
 
     }
 
-    @PostMapping("/add")
-    public String addQuery(@RequestBody String epl) {
-        try {
-            String tmp = String.format("@name('my-statement%s') %s;\n", UUID.randomUUID().getMostSignificantBits(), epl);
-            var compiled = EPCompilerProvider.getCompiler().compile(tmp, new CompilerArguments(Main.esperService.getConfiguration()));
-            EPDeployment deployment = Main.esperService.getRuntime().getDeploymentService().deploy(compiled); //todo make service that is responsible for creating correct sql queries
-            return "Query added: " + deployment.getDeploymentId();
-        } catch (Exception e) {
-            return "Failed to add query: " + e.getMessage();
-        }
-    }
-
-    @GetMapping("/getQueries")
-    public ResponseEntity<String> getEPLStatements() {
-        try {
-            var queries = Arrays.stream(Main.esperService.getDeployment().getStatements()).toList(); //todo get service injected
-            var sb = new StringBuilder();
-            for (var query : queries) {
-                sb.append(query.getName()).append("\n");
-            }
-            return ResponseEntity.ok().body(sb.toString());
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Failed to get queries: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/onDemandQuery") //todo add sliding window ~ 2 mins
-    public ResponseEntity<String> onDemandQuery(@RequestBody String epl) {
-        try {
-            var runtime = Main.esperService.getRuntime();
-            CompilerArguments compilerArguments = new CompilerArguments(Main.esperService.getConfiguration());
-            compilerArguments.getPath().add(runtime.getRuntimePath());
-            var compiled = EPCompilerProvider.getCompiler().compileQuery(epl, compilerArguments);
-            EPFireAndForgetQueryResult result = runtime.getFireAndForgetService().executeQuery(compiled);
-            var sb = new StringBuilder();
-            for (EventBean row : result.getArray()) {
-                sb.append(row.getUnderlying()).append("\n");
-            }
-            return ResponseEntity.ok().body(sb.toString());
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Failed to run query: " + e.getMessage());
-        }
-    }
+//    @PostMapping("/add")
+//    public String addQuery(@RequestBody String epl) {
+//        try {
+//            String tmp = String.format("@name('my-statement%s') %s;\n", UUID.randomUUID().getMostSignificantBits(), epl);
+//            var compiled = EPCompilerProvider.getCompiler().compile(tmp, new CompilerArguments(Main.esperService.getConfiguration()));
+//            EPDeployment deployment = Main.esperService.getRuntime().getDeploymentService().deploy(compiled); //todo make service that is responsible for creating correct sql queries
+//            return "Query added: " + deployment.getDeploymentId();
+//        } catch (Exception e) {
+//            return "Failed to add query: " + e.getMessage();
+//        }
+//    }
+//
+//    @GetMapping("/getQueries")
+//    public ResponseEntity<String> getEPLStatements() {
+//        try {
+//            var queries = Arrays.stream(Main.esperService.getDeployment().getStatements()).toList(); //todo get service injected
+//            var sb = new StringBuilder();
+//            for (var query : queries) {
+//                sb.append(query.getName()).append("\n");
+//            }
+//            return ResponseEntity.ok().body(sb.toString());
+//        } catch (Exception e) {
+//            return ResponseEntity.status(500).body("Failed to get queries: " + e.getMessage());
+//        }
+//    }
+//
+//    @PostMapping("/onDemandQuery") //todo add sliding window ~ 2 mins
+//    public ResponseEntity<String> onDemandQuery(@RequestBody String epl) {
+//        try {
+//            var runtime = Main.esperService.getRuntime();
+//            CompilerArguments compilerArguments = new CompilerArguments(Main.esperService.getConfiguration());
+//            compilerArguments.getPath().add(runtime.getRuntimePath());
+//            var compiled = EPCompilerProvider.getCompiler().compileQuery(epl, compilerArguments);
+//            EPFireAndForgetQueryResult result = runtime.getFireAndForgetService().executeQuery(compiled);
+//            var sb = new StringBuilder();
+//            for (EventBean row : result.getArray()) {
+//                sb.append(row.getUnderlying()).append("\n");
+//            }
+//            return ResponseEntity.ok().body(sb.toString());
+//        } catch (Exception e) {
+//            return ResponseEntity.status(500).body("Failed to run query: " + e.getMessage());
+//        }
+//    }
 }

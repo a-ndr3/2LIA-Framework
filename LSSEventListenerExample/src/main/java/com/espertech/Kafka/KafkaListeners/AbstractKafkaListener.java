@@ -47,7 +47,7 @@ public abstract class AbstractKafkaListener {
     private void init(LSSEsperQueries esperQueries, String queriesDeploymentId) throws EPCompileException, EPDeployException, RuntimeException {
         this.consumer = getKafkaConsumer();
 
-        Main.logger.info("Kafka Event Listener initialized");
+        //Main.logger.info("Kafka Event Listener initialized");
 
         configuration = esperQueries.getConfiguration();
 
@@ -62,7 +62,7 @@ public abstract class AbstractKafkaListener {
         ((EsperServiceImpl) this.esperService).setDeployment(deployment);
         ((EsperServiceImpl) this.esperService).setConfiguration(configuration);
 
-        Main.logger.info("ESPER deployed");
+        //Main.logger.info("ESPER deployed");
     }
 
     private KafkaConsumer<String, String> getKafkaConsumer() throws RuntimeException {

@@ -75,6 +75,12 @@
 
         <dependency>
             <groupId>com.espertech</groupId>
+            <artifactId>esperio-kafka</artifactId>
+            <version>9.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.espertech</groupId>
             <artifactId>esper-common</artifactId>
             <version>${project.version}</version>
         </dependency>
