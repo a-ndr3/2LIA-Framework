@@ -1,7 +1,7 @@
 package com.espertech;
 
+import com.espertech.ESPERQueries.ComplexEsperQueries;
 import com.espertech.ESPERQueries.LSSEsperQueries;
-import com.espertech.ESPERQueries.SimpleEsperQueries;
 import com.espertech.Kafka.KafkaListeners.KafkaComplexEventListener;
 import com.espertech.Kafka.KafkaListeners.KafkaSimpleEventListener;
 import com.espertech.Kafka.KafkaProducers.KafkaComplexEventProducer;
@@ -42,7 +42,7 @@ public class Main {
 
     @Bean
     public LSSKafkaListener kafkaEventListener() {
-        LSSEsperQueries queries = new SimpleEsperQueries();
+        LSSEsperQueries queries = new ComplexEsperQueries();
         return new KafkaComplexEventListener(config.kafkaTopic(), config.kafkaBootstrapServers(), esperService, queries);
     }
 }

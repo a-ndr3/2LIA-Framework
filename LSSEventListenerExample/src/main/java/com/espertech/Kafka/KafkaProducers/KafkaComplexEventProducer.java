@@ -33,7 +33,7 @@ public class KafkaComplexEventProducer extends AbstractKafkaProducer implements 
         Random random = new Random(System.currentTimeMillis());
         while (true) {
             try {
-                Thread.sleep(runEachSeconds * 1000);
+                Thread.sleep(runEachSeconds * 100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

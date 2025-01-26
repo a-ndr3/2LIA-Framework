@@ -18,12 +18,11 @@ public class ComplexEsperQueries implements LSSEsperQueries {
 
     public void compileEpl(EPRuntime runtime, Configuration conf) {
 
-        String simpleSelect = "@name('my-statement') select * from ComplexEvent where value < 20;";
+        String simpleSelect = "@name('my-statement') select * from ComplexEvent where value < -40 or value > 60;";
 
         String timeWindowForDynamicSelection = """
                 @public create context TestContext initiated @now and pattern [every timer:interval(2 min)] terminated after 2 minutes;
                 @public create window TestWindow#keepall as select * from ComplexEvent;
-                insert into TestWindow(systemId,type) select * from ComplexEvent;
                 """;
         try {
             EPCompiled selectCompiled = EPCompilerProvider.getCompiler().compile(simpleSelect, new CompilerArguments(conf));

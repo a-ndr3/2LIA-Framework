@@ -28,8 +28,7 @@ public abstract class AbstractKafkaListener {
     protected EPDeployment deployment;
     protected Configuration configuration;
 
-    //protected KafkaConsumer<String, String> consumer;
-    protected KafkaConsumer<String, ByteBuffer> consumer;
+    protected KafkaConsumer<String, String> consumer;
 
     protected EsperService esperService;
 
@@ -66,7 +65,7 @@ public abstract class AbstractKafkaListener {
         Main.logger.info("ESPER deployed");
     }
 
-    private KafkaConsumer<String, ByteBuffer> getKafkaConsumer() throws RuntimeException {
+    private KafkaConsumer<String, String> getKafkaConsumer() throws RuntimeException {
         var properties = new Properties();
 
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, server);

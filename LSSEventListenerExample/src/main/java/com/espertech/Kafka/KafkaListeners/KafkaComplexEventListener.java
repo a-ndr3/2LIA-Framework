@@ -2,11 +2,9 @@ package com.espertech.Kafka.KafkaListeners;
 
 import com.espertech.ESPERQueries.ComplexEsperQueries;
 import com.espertech.ESPERQueries.LSSEsperQueries;
-import com.espertech.ESPERQueries.SimpleEsperQueries;
 import com.espertech.EsperService;
+import com.espertech.EventListeners.ComplexEventListener;
 import com.espertech.Kafka.LSSKafkaListener;
-import com.espertech.events.ComplexEvent;
-import com.espertech.events.MySystemEvent;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -24,12 +22,16 @@ public class KafkaComplexEventListener extends AbstractKafkaListener implements 
         try {
             consumer.subscribe(Collections.singletonList(topic));
 
+            var listener = new ComplexEventListener();
+            runtime.getDeploymentService().getStatement(ComplexEsperQueries.staticQueriesDeploymentId, "my-statement").addListener(listener);
+
             while (true) {
                 var records = this.consumer.poll(Duration.ofMillis(100));
 
                 for (var record : records) {
-                    var x = 1;
-                    //runtime.getEventService().sendEventBean(ComplexEvent.fromByteBuffer(record.value()), "ComplexEvent");
+                    runtime.getEventService().sendEventBean(record.value(), "ComplexEvent");
+                    //runtime.getEventService().sendEventJson(record.value(), "ComplexEvent");
+                    //runtime.getEventService().routeEventJson(record.value(), "ComplexEvent");
                 }
             }
         } catch (Exception e) {

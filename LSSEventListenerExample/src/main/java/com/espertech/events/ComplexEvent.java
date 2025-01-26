@@ -17,6 +17,67 @@ public class ComplexEvent {
     public short level;
     public char category;
     public byte priority;
+
+    public List<Integer> getDataPoints() {
+        return dataPoints;
+    }
+
+    public Map<String, String> getMetadata() {
+        return metadata;
+    }
+
+    public long getDuration() {
+        return duration;
+    }
+
+    public String getDestination() {
+        return destination;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public byte getPriority() {
+        return priority;
+    }
+
+    public char getCategory() {
+        return category;
+    }
+
+    public short getLevel() {
+        return level;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public float getPercentage() {
+        return percentage;
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public int getEventId() {
+        return eventId;
+    }
+
     public String source;
     public String destination;
     public long duration;
