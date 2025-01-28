@@ -108,76 +108,25 @@ public class ComplexEvent {
         this.dataPoints = dataPoints;
     }
 
-//    public static ComplexEvent fromByteBuffer(ByteBuffer byteBuffer) {
-//        ComplexEvent event = new ComplexEvent();
-//
-//        event.eventId = byteBuffer.getInt();
-//
-//        char[] eventNameChars = new char[20]; // assumed length 20
-//        for (int i = 0; i < eventNameChars.length; i++) {
-//            eventNameChars[i] = byteBuffer.getChar();
-//        }
-//        event.eventName = new String(eventNameChars).trim();
-//
-//        char[] eventTypeChars = new char[10]; // assumed length 10
-//        for (int i = 0; i < eventTypeChars.length; i++) {
-//            eventTypeChars[i] = byteBuffer.getChar();
-//        }
-//
-//        event.eventType = new String(eventTypeChars).trim();
-//        event.timestamp = byteBuffer.getLong();
-//        event.value = byteBuffer.getDouble();
-//        event.percentage = byteBuffer.getFloat();
-//        event.isActive = byteBuffer.get() == 1;
-//        event.level = byteBuffer.getShort();
-//        event.category = byteBuffer.getChar();
-//        event.priority = byteBuffer.get();
-//
-//        char[] sourceChars = new char[15]; // assumed length 15
-//        for (int i = 0; i < sourceChars.length; i++) {
-//            sourceChars[i] = byteBuffer.getChar();
-//        }
-//
-//        event.source = new String(sourceChars).trim();
-//
-//        char[] destinationChars = new char[15]; // assumed length 15
-//        for (int i = 0; i < destinationChars.length; i++) {
-//            destinationChars[i] = byteBuffer.getChar();
-//        }
-//
-//        event.destination = new String(destinationChars).trim();
-//
-//        event.duration = byteBuffer.getLong();
-//
-//        int metadataSize = byteBuffer.getInt();
-//        Map<String, String> metadata = new HashMap<>();
-//        for (int i = 0; i < metadataSize; i++) {
-//            char[] keyChars = new char[10];
-//            for (int j = 0; j < keyChars.length; j++) {
-//                keyChars[j] = byteBuffer.getChar();
-//            }
-//            String key = new String(keyChars).trim();
-//
-//            char[] valueChars = new char[20];
-//            for (int j = 0; j < valueChars.length; j++) {
-//                valueChars[j] = byteBuffer.getChar();
-//            }
-//            String value = new String(valueChars).trim();
-//
-//            metadata.put(key, value);
-//        }
-//
-//        event.metadata = metadata;
-//
-//        int dataPointsSize = byteBuffer.getInt();
-//        List<Integer> dataPoints = new ArrayList<>();
-//        for (int i = 0; i < dataPointsSize; i++) {
-//            dataPoints.add(byteBuffer.getInt());
-//        }
-//
-//        event.dataPoints = dataPoints;
-//
-//        return event;
-//    }
+    @Override
+    public String toString() {
+        return "ComplexEvent{" +
+                "eventId=" + eventId +
+                ", eventName='" + eventName + '\'' +
+                ", eventType='" + eventType + '\'' +
+                ", timestamp=" + timestamp +
+                ", value=" + value +
+                ", percentage=" + percentage +
+                ", isActive=" + isActive +
+                ", level=" + level +
+                ", category=" + category +
+                ", priority=" + priority +
+                ", source='" + source + '\'' +
+                ", destination='" + destination + '\'' +
+                ", duration=" + duration +
+                ", metadata=" + metadata +
+                ", dataPoints=" + dataPoints +
+                '}';
+    }
 }
 

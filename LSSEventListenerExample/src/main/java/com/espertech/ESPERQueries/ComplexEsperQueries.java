@@ -23,6 +23,7 @@ public class ComplexEsperQueries implements LSSEsperQueries {
         String timeWindowForDynamicSelection = """
                 @public create context TestContext initiated @now and pattern [every timer:interval(2 min)] terminated after 2 minutes;
                 @public create window TestWindow#keepall as select * from ComplexEvent;
+                insert into TestWindow select * from ComplexEvent;
                 """;
         try {
             EPCompiled selectCompiled = EPCompilerProvider.getCompiler().compile(simpleSelect, new CompilerArguments(conf));

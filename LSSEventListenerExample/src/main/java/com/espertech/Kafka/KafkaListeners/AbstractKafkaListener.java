@@ -74,8 +74,21 @@ public abstract class AbstractKafkaListener {
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class.getName());
 
+        properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "80000");
+        properties.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, "1048576");
+        properties.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, "104857600");
+        properties.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, "10485760");
+        properties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "6000");
+        properties.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, "1000");
+
         properties.put("spring.json.value.default.type", ComplexEvent.class.getName());
         properties.put("spring.json.trusted.packages", "*");
+
+        /*
+        properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "40000");
+        properties.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, "1048576");
+        properties.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, "1000");
+         */
 
         //properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
         //properties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000");

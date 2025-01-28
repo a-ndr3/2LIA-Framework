@@ -4,6 +4,7 @@ import com.espertech.ESPERQueries.ComplexEsperQueries;
 import com.espertech.ESPERQueries.LSSEsperQueries;
 import com.espertech.Kafka.KafkaListeners.KafkaComplexEventListener;
 import com.espertech.Kafka.KafkaListeners.KafkaSimpleEventListener;
+import com.espertech.Kafka.KafkaProducers.KafkaComplexEventBulkProducer;
 import com.espertech.Kafka.KafkaProducers.KafkaComplexEventProducer;
 import com.espertech.Kafka.KafkaProducers.KafkaSimpleEventProducer;
 import com.espertech.Kafka.LSSKafkaListener;
@@ -37,7 +38,7 @@ public class Main {
 
     @Bean
     public LSSKafkaProducer kafkaEventProducer() {
-        return new KafkaComplexEventProducer(config.kafkaTopic(), config.kafkaBootstrapServers());
+        return new KafkaComplexEventBulkProducer(config.kafkaTopic(), config.kafkaBootstrapServers());
     }
 
     @Bean

@@ -66,7 +66,7 @@ public class EsperController {
             EPFireAndForgetQueryResult result = runtime.getFireAndForgetService().executeQuery(compiled);
             var sb = new StringBuilder();
             for (EventBean row : result.getArray()) {
-                sb.append(row.getUnderlying()).append("\n");
+                sb.append((row.getUnderlying()).toString()).append("\n");
             }
             return ResponseEntity.ok().body(sb.toString());
         } catch (Exception e) {

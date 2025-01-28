@@ -3,8 +3,8 @@ package com.espertech.Kafka.KafkaListeners;
 import com.espertech.ESPERQueries.ComplexEsperQueries;
 import com.espertech.ESPERQueries.LSSEsperQueries;
 import com.espertech.EsperService;
-import com.espertech.EventListeners.ComplexEventListener;
 import com.espertech.Kafka.LSSKafkaListener;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -12,26 +12,46 @@ import java.util.Collections;
 public class KafkaComplexEventListener extends AbstractKafkaListener implements LSSKafkaListener {
 
     public KafkaComplexEventListener(String kafkaTopic,
-                                    String kafkaBootstrapServers,
-                                    EsperService esperService,
-                                    LSSEsperQueries esperQueries) {
+                                     String kafkaBootstrapServers,
+                                     EsperService esperService,
+                                     LSSEsperQueries esperQueries) {
         super(kafkaTopic, kafkaBootstrapServers, esperService, esperQueries, ComplexEsperQueries.staticQueriesDeploymentId);
     }
 
     public void run() {
         try {
             consumer.subscribe(Collections.singletonList(topic));
+            ConsumerRecords<String, String> records = null;
 
-            var listener = new ComplexEventListener();
-            runtime.getDeploymentService().getStatement(ComplexEsperQueries.staticQueriesDeploymentId, "my-statement").addListener(listener);
-
+            long allSizes = 0;
+            long pollCounter = 0;
+            long totalPollTime = 0;
+            long totalInjectTime = 0;
             while (true) {
-                var records = this.consumer.poll(Duration.ofMillis(100));
-
+                long pollStart = System.nanoTime();
+                records = consumer.poll(Duration.ofMillis(100));
+                long pollDuration = System.nanoTime() - pollStart;
+                long size = records.count();
+                long injectStart = System.nanoTime();
                 for (var record : records) {
                     runtime.getEventService().sendEventBean(record.value(), "ComplexEvent");
-                    //runtime.getEventService().sendEventJson(record.value(), "ComplexEvent");
-                    //runtime.getEventService().routeEventJson(record.value(), "ComplexEvent");
+                }
+                long injectDuration = System.nanoTime() - injectStart;
+
+                if (size != 0) {
+                    totalPollTime += pollDuration;
+                    totalInjectTime += injectDuration;
+                    pollCounter++;
+                }
+
+                if (size != 0) {
+                    System.out.printf("Size: %d, Poll Time: %d ms, Inject Time: %d ms%n",
+                            size, pollDuration / 1_000_000, injectDuration / 1_000_000);
+                    allSizes += size;
+                } else {
+                    if (allSizes != 0)
+                        System.out.printf("Overall Consumed: %d, Average Poll Time: %.2f ms%n, Average Inject Time: %.2f ms%n",
+                            allSizes, (totalPollTime / pollCounter) / 1_000_000.0, (totalInjectTime / pollCounter) / 1_000_000.0);
                 }
             }
         } catch (Exception e) {
