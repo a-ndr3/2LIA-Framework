@@ -74,7 +74,7 @@ public abstract class AbstractKafkaListener {
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class.getName());
 
-        properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "80000");
+        properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "5000");
         properties.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, "1048576");
         properties.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, "104857600");
         properties.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, "10485760");
