@@ -17,6 +17,11 @@ public class ComplexEvent {
     public short level;
     public char category;
     public byte priority;
+    public String source;
+    public String destination;
+    public long duration;
+    public Map<String, String> metadata;
+    public List<Integer> dataPoints;
 
     public List<Integer> getDataPoints() {
         return dataPoints;
@@ -77,12 +82,6 @@ public class ComplexEvent {
     public int getEventId() {
         return eventId;
     }
-
-    public String source;
-    public String destination;
-    public long duration;
-    public Map<String, String> metadata;
-    public List<Integer> dataPoints;
 
     public ComplexEvent() {
     }

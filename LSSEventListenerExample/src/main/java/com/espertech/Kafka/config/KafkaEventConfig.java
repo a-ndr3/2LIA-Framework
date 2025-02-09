@@ -16,30 +16,7 @@ import java.util.Map;
 @Configuration
 public class KafkaEventConfig {
 
-//    @Bean
-//
-//    public ProducerFactory<String, ComplexEvent> producerFactory() {
-//        Map<String, Object> config = new HashMap<>();
-//
-//        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
-//                "localhost:9092");
-//        config.put(
-//                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-//                StringSerializer.class);
-//        config.put(
-//                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-//                JsonSerializer.class);
-//        config.put(
-//                "Config_Type_Simple",
-//                "systemEvents");
-//        config.put(
-//                "Config_Type_Complex",
-//                "complexEvents");
-//
-//        return new DefaultKafkaProducerFactory<>(config);
-//    }
-
-        public enum ConfigType {
+    public enum ConfigType {
         Simple,
         Complex
     }
@@ -71,9 +48,4 @@ public class KafkaEventConfig {
     public String kafkaBootstrapServers() {
         return kafkaBootstrapServers;
     }
-
-//    @Bean
-//    public KafkaTemplate kafkaTemplate() {
-//        return new KafkaTemplate<>(producerFactory());
-//    }
 }

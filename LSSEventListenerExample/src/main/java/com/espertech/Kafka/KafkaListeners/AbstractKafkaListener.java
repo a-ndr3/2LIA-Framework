@@ -54,7 +54,7 @@ public abstract class AbstractKafkaListener {
         runtime = EPRuntimeProvider.getRuntime("KafkaListener", configuration);
         runtime.initialize();
 
-        esperQueries.compileEpl(runtime, configuration);
+        esperQueries.compileEpl(runtime);
 
         deployment = runtime.getDeploymentService().getDeployment(queriesDeploymentId);
 

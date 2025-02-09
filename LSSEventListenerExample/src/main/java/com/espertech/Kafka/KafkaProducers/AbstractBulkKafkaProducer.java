@@ -8,7 +8,7 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import java.util.Properties;
 import java.util.UUID;
 
-public class AbstractBulkKafkaProducer {
+public abstract class AbstractBulkKafkaProducer {
     protected String topic;
     protected String server;
     protected KafkaProducer<String, Object> producer;
