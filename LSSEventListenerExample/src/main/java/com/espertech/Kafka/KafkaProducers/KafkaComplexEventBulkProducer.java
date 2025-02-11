@@ -97,4 +97,35 @@ public class KafkaComplexEventBulkProducer extends AbstractBulkKafkaProducer imp
             e.printStackTrace();
         }
     }
+
+    public static ComplexEvent getSpecificEvent(String eventType, double value){
+        Random random = new Random(System.currentTimeMillis());
+        var mmap = new HashMap<String, String>();
+        var rnd = random.nextInt(0, meta.size());
+        var rnd2 = random.nextInt(0, meta.size());
+        mmap.put("meta1" + rnd, meta.get("meta" + rnd));
+        mmap.put("meta2" + rnd2, meta.get("meta" + rnd2));
+
+        var dataP = new ArrayList<Integer>();
+        dataP.add(dataPoints.get(0));
+        dataP.add(dataPoints.get(1));
+
+        return new ComplexEvent(
+                1,
+                "EventName" + 1,
+                eventType,
+                System.currentTimeMillis(),
+                value,
+                random.nextFloat(0.0f, 100.0f),
+                random.nextBoolean(),
+                ((short) random.nextInt(0, 10000)),
+                category[0],
+                priority[0],
+                source.get(0),
+                destination.get(0),
+                duration[0],
+                mmap,
+                dataP
+        );
+    }
 }

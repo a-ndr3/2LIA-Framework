@@ -107,6 +107,15 @@ public class ComplexEvent {
         this.dataPoints = dataPoints;
     }
 
+    /**
+     * Constructor for Tests
+     */
+    public ComplexEvent(int eventId, String eventName, double value){
+        this.eventId = eventId;
+        this.eventName = eventName;
+        this.value = value;
+    }
+
     @Override
     public String toString() {
         return "ComplexEvent{" +
