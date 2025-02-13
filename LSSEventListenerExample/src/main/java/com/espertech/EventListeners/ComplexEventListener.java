@@ -19,19 +19,19 @@ public class ComplexEventListener implements UpdateListener {
         for (EventBean newEvent : newEvents) {
             var event = ((HashMap) newEvent.getUnderlying());
             var eventId = event.get("eventId").toString();
-            var eventName = event.get("eventName").toString();
+            var eventType = event.get("eventType").toString();
             var value = event.get("value").toString();
             emittedList.add(new ComplexEvent(
                     Integer.parseInt(eventId),
-                    eventName,
+                    eventType,
                     Double.parseDouble(value)));
             System.out.printf("""
-                            Event Name: %s
+                            Event Type: %s
                             Event Value: %s
                             Event ID: %s
                             -----------------------
                             
-                            %n""", eventName,
+                            %n""", eventType,
                     value,
                     eventId);
         }

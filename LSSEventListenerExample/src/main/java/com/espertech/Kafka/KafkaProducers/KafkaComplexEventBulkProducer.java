@@ -5,10 +5,12 @@ import com.espertech.events.ComplexEvent;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class KafkaComplexEventBulkProducer extends AbstractBulkKafkaProducer implements LSSKafkaProducer {
     private static final int TOTAL_MESSAGES = 1_000_000;
     private static final int BATCH_SIZE = 20_000;
+    private static AtomicLong ID = new AtomicLong(0);
 
     static List<String> eventType = List.of("Event1", "Event2", "Event3", "Event4", "Event5");
     static List<String> source = List.of("Source1", "Source2", "Source3", "Source4", "Source5");
@@ -110,9 +112,11 @@ public class KafkaComplexEventBulkProducer extends AbstractBulkKafkaProducer imp
         dataP.add(dataPoints.get(0));
         dataP.add(dataPoints.get(1));
 
+        var id = (int)ID.addAndGet(1);
+
         return new ComplexEvent(
-                1,
-                "EventName" + 1,
+                id,
+                "EventName" + id,
                 eventType,
                 System.currentTimeMillis(),
                 value,

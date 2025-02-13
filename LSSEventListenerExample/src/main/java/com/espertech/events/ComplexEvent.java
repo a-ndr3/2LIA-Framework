@@ -110,9 +110,9 @@ public class ComplexEvent {
     /**
      * Constructor for Tests
      */
-    public ComplexEvent(int eventId, String eventName, double value){
+    public ComplexEvent(int eventId, String eventType, double value){
         this.eventId = eventId;
-        this.eventName = eventName;
+        this.eventType = eventType;
         this.value = value;
     }
 
