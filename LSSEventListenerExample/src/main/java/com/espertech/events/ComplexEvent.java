@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ComplexEvent {
+public class ComplexEvent implements LSSKafkaEvent {
     public int eventId;
     public String eventName;
     public String eventType;
@@ -135,6 +135,11 @@ public class ComplexEvent {
                 ", metadata=" + metadata +
                 ", dataPoints=" + dataPoints +
                 '}';
+    }
+
+    @Override
+    public String getClassType() {
+        return ComplexEvent.class.getName();
     }
 }
 

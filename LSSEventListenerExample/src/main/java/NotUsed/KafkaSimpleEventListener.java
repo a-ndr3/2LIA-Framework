@@ -1,11 +1,9 @@
-package com.espertech.Kafka.KafkaListeners;
+package NotUsed;
 
-import com.espertech.ESPERQueries.SimpleEsperQueries;
 import com.espertech.EsperService;
+import com.espertech.Kafka.KafkaListeners.AbstractKafkaListener;
 import com.espertech.Kafka.LSSKafkaListener;
 import com.espertech.ESPERQueries.LSSEsperQueries;
-import com.espertech.Main;
-import com.espertech.events.MySystemEvent;
 
 import java.time.Duration;
 import java.util.Collections;

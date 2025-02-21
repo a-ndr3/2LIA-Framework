@@ -19,7 +19,7 @@ public class KafkaEventService {
         Thread consumerThread = new Thread(listener::run);
         consumerThread.start();
 
-        Thread producerThread = new Thread(() -> producer.run(1));
+        Thread producerThread = new Thread(producer::run);
         producerThread.start();
     }
 }

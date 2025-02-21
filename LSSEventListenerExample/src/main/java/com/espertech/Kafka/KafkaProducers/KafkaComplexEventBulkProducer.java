@@ -32,75 +32,72 @@ public class KafkaComplexEventBulkProducer extends AbstractBulkKafkaProducer imp
     }
 
     @Override
-    public void run(int runEachSeconds) {
+    public void run() {
+        List<ComplexEvent> eventBatch = new ArrayList<>();
+
         try {
             try {
-                producer.initTransactions();
-                producer.beginTransaction();
-
                 for (int i = 1; i <= TOTAL_MESSAGES; i++) {
-                    Random random = new Random(System.currentTimeMillis());
-                    var mmap = new HashMap<String, String>();
-                    var rnd = random.nextInt(0, meta.size());
-                    var rnd2 = random.nextInt(0, meta.size());
-                    mmap.put("meta1" + rnd, meta.get("meta" + rnd));
-                    mmap.put("meta2" + rnd2, meta.get("meta" + rnd2));
-
-                    var dataP = new ArrayList<Integer>();
-                    dataP.add(dataPoints.get(i % dataPoints.size()));
-                    dataP.add(dataPoints.get((i + 1) % dataPoints.size()));
-
-                    var obj = new ComplexEvent(
-                            i,
-                            "EventName" + i,
-                            eventType.get(i % eventType.size()),
-                            System.currentTimeMillis(),
-                            random.nextDouble(-100.0, 100.0),
-                            random.nextFloat(0.0f, 100.0f),
-                            random.nextBoolean(),
-                            ((short) random.nextInt(0, 10000)),
-                            category[i % category.length],
-                            priority[i % priority.length],
-                            source.get(i % source.size()),
-                            destination.get(i % destination.size()),
-                            duration[i % duration.length],
-                            mmap,
-                            dataP
-                    );
-
-                    producer.send(new ProducerRecord<>(topic, obj), (metadata, exception) -> {
-                        if (exception != null) {
-                            System.err.println("Error sending message: " + exception.getMessage());
-                        }
-                    });
-
+                    eventBatch.add(getComplexEvent(i));
                     var startTime = System.nanoTime();
+
                     if (i % BATCH_SIZE == 0) {
-                        producer.commitTransaction();
-                        System.out.println("Committed " + i + " messages in transaction.");
-                        producer.beginTransaction();
+                        sendEventBatch(eventBatch);
 
                         long endTime = System.nanoTime();
+                        System.out.println("Committed " + i + " messages in transaction.");
+                        eventBatch.clear();
                         System.out.println("Total time to send " + TOTAL_MESSAGES + " messages: " + (endTime - startTime) / 1_000_000_000 + " s");
                     }
                 }
-
-                var startTime = System.nanoTime();
-                producer.commitTransaction();
-
-                long endTime = System.nanoTime();
-                System.out.println("Total time to send " + TOTAL_MESSAGES + " messages: " + (endTime - startTime) / 1_000_000_000 + " s");
+                if (!eventBatch.isEmpty()) {
+                    var startTime = System.nanoTime();
+                    sendEventBatch(eventBatch);
+                    long endTime = System.nanoTime();
+                    System.out.println("Total time to send " + TOTAL_MESSAGES + " messages: " + (endTime - startTime) / 1_000_000_000 + " s");
+                }
 
             } catch (Exception e) {
                 System.err.println("Exception occurred: " + e.getMessage());
-                producer.abortTransaction();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static ComplexEvent getSpecificEvent(String eventType, double value){
+    private static ComplexEvent getComplexEvent(int i) {
+        Random random = new Random(System.currentTimeMillis() + i);
+        var mmap = new HashMap<String, String>();
+        var rnd = random.nextInt(0, meta.size());
+        var rnd2 = random.nextInt(0, meta.size());
+        mmap.put("meta1" + rnd, meta.get("meta" + rnd));
+        mmap.put("meta2" + rnd2, meta.get("meta" + rnd2));
+
+        var dataP = new ArrayList<Integer>();
+        dataP.add(dataPoints.get(i % dataPoints.size()));
+        dataP.add(dataPoints.get((i + 1) % dataPoints.size()));
+
+        var obj = new ComplexEvent(
+                i,
+                "EventName" + i,
+                eventType.get(i % eventType.size()),
+                System.currentTimeMillis(),
+                random.nextDouble(-100.0, 100.0),
+                random.nextFloat(0.0f, 100.0f),
+                random.nextBoolean(),
+                ((short) random.nextInt(0, 10000)),
+                category[i % category.length],
+                priority[i % priority.length],
+                source.get(i % source.size()),
+                destination.get(i % destination.size()),
+                duration[i % duration.length],
+                mmap,
+                dataP
+        );
+        return obj;
+    }
+
+    public static ComplexEvent getSpecificEvent(String eventType, double value) {
         Random random = new Random(System.currentTimeMillis());
         var mmap = new HashMap<String, String>();
         var rnd = random.nextInt(0, meta.size());
@@ -112,7 +109,7 @@ public class KafkaComplexEventBulkProducer extends AbstractBulkKafkaProducer imp
         dataP.add(dataPoints.get(0));
         dataP.add(dataPoints.get(1));
 
-        var id = (int)ID.addAndGet(1);
+        var id = (int) ID.addAndGet(1);
 
         return new ComplexEvent(
                 id,

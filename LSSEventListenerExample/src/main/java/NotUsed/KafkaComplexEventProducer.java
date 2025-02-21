@@ -1,7 +1,6 @@
-package com.espertech.Kafka.KafkaProducers;
+package NotUsed;
 
 import com.espertech.Kafka.LSSKafkaProducer;
-import com.espertech.Main;
 import com.espertech.events.ComplexEvent;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
@@ -28,12 +27,12 @@ public class KafkaComplexEventProducer extends AbstractKafkaProducer implements 
     static byte[] priority = new byte[]{1, 2, 3, 4, 5};
     static long[] duration = new long[]{1000, 2000, 3000, 4000, 5000};
 
-    public void run(int runEachSeconds) {
+    public void run() {
         int i = 0;
         Random random = new Random(System.currentTimeMillis());
         while (true) {
             try {
-                Thread.sleep(runEachSeconds * 100);
+                Thread.sleep(1 * 100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

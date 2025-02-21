@@ -3,13 +3,20 @@ package com.espertech.Kafka.KafkaListeners;
 import com.espertech.ESPERQueries.ComplexEsperQueries;
 import com.espertech.ESPERQueries.LSSEsperQueries;
 import com.espertech.EsperService;
+import com.espertech.Kafka.ESPERAnalysisOutputUpdateListener;
+import com.espertech.Kafka.KafkaProducers.AbstractBulkKafkaProducer;
+import com.espertech.Kafka.KafkaProducers.KafkaComplexEventBulkProducer;
 import com.espertech.Kafka.LSSKafkaListener;
+import com.espertech.Main;
+import com.espertech.events.LSSKafkaEvent;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 
 import java.time.Duration;
 import java.util.Collections;
 
 public class KafkaComplexEventListener extends AbstractKafkaListener implements LSSKafkaListener {
+    ESPERAnalysisOutputUpdateListener listener = new ESPERAnalysisOutputUpdateListener(
+            new KafkaComplexEventBulkProducer(Main.config.kafkaTopic(), Main.config.kafkaBootstrapServers()));
 
     public KafkaComplexEventListener(String kafkaTopic,
                                      String kafkaBootstrapServers,
@@ -20,7 +27,10 @@ public class KafkaComplexEventListener extends AbstractKafkaListener implements 
 
     public void run() {
         try {
+            runtime.getDeploymentService().getStatement(ComplexEsperQueries.staticQueriesDeploymentId, "my-statement").addListener(listener);
+
             consumer.subscribe(Collections.singletonList(topic));
+
             ConsumerRecords<String, String> records = null;
 
             long allSizes = 0;

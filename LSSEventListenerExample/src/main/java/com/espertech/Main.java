@@ -4,6 +4,7 @@ import com.espertech.ESPERQueries.ComplexEsperQueries;
 import com.espertech.ESPERQueries.LSSEsperQueries;
 import com.espertech.Kafka.KafkaListeners.KafkaComplexEventListener;
 import com.espertech.Kafka.KafkaProducers.KafkaComplexEventBulkProducer;
+import com.espertech.Kafka.KafkaTopicManager;
 import com.espertech.Kafka.LSSKafkaListener;
 import com.espertech.Kafka.LSSKafkaProducer;
 import com.espertech.Kafka.config.KafkaEventConfig;
@@ -16,8 +17,9 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class Main {
     public static final Logger logger = LoggerFactory.getLogger(Main.class);
-    static EsperService esperService; //todo inject into controller
-    static KafkaEventConfig config = new KafkaEventConfig(KafkaEventConfig.ConfigType.Complex);
+    public static EsperService esperService; //todo inject into controller
+    public static KafkaEventConfig config = new KafkaEventConfig(KafkaEventConfig.ConfigType.Complex);
+    public static KafkaTopicManager topicManager = new KafkaTopicManager(config.kafkaBootstrapServers());
 
     public static void main(String[] args) {
         try {

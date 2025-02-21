@@ -84,16 +84,6 @@ public abstract class AbstractKafkaListener {
         properties.put("spring.json.value.default.type", ComplexEvent.class.getName());
         properties.put("spring.json.trusted.packages", "*");
 
-        /*
-        properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "40000");
-        properties.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, "1048576");
-        properties.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, "1000");
-         */
-
-        //properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
-        //properties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000");
-        // properties.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, "10000");
-
         return new KafkaConsumer<>(properties);
     }
 }

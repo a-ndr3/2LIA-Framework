@@ -1,9 +1,9 @@
-package com.espertech.ESPERQueries;
+package NotUsed;
 
-import com.espertech.esper.common.client.configuration.Configuration;
+import com.espertech.ESPERQueries.AbstractQueries;
+import com.espertech.ESPERQueries.LSSEsperQueries;
+import com.espertech.ESPERQueries.LSSQuery;
 import com.espertech.esper.runtime.client.EPRuntime;
-import com.espertech.events.ComplexEvent;
-import com.espertech.events.MySystemEvent;
 
 
 public class SimpleEsperQueries extends AbstractQueries implements LSSEsperQueries {

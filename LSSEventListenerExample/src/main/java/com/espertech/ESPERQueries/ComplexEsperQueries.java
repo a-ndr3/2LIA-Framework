@@ -15,7 +15,7 @@ public class ComplexEsperQueries extends AbstractQueries implements LSSEsperQuer
 
     public void compileEpl(EPRuntime runtime) {
 
-        String simpleSelect = "@name('my-statement') select * from ComplexEvent where value < -40 or value > 60;";
+        String simpleSelect = "@name('my-statement') select * from ComplexEvent where value >= 54.5 and value <= 55.4;";
 
         String timeWindowForDynamicSelection = """
                 @public create context TestContext initiated @now and pattern [every timer:interval(2 min)] terminated after 2 minutes;
