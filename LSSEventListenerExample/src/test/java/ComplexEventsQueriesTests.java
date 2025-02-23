@@ -1,3 +1,4 @@
+import RemindsListeners.*;
 import TestListeners.*;
 import com.espertech.ESPERQueries.ComplexEsperQueries;
 import com.espertech.Kafka.KafkaProducers.KafkaComplexEventBulkProducer;
@@ -38,6 +39,15 @@ public class ComplexEventsQueriesTests {
     TestListenerConflictingEvents testConflictingEvents;
     TestListenerEventsSpikes testEventSpikes;
 
+    //Reminds listeners
+    TestCompositeConstraintListener testListenerComposite;
+    TestMultipleDataChecksListener testListenerMultipleData;
+    TestCrossEventListener testListenerCrossEvent;
+    TestMultipleDataChecksForOneEventListener testListenerMultipleDataForOneEvent;
+    TestEventBasedEvaluationCriteria testEventBasedEvaluationCriteria;
+    TestMultipleEvaluationListener testMultipleEvaluationListener;
+    TestFlexibleEventSequencesListener testFlexibleEventSequencesListener;
+
     EPRuntime runtime;
 
     @BeforeEach
@@ -59,6 +69,7 @@ public class ComplexEventsQueriesTests {
         var queries = new ComplexEsperQueries();
         queries.addMoreQueries();
         queries.addLSSQueries();
+        queries.addRemindsConstraintsQueries();
 
         for (var query : queries.queries) {
             EPCompiled selectCompiled = null;
@@ -96,6 +107,28 @@ public class ComplexEventsQueriesTests {
 
         testEventSpikes = new TestListenerEventsSpikes();
         runtime.getDeploymentService().getStatement("eventSpikes", "eventSpikesStatement").addListener(testEventSpikes);
+
+        //Reminds queries
+        testListenerComposite = new TestCompositeConstraintListener();
+        runtime.getDeploymentService().getStatement("compositeConstraint", "compositeConstraintStatement").addListener(testListenerComposite);
+
+        testListenerMultipleData = new TestMultipleDataChecksListener();
+        runtime.getDeploymentService().getStatement("multipleDataChecks", "multipleDataChecksStatement").addListener(testListenerMultipleData);
+
+        testListenerCrossEvent = new TestCrossEventListener();
+        runtime.getDeploymentService().getStatement("crossEventData", "crossEventDataStatement").addListener(testListenerCrossEvent);
+
+        testListenerMultipleDataForOneEvent = new TestMultipleDataChecksForOneEventListener();
+        runtime.getDeploymentService().getStatement("multipleDataChecksForOneEvent", "multipleDataChecksStatement").addListener(testListenerMultipleDataForOneEvent);
+
+        testMultipleEvaluationListener = new TestMultipleEvaluationListener();
+        runtime.getDeploymentService().getStatement("multipleEvaluationCriteria", "multipleEvaluationCriteriaStatement").addListener(testMultipleEvaluationListener);
+
+        testEventBasedEvaluationCriteria = new TestEventBasedEvaluationCriteria();
+        runtime.getDeploymentService().getStatement("eventBasedEvaluationCriteria", "eventBasedEvaluationCriteriaStatement").addListener(testEventBasedEvaluationCriteria);
+
+        testFlexibleEventSequencesListener = new TestFlexibleEventSequencesListener();
+        runtime.getDeploymentService().getStatement("flexibleEventSequences", "flexibleEventSequencesStatement").addListener(testFlexibleEventSequencesListener);
     }
 
     private void timer(int seconds) {
@@ -198,7 +231,7 @@ public class ComplexEventsQueriesTests {
 
     @Test
     public void testEventDependencies(){
-        System.out.println("Sending Event1...");
+        System.out.println("Event1");
         runtime.getEventService().sendEventBean(new ComplexEvent(1, "Event1", 65.0), "ComplexEvent");
 
         timer(12);
@@ -208,7 +241,7 @@ public class ComplexEventsQueriesTests {
 
     @Test
     public void testTwoEventsBeforeB() {
-        System.out.println("Sending Event1...");
+        System.out.println("Event1");
         runtime.getEventService().sendEventBean(new ComplexEvent(1, "Event1", 50.0), "ComplexEvent");
         timer(2);
         runtime.getEventService().sendEventBean(new ComplexEvent(2, "Event1", 55.0), "ComplexEvent");
@@ -233,28 +266,28 @@ public class ComplexEventsQueriesTests {
      */
     @Test
     public void testCascadeEffects() {
-        System.out.println("Sending A update...");
+        System.out.println("A update");
         runtime.getEventService().sendEventBean(new ComplexEvent(1, "SystemA_Update", 50.0), "ComplexEvent");
 
         timer(2);
 
         Assertions.assertEquals(0, testCascadeImpact.emittedList.size());
 
-        System.out.println("Sending B change...");
+        System.out.println("B change");
         runtime.getEventService().sendEventBean(new ComplexEvent(2, "SystemB_Change", 60.0), "ComplexEvent");
 
         timer(5);
 
         Assertions.assertEquals(0, testCascadeImpact.emittedList.size());
 
-        System.out.println("Sending C change...");
+        System.out.println("C change");
         runtime.getEventService().sendEventBean(new ComplexEvent(3, "SystemC_Change", 70.0), "ComplexEvent");
 
         timer(1);
 
         Assertions.assertEquals(1, testCascadeImpact.emittedList.size());
 
-        System.out.println("Sending another C change...");
+        System.out.println("another C change");
         timer(2);
         runtime.getEventService().sendEventBean(new ComplexEvent(4, "SystemC_Change", 80.0), "ComplexEvent");
     }
@@ -262,27 +295,26 @@ public class ComplexEventsQueriesTests {
 
     @Test
     public void testSystemSlowDownAfterUpdate(){
-        System.out.println("Sending SystemA Update...");
+        System.out.println("SystemA Update");
         runtime.getEventService().sendEventBean(new ComplexEvent(1, "SystemA_Update", 50.0), "ComplexEvent");
 
-        timer(3); // wait 3 sec (B should still arrive on time)
+        timer(3);
         runtime.getEventService().sendEventBean(new ComplexEvent(2, "SystemB_Response", 60.0), "ComplexEvent");
 
-        timer(2); // total time = 5 sec
-        Assertions.assertEquals(0, testSystemSlowDetect.emittedList.size()); //no alert expected
+        timer(2);
+        Assertions.assertEquals(0, testSystemSlowDetect.emittedList.size());
 
-        // reset the test case for failure scenario
         testSystemSlowDetect.emittedList.clear();
-        System.out.println("Sending another SystemA Update...");
+        System.out.println("SystemA Update");
         runtime.getEventService().sendEventBean(new ComplexEvent(3, "SystemA_Update", 50.0), "ComplexEvent");
 
-        timer(6); // wait 6 sec aka slow response
+        timer(6);
         Assertions.assertEquals(1, testSystemSlowDetect.emittedList.size());
     }
 
     @Test
     public void testConflictingEvents(){
-        System.out.println("Sending SystemA Update...");
+        System.out.println("SystemA Update");
         runtime.getEventService().sendEventBean(new ComplexEvent(1, "SystemA_Update", 50.0), "ComplexEvent");
 
         timer(2);
@@ -292,7 +324,7 @@ public class ComplexEventsQueriesTests {
         Assertions.assertEquals(1, testConflictingEvents.emittedList.size());
 
         testConflictingEvents.emittedList.clear();
-        System.out.println("Sending another SystemA Update...");
+        System.out.println("SystemA Update");
         runtime.getEventService().sendEventBean(new ComplexEvent(3, "SystemA_Update", 50.0), "ComplexEvent");
 
         timer(6);
@@ -304,7 +336,7 @@ public class ComplexEventsQueriesTests {
 
     @Test
     public void testEventSpikesAfterUpdate(){
-        System.out.println("Sending SystemA Update...");
+        System.out.println("SystemA Update");
         runtime.getEventService().sendEventBean(new ComplexEvent(1, "SystemA_Update", 50.0), "ComplexEvent");
 
         timer(2);
@@ -326,7 +358,7 @@ public class ComplexEventsQueriesTests {
 
         // check behavior if less than 6 errors occur
         testEventSpikes.emittedList.clear();
-        System.out.println("Sending another SystemA Update...");
+        System.out.println("SystemA Update");
         runtime.getEventService().sendEventBean(new ComplexEvent(8, "SystemA_Update", 50.0), "ComplexEvent");
 
         timer(2);
@@ -343,5 +375,313 @@ public class ComplexEventsQueriesTests {
 
         timer(1);
         Assertions.assertEquals(0, testEventSpikes.emittedList.size());
+    }
+
+
+    //REMINDS queries tests
+
+    @Test
+    public void testCompositeConstraint() {
+        System.out.println("Sending event A");
+        runtime.getEventService().sendEventBean(new ComplexEvent(1, "EventA", 90.0), "ComplexEvent");
+
+        timer(2);
+
+        System.out.println("Sending event B");
+        runtime.getEventService().sendEventBean(new ComplexEvent(2, "EventB", 30.0), "ComplexEvent");
+
+        timer(2);
+
+        System.out.println("Sending event C");
+        runtime.getEventService().sendEventBean(new ComplexEvent(3, "EventC", 50.0), "ComplexEvent");
+
+        timer(1);
+
+        Assertions.assertEquals(0, testListenerComposite.emittedList.size());
+
+        System.out.println("A (violation)");
+        runtime.getEventService().sendEventBean(new ComplexEvent(4, "EventA", 120.0), "ComplexEvent");
+
+        timer(2);
+
+        System.out.println("B (violation)");
+        runtime.getEventService().sendEventBean(new ComplexEvent(5, "EventB", 110.0), "ComplexEvent");
+
+        timer(2);
+
+        System.out.println("C (violation)");
+        runtime.getEventService().sendEventBean(new ComplexEvent(6, "EventC", 120.0), "ComplexEvent");
+
+        timer(1);
+
+        Assertions.assertEquals(1, testListenerComposite.emittedList.size());
+    }
+
+    @Test
+    public void testSequenceDataCheck() {
+        System.out.println("Start_Analysis event");
+        runtime.getEventService().sendEventBean(new ComplexEvent(1, "Start_Analysis", 0.0), "ComplexEvent");
+
+        timer(2);
+
+        System.out.println("Temperature event");
+        runtime.getEventService().sendEventBean(new ComplexEvent(2, "Temperature", 1300.0), "ComplexEvent");
+
+        timer(3);
+
+        System.out.println("Quality event");
+        runtime.getEventService().sendEventBean(new ComplexEvent(3, "Quality", 0.99f), "ComplexEvent");
+
+        timer(3);
+
+        System.out.println("End_Analysis event");
+        runtime.getEventService().sendEventBean(new ComplexEvent(4, "End_Analysis", 0.0), "ComplexEvent");
+
+        timer(1);
+
+        Assertions.assertEquals(1, testListenerMultipleData.emittedList.size());
+
+        testListenerMultipleData.emittedList.clear();
+
+        System.out.println("Start_Analysis event");
+        runtime.getEventService().sendEventBean(new ComplexEvent(5, "Start_Analysis", 0.0), "ComplexEvent");
+
+        timer(2);
+
+        System.out.println("Temperature event");
+        runtime.getEventService().sendEventBean(new ComplexEvent(6, "Temperature", 1300.0), "ComplexEvent");
+
+        timer(5);
+
+        System.out.println("Quality event (late)");
+        runtime.getEventService().sendEventBean(new ComplexEvent(7, "Quality",0.99f), "ComplexEvent");
+
+        timer(4);
+
+        System.out.println("End_Analysis (late)");
+        runtime.getEventService().sendEventBean(new ComplexEvent(8, "End_Analysis", 0.0), "ComplexEvent");
+
+        timer(1);
+
+        Assertions.assertEquals(0, testListenerMultipleData.emittedList.size());
+    }
+
+    @Test
+    public void testCrossEventDataCheck() {
+        System.out.println("LabAnalysis1");
+        runtime.getEventService().sendEventBean(new ComplexEvent(1, "LabAnalysis1", 1400.0), "ComplexEvent");
+
+        timer(6);
+
+        //added random events to test if the query is still working
+        System.out.println("random event_0");
+        runtime.getEventService().sendEventBean(new ComplexEvent(2, "RandomEvent", -1.0), "ComplexEvent");
+
+        System.out.println("random event_1");
+        runtime.getEventService().sendEventBean(new ComplexEvent(2, "RandomEvent", -1.0), "ComplexEvent");
+
+
+        System.out.println("LabAnalysis2");
+        runtime.getEventService().sendEventBean(new ComplexEvent(2, "LabAnalysis2", 1350.0), "ComplexEvent");
+
+        timer(9);
+
+        System.out.println("LabAnalysis3");
+        runtime.getEventService().sendEventBean(new ComplexEvent(3, "LabAnalysis3", 1300.0), "ComplexEvent");
+
+        timer(6);
+
+        Assertions.assertEquals(1, testListenerCrossEvent.emittedList.size());
+
+        testListenerCrossEvent.emittedList.clear();
+        System.out.println("Sending another LabAnalysis1...");
+        runtime.getEventService().sendEventBean(new ComplexEvent(4, "LabAnalysis1", 1400.0), "ComplexEvent");
+
+        timer(6);
+
+
+        System.out.println("random event_0");
+        runtime.getEventService().sendEventBean(new ComplexEvent(2, "RandomEvent", -1.0), "ComplexEvent");
+
+        System.out.println("Sending LabAnalysis2 (wrong order)...");
+        runtime.getEventService().sendEventBean(new ComplexEvent(5, "LabAnalysis2", 1420.0), "ComplexEvent");
+
+        System.out.println("random event_1");
+        runtime.getEventService().sendEventBean(new ComplexEvent(2, "RandomEvent", -1.0), "ComplexEvent");
+
+
+        timer(9);
+
+
+        System.out.println("Sending LabAnalysis3...");
+        runtime.getEventService().sendEventBean(new ComplexEvent(6, "LabAnalysis3", 1300.0), "ComplexEvent");
+
+        timer(6);
+
+        //no alert expected since LabAnalysis2 had a higher temperature than LabAnalysis1
+        Assertions.assertEquals(0, testListenerCrossEvent.emittedList.size());
+    }
+
+    @Test
+    public void testMultipleDataChecksForOneEvent(){
+        System.out.println("Sending event Percentage, no error");
+        runtime.getEventService().sendEventBean(new ComplexEvent(1, "Percentage", 6.0), "ComplexEvent");
+
+        timer(1);
+
+        System.out.println("Sending event Percentage, no error");
+        runtime.getEventService().sendEventBean(new ComplexEvent(3, "Percentage", 8.0), "ComplexEvent");
+
+        Assertions.assertEquals(0, testListenerMultipleDataForOneEvent.emittedList.size());
+
+        System.out.println("Percentage (violation)");
+        runtime.getEventService().sendEventBean(new ComplexEvent(2, "Percentage", 5.5), "ComplexEvent");
+
+        timer(1);
+
+        Assertions.assertEquals(1, testListenerMultipleDataForOneEvent.emittedList.size());
+    }
+
+    @Test
+    public void testEventBasedEvaluationCriteria(){
+        System.out.println("StartAnalysis");
+        runtime.getEventService().sendEventBean(new ComplexEvent(1, "StartAnalysis", 0.0), "ComplexEvent");
+
+        timer(2);
+
+        System.out.println("TempAnalysis");
+        runtime.getEventService().sendEventBean(new ComplexEvent(2, "TempAnalysis", 0.0), "ComplexEvent");
+
+        timer(3);
+
+        System.out.println("QualityAnalysis");
+        runtime.getEventService().sendEventBean(new ComplexEvent(3, "QualityAnalysis", 0.0), "ComplexEvent");
+
+        timer(1);
+
+        System.out.println("EndAnalysis");
+        runtime.getEventService().sendEventBean(new ComplexEvent(4, "EndAnalysis", 0.0), "ComplexEvent");
+
+        timer(1);
+
+        Assertions.assertEquals(0, testEventBasedEvaluationCriteria.emittedList.size());
+        testEventBasedEvaluationCriteria.emittedList.clear();
+
+        System.out.println("StartAnalysis");
+        runtime.getEventService().sendEventBean(new ComplexEvent(5, "StartAnalysis", 0.0), "ComplexEvent");
+
+        timer(2);
+
+        System.out.println("TempAnalysis");
+        runtime.getEventService().sendEventBean(new ComplexEvent(6, "TempAnalysis", 0.0), "ComplexEvent");
+
+        timer(3);
+
+        System.out.println("EndAnalysis");
+        runtime.getEventService().sendEventBean(new ComplexEvent(7, "EndAnalysis", 0.0), "ComplexEvent");
+
+        timer(1);
+
+        Assertions.assertEquals(1, testEventBasedEvaluationCriteria.emittedList.size());
+
+        testEventBasedEvaluationCriteria.emittedList.clear();
+
+        System.out.println("StartAnalysis");
+        runtime.getEventService().sendEventBean(new ComplexEvent(8, "StartAnalysis", 0.0), "ComplexEvent");
+
+        timer(2);
+
+        System.out.println("TempAnalysis");
+        runtime.getEventService().sendEventBean(new ComplexEvent(9, "TempAnalysis", 0.0), "ComplexEvent");
+
+        timer(3);
+
+        System.out.println("QualityAnalysis");
+        runtime.getEventService().sendEventBean(new ComplexEvent(10, "QualityAnalysis", 0.0), "ComplexEvent");
+
+        timer(1);
+
+        System.out.println("StartAnalysis");
+        runtime.getEventService().sendEventBean(new ComplexEvent(11, "StartAnalysis", 0.0), "ComplexEvent");
+
+        timer(1);
+        Assertions.assertEquals(1, testEventBasedEvaluationCriteria.emittedList.size());
+    }
+
+    //TODO: it works but requires FIX => b,c events return null
+    @Test
+    public void testMultipleEvaluationCriteria() {
+        System.out.println("ProductionStart");
+        runtime.getEventService().sendEventBean(new ComplexEvent(1, "ProductionStarted", 0.0), "ComplexEvent");
+
+        timer(2);
+
+        System.out.println("QualityAnalyzed");
+        runtime.getEventService().sendEventBean(new ComplexEvent(2, "QualityAnalyzed", 0.0), "ComplexEvent");
+
+        timer(3);
+
+        System.out.println("ProductionEnded");
+        runtime.getEventService().sendEventBean(new ComplexEvent(3, "ProductionEnded", 0.0), "ComplexEvent");
+
+        timer(1);
+
+        Assertions.assertEquals(0, testMultipleEvaluationListener.emittedList.size());
+
+        testMultipleEvaluationListener.emittedList.clear();
+        System.out.println("ProductionStart");
+        runtime.getEventService().sendEventBean(new ComplexEvent(4, "ProductionStarted", 0.0), "ComplexEvent");
+
+        timer(2);
+
+        System.out.println("QualityAnalyzed");
+        runtime.getEventService().sendEventBean(new ComplexEvent(5, "QualityAnalyzed", 0.0), "ComplexEvent");
+
+        timer(3);
+
+        System.out.println("another ProductionStart");
+        runtime.getEventService().sendEventBean(new ComplexEvent(6, "ProductionStarted", 0.0), "ComplexEvent");
+
+        timer(1);
+
+        Assertions.assertEquals(1, testMultipleEvaluationListener.emittedList.size());
+    }
+
+    @Test
+    public void testFlexibleSequences(){
+        System.out.println("TapStart");
+        runtime.getEventService().sendEventBean(new ComplexEvent(1, "TapStart", 0.0), "ComplexEvent");
+
+        timer(6);
+
+        System.out.println("TapAnalysis (optional)");
+        runtime.getEventService().sendEventBean(new ComplexEvent(2, "TapAnalysis", 0.0), "ComplexEvent");
+
+        timer(6);
+
+        System.out.println("TapEnd");
+        runtime.getEventService().sendEventBean(new ComplexEvent(3, "TapEnd", 0.0), "ComplexEvent");
+
+        timer(3);
+
+        Assertions.assertEquals(1, testFlexibleEventSequencesListener.emittedList.size());
+
+        testFlexibleEventSequencesListener.emittedList.clear();
+        System.out.println("TapStart");
+        runtime.getEventService().sendEventBean(new ComplexEvent(4, "TapStart", 0.0), "ComplexEvent");
+
+        timer(3);
+
+        System.out.println("SlagStart");
+        runtime.getEventService().sendEventBean(new ComplexEvent(5, "SlagStart", 0.0), "ComplexEvent");
+
+        timer(6);
+
+        System.out.println("TapEnd");
+        runtime.getEventService().sendEventBean(new ComplexEvent(6, "TapEnd", 0.0), "ComplexEvent");
+
+        timer(3);
+
+        Assertions.assertEquals(0, testFlexibleEventSequencesListener.emittedList.size());
     }
 }
