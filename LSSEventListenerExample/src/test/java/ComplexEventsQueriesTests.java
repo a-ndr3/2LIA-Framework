@@ -8,6 +8,9 @@ import com.espertech.esper.compiler.client.EPCompileException;
 import com.espertech.esper.compiler.client.EPCompilerProvider;
 import com.espertech.esper.runtime.client.*;
 import com.espertech.events.ComplexEvent;
+import com.espertech.events.DifferentKindEventsTest.EventA;
+import com.espertech.events.DifferentKindEventsTest.EventB;
+import com.espertech.events.DifferentKindEventsTest.EventC;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -48,14 +51,26 @@ public class ComplexEventsQueriesTests {
     TestMultipleEvaluationListener testMultipleEvaluationListener;
     TestFlexibleEventSequencesListener testFlexibleEventSequencesListener;
 
+    TestCompositeConstraintListener testListenerCompositeTypeDifferentEvents;
+
     EPRuntime runtime;
 
     @BeforeEach
     public void setUp() {
         events = new ArrayList<>();
         Configuration config = new Configuration();
+
+        //Config events
         config.getCommon().addEventType(ComplexEvent.class);
+
+        //DifferentKindEventsTest
+        config.getCommon().addEventType(EventA.class);
+        config.getCommon().addEventType(EventB.class);
+        config.getCommon().addEventType(EventC.class);
+        //DifferentKindEventsTest
+
         config.getRuntime().getThreading().setInternalTimerEnabled(true);
+
         runtime = EPRuntimeProvider.getDefaultRuntime(config);
         runtime.initialize();
         events.add(KafkaComplexEventBulkProducer.getSpecificEvent("Event3", 44.0));
@@ -108,6 +123,7 @@ public class ComplexEventsQueriesTests {
         testEventSpikes = new TestListenerEventsSpikes();
         runtime.getDeploymentService().getStatement("eventSpikes", "eventSpikesStatement").addListener(testEventSpikes);
 
+
         //Reminds queries
         testListenerComposite = new TestCompositeConstraintListener();
         runtime.getDeploymentService().getStatement("compositeConstraint", "compositeConstraintStatement").addListener(testListenerComposite);
@@ -129,6 +145,11 @@ public class ComplexEventsQueriesTests {
 
         testFlexibleEventSequencesListener = new TestFlexibleEventSequencesListener();
         runtime.getDeploymentService().getStatement("flexibleEventSequences", "flexibleEventSequencesStatement").addListener(testFlexibleEventSequencesListener);
+
+
+        //DifferentKindEventsTest
+        testListenerCompositeTypeDifferentEvents = new TestCompositeConstraintListener();
+        runtime.getDeploymentService().getStatement("compositeConstraintTypeGeneralEvents", "compositeConstraintCheckTypeStatement").addListener(testListenerCompositeTypeDifferentEvents);
     }
 
     private void timer(int seconds) {
@@ -683,5 +704,43 @@ public class ComplexEventsQueriesTests {
         timer(3);
 
         Assertions.assertEquals(0, testFlexibleEventSequencesListener.emittedList.size());
+    }
+
+    @Test
+    public void testCompositeConstraint2() {
+        System.out.println("EventA");
+        runtime.getEventService().sendEventBean(new EventA(true), "EventA");
+
+        timer(2);
+
+        System.out.println("EventB");
+        runtime.getEventService().sendEventBean(new EventB(true), "EventB");
+
+        timer(2);
+
+        System.out.println("EventC");
+        runtime.getEventService().sendEventBean(new EventC(true), "EventC");
+
+        timer(1);
+
+        Assertions.assertEquals(1, testListenerCompositeTypeDifferentEvents.emittedList.size());
+
+        testListenerCompositeTypeDifferentEvents.emittedList.clear();
+        System.out.println("EventA");
+        runtime.getEventService().sendEventBean(new EventA(true), "EventA");
+
+        timer(2);
+
+        System.out.println("EventB");
+        runtime.getEventService().sendEventBean(new EventB(false), "EventB");
+
+        timer(2);
+
+        System.out.println("EventC");
+        runtime.getEventService().sendEventBean(new EventC(true), "EventC");
+
+        timer(1);
+
+        Assertions.assertEquals(0, testListenerCompositeTypeDifferentEvents.emittedList.size());
     }
 }

@@ -251,5 +251,14 @@ public class ComplexEsperQueries extends AbstractQueries implements LSSEsperQuer
                 ];
                 """;
         queries.add(new LSSQuery(flexibleEventSequences, "flexibleEventSequences"));
+
+        String compositeConstraintGeneralEvents = """
+                    @name('compositeConstraintCheckTypeStatement')
+                    select 'ALERT: All constraints violated!' as alert
+                    from pattern [
+                        every (a=EventA(type = true) -> b=EventB(type = true) -> c=EventC(type = true))
+                    ];
+                """;
+        queries.add(new LSSQuery(compositeConstraintGeneralEvents, "compositeConstraintTypeGeneralEvents"));
     }
 }
