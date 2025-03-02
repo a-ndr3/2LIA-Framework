@@ -1,5 +1,6 @@
 package com.espertech.Kafka;
 
 public interface LSSKafkaListener {
-    void run();
+    void run() throws InterruptedException;
+    void stop();
 }

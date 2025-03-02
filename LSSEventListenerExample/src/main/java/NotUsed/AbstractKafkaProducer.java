@@ -13,6 +13,8 @@ public abstract class AbstractKafkaProducer {
     protected String server;
     protected KafkaProducer<String, Object> producer;
 
+    protected volatile boolean running = true;
+
     public AbstractKafkaProducer(String kafkaTopic, String kafkaBootstrapServers) {
         this.topic = kafkaTopic;
         this.server = kafkaBootstrapServers;

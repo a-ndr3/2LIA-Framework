@@ -10,7 +10,7 @@ public class KafkaSimpleEventProducer extends AbstractKafkaProducer implements L
 
     public void run(){
         int i = 0;
-        while (true) {
+        while (running) {
             try {
                 Thread.sleep(1 * 1000);
             } catch (InterruptedException e) {
@@ -23,5 +23,10 @@ public class KafkaSimpleEventProducer extends AbstractKafkaProducer implements L
             i++;
             //Main.logger.debug("Sent event: {}", record.value());
         }
+    }
+
+    @Override
+    public void stop() {
+        running = false;
     }
 }

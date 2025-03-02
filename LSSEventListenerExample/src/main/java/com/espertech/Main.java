@@ -18,8 +18,8 @@ import org.springframework.context.annotation.Bean;
 public class Main {
     public static final Logger logger = LoggerFactory.getLogger(Main.class);
     public static EsperService esperService; //todo inject into controller
-    public static KafkaEventConfig config = new KafkaEventConfig(KafkaEventConfig.ConfigType.Complex);
-    public static KafkaTopicManager topicManager = new KafkaTopicManager(config.kafkaBootstrapServers());
+    public static KafkaEventConfig config = new KafkaEventConfig();
+    public static KafkaTopicManager topicManager = new KafkaTopicManager(config.kafkaBootstrapServers);
 
     public static void main(String[] args) {
         try {
@@ -32,15 +32,4 @@ public class Main {
     }
 
     //http://localhost:8081/swagger-ui/index.html
-
-    @Bean
-    public LSSKafkaProducer kafkaEventProducer() {
-        return new KafkaComplexEventBulkProducer(config.kafkaTopic(), config.kafkaBootstrapServers());
-    }
-
-    @Bean
-    public LSSKafkaListener kafkaEventListener() {
-        LSSEsperQueries queries = new ComplexEsperQueries();
-        return new KafkaComplexEventListener(config.kafkaTopic(), config.kafkaBootstrapServers(), esperService, queries);
-    }
 }

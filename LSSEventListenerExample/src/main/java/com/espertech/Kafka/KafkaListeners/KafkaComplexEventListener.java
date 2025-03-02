@@ -16,7 +16,7 @@ import java.util.Collections;
 
 public class KafkaComplexEventListener extends AbstractKafkaListener implements LSSKafkaListener {
     ESPERAnalysisOutputUpdateListener listener = new ESPERAnalysisOutputUpdateListener(
-            new KafkaComplexEventBulkProducer(Main.config.kafkaTopic(), Main.config.kafkaBootstrapServers()));
+            new KafkaComplexEventBulkProducer(Main.config.kafkaTopic, Main.config.kafkaBootstrapServers));
 
     public KafkaComplexEventListener(String kafkaTopic,
                                      String kafkaBootstrapServers,
@@ -37,7 +37,7 @@ public class KafkaComplexEventListener extends AbstractKafkaListener implements 
             long pollCounter = 0;
             long totalPollTime = 0;
             long totalInjectTime = 0;
-            while (true) {
+            while (running) {
                 long pollStart = System.nanoTime();
                 records = consumer.poll(Duration.ofMillis(100));
                 long pollDuration = System.nanoTime() - pollStart;
@@ -70,5 +70,10 @@ public class KafkaComplexEventListener extends AbstractKafkaListener implements 
         } finally {
             consumer.close();
         }
+    }
+
+    @Override
+    public void stop() {
+        running = false;
     }
 }

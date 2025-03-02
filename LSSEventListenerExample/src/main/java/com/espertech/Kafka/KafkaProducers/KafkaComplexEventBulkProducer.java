@@ -5,6 +5,7 @@ import com.espertech.events.ComplexEvent;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class KafkaComplexEventBulkProducer extends AbstractBulkKafkaProducer implements LSSKafkaProducer {
@@ -37,7 +38,7 @@ public class KafkaComplexEventBulkProducer extends AbstractBulkKafkaProducer imp
 
         try {
             try {
-                for (int i = 1; i <= TOTAL_MESSAGES; i++) {
+                for (int i = 1; i <= TOTAL_MESSAGES || running; i++) {
                     eventBatch.add(getComplexEvent(i));
                     var startTime = System.nanoTime();
 
@@ -64,6 +65,12 @@ public class KafkaComplexEventBulkProducer extends AbstractBulkKafkaProducer imp
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void stop() {
+        running = false;
+    }
+
 
     public static ComplexEvent getComplexEvent(int i) {
         Random random = new Random(System.currentTimeMillis() + i);

@@ -67,3 +67,14 @@ out/
 *.iws
 *.class
 LSSEventListenerExample/target
+*.class
+LSSEventListenerExample/target/classes/com/espertech/SwaggerConfig.class
+LSSEventListenerExample/target/classes/com/espertech/MySystemEvent.class
+LSSEventListenerExample/target/classes/com/espertech/Main.class
+LSSEventListenerExample/target/classes/com/espertech/KafkaQueries.class
+LSSEventListenerExample/target/classes/com/espertech/KafkaEventService.class
+LSSEventListenerExample/target/classes/com/espertech/KafkaEventProducer.class
+LSSEventListenerExample/target/classes/com/espertech/KafkaEventListener.class
+LSSEventListenerExample/target/classes/com/espertech/KafkaConfig.class
+LSSEventListenerExample/target/classes/com/espertech/EsperController.class
+LSSEventListenerExample/target/checkstyle-result.xml

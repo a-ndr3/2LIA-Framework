@@ -17,6 +17,8 @@ public abstract class AbstractBulkKafkaProducer {
     protected String server;
     protected KafkaProducer<String, LSSKafkaEvent> producer;
 
+    protected volatile boolean running = true;
+
     public AbstractBulkKafkaProducer(String kafkaTopic, String kafkaBootstrapServers) {
         this.topic = kafkaTopic;
         this.server = kafkaBootstrapServers;

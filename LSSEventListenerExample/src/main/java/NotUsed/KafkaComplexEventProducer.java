@@ -71,4 +71,9 @@ public class KafkaComplexEventProducer extends AbstractKafkaProducer implements 
             i++;
         }
     }
+
+    @Override
+    public void stop() {
+        running = false;
+    }
 }

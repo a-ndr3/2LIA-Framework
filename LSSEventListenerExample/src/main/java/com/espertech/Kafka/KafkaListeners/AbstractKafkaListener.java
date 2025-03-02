@@ -32,6 +32,8 @@ public abstract class AbstractKafkaListener {
 
     protected EsperService esperService;
 
+    protected volatile boolean running = true;
+
     public AbstractKafkaListener(String kafkaTopic, String kafkaBootstrapServers, EsperService esperService, LSSEsperQueries esperQueries, String queriesDeploymentId) {
         this.topic = kafkaTopic;
         this.server = kafkaBootstrapServers;

@@ -1,30 +1,30 @@
 package com.espertech.Kafka.config;
 
-import com.espertech.events.ComplexEvent;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
-import org.springframework.kafka.support.serializer.JsonSerializer;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 public class KafkaEventConfig {
+
+    @Value("${kafka.topic:complexEvents}")
+    public String kafkaTopic;
+
+    @Value("${kafka.bootstrap-servers:localhost:9092}")
+    public String kafkaBootstrapServers;
+
+    private ConfigType configType = ConfigType.Complex;
+
+    public KafkaEventConfig() {
+        updateConfig(configType);
+    }
 
     public enum ConfigType {
         Simple,
         Complex
     }
 
-    private final String kafkaTopic;
-    private final String kafkaBootstrapServers;
-
-    public KafkaEventConfig(ConfigType configType) {
+    public void updateConfig(ConfigType configType) {
+        this.configType = configType;
         switch (configType) {
             case Simple:
                 this.kafkaTopic = "systemEvents";
@@ -39,13 +39,11 @@ public class KafkaEventConfig {
         }
     }
 
-    @Bean
-    public String kafkaTopic() {
+    public String getKafkaTopic() {
         return kafkaTopic;
     }
 
-    @Bean
-    public String kafkaBootstrapServers() {
+    public String getKafkaBootstrapServers() {
         return kafkaBootstrapServers;
     }
 }

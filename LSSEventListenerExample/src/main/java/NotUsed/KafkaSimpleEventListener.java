@@ -28,7 +28,7 @@ public class KafkaSimpleEventListener extends AbstractKafkaListener implements L
 //            });
 //---------- DEBUG
 
-            while (true) {
+            while (running) {
                 var records = this.consumer.poll(Duration.ofMillis(100));
                 for (var record : records) {
 
@@ -43,5 +43,10 @@ public class KafkaSimpleEventListener extends AbstractKafkaListener implements L
         } finally {
             consumer.close();
         }
+    }
+
+    @Override
+    public void stop() {
+        running = false;
     }
 }
