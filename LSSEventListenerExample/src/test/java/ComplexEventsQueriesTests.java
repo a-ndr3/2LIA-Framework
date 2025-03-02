@@ -1,3 +1,4 @@
+import NotUsed.KafkaComplexEventProducer;
 import RemindsListeners.*;
 import TestListeners.*;
 import com.espertech.ESPERQueries.ComplexEsperQueries;
@@ -707,7 +708,7 @@ public class ComplexEventsQueriesTests {
     }
 
     @Test
-    public void testCompositeConstraint2() {
+    public void testCompositeConstraintGeneralEvents() {
         System.out.println("EventA");
         runtime.getEventService().sendEventBean(new EventA(true), "EventA");
 
@@ -742,5 +743,60 @@ public class ComplexEventsQueriesTests {
         timer(1);
 
         Assertions.assertEquals(0, testListenerCompositeTypeDifferentEvents.emittedList.size());
+    }
+
+    @Test
+    public void testCompositeConstraintGeneralEventsThroughput(){
+        int batchSize = 10_000;
+        long startTime = System.nanoTime();
+
+        for (int i = 0; i < batchSize; i++) {
+            runtime.getEventService().sendEventBean(new EventA(true), "EventA");
+            runtime.getEventService().sendEventBean(new EventB(true), "EventB");
+            runtime.getEventService().sendEventBean(new EventC(true), "EventC");
+        }
+
+        long endTime = System.nanoTime();
+        long durationNs = endTime - startTime;
+        double durationSeconds = durationNs / 1_000_000_000.0;
+
+        double throughput = batchSize / durationSeconds;
+        System.out.printf("Esper Throughput: %.2f events/sec%n", throughput);
+
+        Assertions.assertTrue(throughput > 0);
+    }
+
+    @Test
+    public void testMultipleDataChecksThroughput(){
+        int batchSize = 10_000;
+
+        var startEvents = new ArrayList<>();
+        var tempEvents = new ArrayList<>();
+        var qualEvents = new ArrayList<>();
+        var endEvents = new ArrayList<>();
+
+        for (int i = 0; i < batchSize; i++) {
+            startEvents.add(KafkaComplexEventBulkProducer.getComplexEvent(i));
+            tempEvents.add(KafkaComplexEventBulkProducer.getComplexEvent(i));
+            qualEvents.add(KafkaComplexEventBulkProducer.getComplexEvent(i));
+            endEvents.add(KafkaComplexEventBulkProducer.getComplexEvent(i));
+        }
+
+        long startTime = System.nanoTime();
+
+        for (int i = 0; i < batchSize; i++) {
+            runtime.getEventService().sendEventBean(startEvents.get(i), "ComplexEvent");
+            runtime.getEventService().sendEventBean(tempEvents.get(i), "ComplexEvent");
+            runtime.getEventService().sendEventBean(qualEvents.get(i), "ComplexEvent");
+            runtime.getEventService().sendEventBean(endEvents.get(i), "ComplexEvent");
+        }
+
+        long endTime = System.nanoTime();
+        double durationSeconds = (endTime - startTime) / 1_000_000_000.0;
+
+        double throughput = batchSize / durationSeconds;
+        System.out.printf("Esper Throughput for multipleDataChecks: %.2f events/sec%n", throughput);
+
+        Assertions.assertTrue(throughput > 0);
     }
 }

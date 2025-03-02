@@ -65,7 +65,7 @@ public class KafkaComplexEventBulkProducer extends AbstractBulkKafkaProducer imp
         }
     }
 
-    private static ComplexEvent getComplexEvent(int i) {
+    public static ComplexEvent getComplexEvent(int i) {
         Random random = new Random(System.currentTimeMillis() + i);
         var mmap = new HashMap<String, String>();
         var rnd = random.nextInt(0, meta.size());
