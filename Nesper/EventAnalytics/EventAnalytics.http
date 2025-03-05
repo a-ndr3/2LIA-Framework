@@ -1,0 +1,6 @@
+@EventAnalytics_HostAddress = http://localhost:5217
+
+GET {{EventAnalytics_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
