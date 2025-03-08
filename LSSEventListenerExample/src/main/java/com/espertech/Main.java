@@ -8,6 +8,7 @@ import com.espertech.Kafka.KafkaTopicManager;
 import com.espertech.Kafka.LSSKafkaListener;
 import com.espertech.Kafka.LSSKafkaProducer;
 import com.espertech.Kafka.config.KafkaEventConfig;
+import com.espertech.PrometheusMetrics.PrometheusMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -25,6 +26,7 @@ public class Main {
         try {
             logger.info("Application started");
             esperService = new EsperServiceImpl();
+            PrometheusMetrics.startMetricsServer();
             SpringApplication.run(Main.class, args);
         } catch (Exception e) {
             logger.error("An error occurred: {}", e.getMessage(), e);

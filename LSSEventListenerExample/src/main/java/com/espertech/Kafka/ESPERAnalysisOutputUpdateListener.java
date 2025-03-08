@@ -1,6 +1,7 @@
 package com.espertech.Kafka;
 
 import com.espertech.Kafka.KafkaProducers.AbstractBulkKafkaProducer;
+import com.espertech.PrometheusMetrics.PrometheusMetrics;
 import com.espertech.esper.common.client.EventBean;
 import com.espertech.esper.runtime.client.EPRuntime;
 import com.espertech.esper.runtime.client.EPStatement;
@@ -30,9 +31,13 @@ public class ESPERAnalysisOutputUpdateListener implements UpdateListener {
                 String topic = getTopicForEvent(event);
                 eventBuffers.computeIfAbsent(topic, k -> Collections.synchronizedList(new ArrayList<>())).add(event);
 
+                PrometheusMetrics.esperAlertCounter.inc();
+
                 if (eventBuffers.get(topic).size() >= BATCH_SIZE) {
                     flushBuffer(topic);
                 }
+
+                PrometheusMetrics.eventBufferSize.set(eventBuffers.get(topic).size());
             }
         }
     }

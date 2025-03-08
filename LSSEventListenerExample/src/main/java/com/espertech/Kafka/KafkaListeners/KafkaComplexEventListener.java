@@ -8,6 +8,7 @@ import com.espertech.Kafka.KafkaProducers.AbstractBulkKafkaProducer;
 import com.espertech.Kafka.KafkaProducers.KafkaComplexEventBulkProducer;
 import com.espertech.Kafka.LSSKafkaListener;
 import com.espertech.Main;
+import com.espertech.PrometheusMetrics.PrometheusMetrics;
 import com.espertech.events.LSSKafkaEvent;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 
@@ -40,6 +41,9 @@ public class KafkaComplexEventListener extends AbstractKafkaListener implements 
             while (running) {
                 long pollStart = System.nanoTime();
                 records = consumer.poll(Duration.ofMillis(100));
+
+                PrometheusMetrics.esperEventCounter.inc(records.count());
+
                 long pollDuration = System.nanoTime() - pollStart;
                 long size = records.count();
                 long injectStart = System.nanoTime();
