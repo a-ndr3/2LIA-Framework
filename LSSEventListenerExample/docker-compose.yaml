@@ -59,3 +59,19 @@ services:
       - '--kafka.server=kafka:29092'
     depends_on:
       - kafka
+  db:
+    image: postgres:latest
+    container_name: esper_db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: esper_queries
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  db_data:
