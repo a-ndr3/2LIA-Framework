@@ -6,13 +6,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class KafkaEventConfig {
 
-    @Value("${kafka.topic:complexEvents}")
+    @Value("${kafka.topic:dynatraceEvents}")
     public String kafkaTopic;
 
     @Value("${kafka.bootstrap-servers:localhost:9092}")
     public String kafkaBootstrapServers;
 
-    private ConfigType configType = ConfigType.Complex;
+    private ConfigType configType = ConfigType.Dynatrace;
 
     public KafkaEventConfig() {
         updateConfig(configType);
@@ -20,7 +20,8 @@ public class KafkaEventConfig {
 
     public enum ConfigType {
         Simple,
-        Complex
+        Complex,
+        Dynatrace
     }
 
     public void updateConfig(ConfigType configType) {
@@ -32,6 +33,10 @@ public class KafkaEventConfig {
                 break;
             case Complex:
                 this.kafkaTopic = "complexEvents";
+                this.kafkaBootstrapServers = "localhost:9092";
+                break;
+            case Dynatrace:
+                this.kafkaTopic = "dynatraceEvents";
                 this.kafkaBootstrapServers = "localhost:9092";
                 break;
             default:

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/kafka")
 public class KafkaEventController {
@@ -25,9 +27,13 @@ public class KafkaEventController {
     }
 
     @PostMapping("/start")
-    public ResponseEntity<String> startAnalysis(@RequestParam(defaultValue = "complex", name = "producer") String producer,
-                                                @RequestParam(defaultValue = "complex", name = "listener") String listener) {
-        kafkaEventService.startAnalysis(listener);
+    public ResponseEntity<String> startAnalysis(@RequestParam(defaultValue = "dynatrace", name = "producer") String producer,
+                                                @RequestParam(defaultValue = "dynatrace", name = "listener") String listener) {
+        try {
+            kafkaEventService.startAnalysis(listener);
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().body("Error starting analysis: " + e.getMessage());
+        }
         return ResponseEntity.ok("Kafka Analysis started with producer: " + producer + " and listener: " + listener);
     }
 

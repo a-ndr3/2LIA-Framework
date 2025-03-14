@@ -1,9 +1,8 @@
 package com.espertech.Kafka.KafkaListeners;
 
 import com.espertech.Brokers.Listeners.AbstractMessageListener;
-import com.espertech.Brokers.Producers.MessageBrokerProducer;
 import com.espertech.Brokers.Producers.MessageProducerFactory;
-import com.espertech.ESPERQueries.ComplexeventQueries.ComplexEsperQueries;
+import com.espertech.ESPERQueries.ComplexEsperQueries;
 import com.espertech.ESPERQueries.LSSEsperQueries;
 import com.espertech.EsperService;
 import com.espertech.Kafka.ESPERAnalysisOutputUpdateListener;
@@ -20,15 +19,15 @@ import java.util.Collections;
 import java.util.Properties;
 import java.util.UUID;
 
-public class KafkaListener extends AbstractMessageListener {
+public class KafkaComplexListener extends AbstractMessageListener {
     private final String server;
     private KafkaConsumer<String, String> consumer;
 
     ESPERAnalysisOutputUpdateListener listener = new ESPERAnalysisOutputUpdateListener(
             MessageProducerFactory.createProducer("kafka", Main.config.kafkaTopic, Main.config.kafkaBootstrapServers));
 
-    public KafkaListener(String kafkaTopic, String kafkaBootstrapServers, EsperService esperService, LSSEsperQueries esperQueries, String queriesDeploymentId) {
-        super(kafkaTopic, esperService, esperQueries, queriesDeploymentId);
+    public KafkaComplexListener(String kafkaTopic, String kafkaBootstrapServers, EsperService esperService, LSSEsperQueries esperQueries, String initDeploymentId) {
+        super(kafkaTopic, esperService, esperQueries, initDeploymentId);
         this.server = kafkaBootstrapServers;
         this.consumer = createKafkaConsumer();
         Main.logger.info("Kafka Listener initialized for topic: {}", kafkaTopic);

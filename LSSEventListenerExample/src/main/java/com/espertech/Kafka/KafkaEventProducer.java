@@ -2,7 +2,6 @@ package com.espertech.Kafka;
 
 import com.espertech.Brokers.Producers.AbstractMessageProducer;
 import com.espertech.EventTypes.LSSEvent;
-import com.espertech.Kafka.KafkaProducers.ComplexEventGenerator;
 import com.espertech.Main;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -73,12 +72,10 @@ public class KafkaEventProducer extends AbstractMessageProducer {
     }
 
     @Override
-    public void run() {
-        var allEvents = ComplexEventGenerator.getEvents();
-
+    public <T extends LSSEvent> void run(List<T> events) {
         try {
-            for (int i = 0; i < allEvents.size(); i += 20000) {
-                sendEvents(allEvents.subList(i, Math.min(i + 20000, allEvents.size())), topic);
+            for (int i = 0; i < events.size(); i += 1000) {
+                sendEvents(events.subList(i, Math.min(i + 1000, events.size())), topic);
             }
         } catch (Exception e) {
             Main.logger.error("Exception in Kafka producer: {}", e.getMessage());

@@ -1,8 +1,8 @@
-import NotUsed.KafkaComplexEventProducer;
+
 import RemindsListeners.*;
 import TestListeners.*;
-import com.espertech.ESPERQueries.ComplexeventQueries.ComplexEsperQueries;
-import com.espertech.Kafka.KafkaProducers.KafkaComplexEventBulkProducer;
+import com.espertech.ESPERQueries.ComplexEsperQueries;
+import com.espertech.EventGenerators.ComplexEventGenerator;
 import com.espertech.esper.common.client.EPCompiled;
 import com.espertech.esper.compiler.client.CompilerArguments;
 import com.espertech.esper.compiler.client.EPCompileException;
@@ -74,13 +74,13 @@ public class ComplexEventsQueriesTests {
 
         runtime = EPRuntimeProvider.getDefaultRuntime(config);
         runtime.initialize();
-        events.add(KafkaComplexEventBulkProducer.getSpecificEvent("Event3", 44.0));
-        events.add(KafkaComplexEventBulkProducer.getSpecificEvent("Event4", 12.0));
-        events.add(KafkaComplexEventBulkProducer.getSpecificEvent("Event1", 56.0));
-        events.add(KafkaComplexEventBulkProducer.getSpecificEvent("Event2", 60.0));
-        events.add(KafkaComplexEventBulkProducer.getSpecificEvent("Event3", 95.0));
-        events.add(KafkaComplexEventBulkProducer.getSpecificEvent("Event2", 33.0));
-        events.add(KafkaComplexEventBulkProducer.getSpecificEvent("Event5", 1.0));
+        events.add(ComplexEventGenerator.getSpecificEvent("Event3", 44.0));
+        events.add(ComplexEventGenerator.getSpecificEvent("Event4", 12.0));
+        events.add(ComplexEventGenerator.getSpecificEvent("Event1", 56.0));
+        events.add(ComplexEventGenerator.getSpecificEvent("Event2", 60.0));
+        events.add(ComplexEventGenerator.getSpecificEvent("Event3", 95.0));
+        events.add(ComplexEventGenerator.getSpecificEvent("Event2", 33.0));
+        events.add(ComplexEventGenerator.getSpecificEvent("Event5", 1.0));
 
         var queries = new ComplexEsperQueries();
         queries.addMoreQueries();
@@ -776,10 +776,10 @@ public class ComplexEventsQueriesTests {
         var endEvents = new ArrayList<>();
 
         for (int i = 0; i < batchSize; i++) {
-            startEvents.add(KafkaComplexEventBulkProducer.getComplexEvent(i));
-            tempEvents.add(KafkaComplexEventBulkProducer.getComplexEvent(i));
-            qualEvents.add(KafkaComplexEventBulkProducer.getComplexEvent(i));
-            endEvents.add(KafkaComplexEventBulkProducer.getComplexEvent(i));
+            startEvents.add(ComplexEventGenerator.getComplexEvent(i));
+            tempEvents.add(ComplexEventGenerator.getComplexEvent(i));
+            qualEvents.add(ComplexEventGenerator.getComplexEvent(i));
+            endEvents.add(ComplexEventGenerator.getComplexEvent(i));
         }
 
         long startTime = System.nanoTime();

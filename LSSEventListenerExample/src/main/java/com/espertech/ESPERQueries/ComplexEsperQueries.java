@@ -1,8 +1,8 @@
 package com.espertech.ESPERQueries;
 
+import com.espertech.EventTypes.Types.ComplexEvent;
 import com.espertech.esper.common.client.configuration.Configuration;
 import com.espertech.esper.runtime.client.EPRuntime;
-import com.espertech.events.ComplexEvent;
 
 
 public class ComplexEsperQueries extends AbstractQueries implements LSSEsperQueries {

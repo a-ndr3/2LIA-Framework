@@ -16,6 +16,8 @@ public abstract class AbstractMessageListener implements MessageBrokerListener {
     protected EsperService esperService;
     protected volatile boolean running = true;
 
+    protected String queriesDeploymentId;
+
     protected EPRuntime runtime;
     protected EPDeployment deployment;
     protected Configuration configuration;
@@ -23,7 +25,7 @@ public abstract class AbstractMessageListener implements MessageBrokerListener {
     public AbstractMessageListener(String topic, EsperService esperService, LSSEsperQueries esperQueries, String queriesDeploymentId) {
         this.topic = topic;
         this.esperService = esperService;
-
+        this.queriesDeploymentId = queriesDeploymentId;
         try {
             init(esperQueries, queriesDeploymentId);
         } catch (EPCompileException | EPDeployException | RuntimeException e) {

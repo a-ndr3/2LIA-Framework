@@ -1,4 +1,4 @@
-package com.espertech.Kafka.KafkaProducers;
+package com.espertech.EventGenerators;
 
 import com.espertech.EventTypes.Types.ComplexEvent;
 

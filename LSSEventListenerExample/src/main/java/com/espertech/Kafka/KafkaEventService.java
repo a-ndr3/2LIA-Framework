@@ -4,14 +4,18 @@ import com.espertech.Brokers.Listeners.MessageBrokerListener;
 import com.espertech.Brokers.Listeners.MessageListenerFactory;
 import com.espertech.Brokers.Producers.MessageBrokerProducer;
 import com.espertech.Brokers.Producers.MessageProducerFactory;
-import com.espertech.ESPERQueries.ComplexeventQueries.ComplexEsperQueries;
+import com.espertech.ESPERQueries.DynatraceEsperQueries;
+import com.espertech.ESPERQueries.ComplexEsperQueries;
 import com.espertech.ESPERQueries.LSSEsperQueries;
 import com.espertech.EsperService;
-import com.espertech.Kafka.KafkaProducers.ComplexEventGenerator;
+import com.espertech.EventGenerators.ComplexEventGenerator;
+import com.espertech.EventGenerators.DynatraceEventGenerator;
 import com.espertech.Kafka.config.KafkaEventConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Service("kafkaEventServiceV1")
 @Scope("singleton")
@@ -32,7 +36,7 @@ public class KafkaEventService {
         this.esperService = esperService;
     }
 
-    public synchronized void startAnalysis(String brokerType) {
+    public synchronized void startAnalysis(String brokerType) throws IOException {
         stopAnalysis();
 
         producer = createProducer();
@@ -50,15 +54,35 @@ public class KafkaEventService {
             }
         });
 
-        producerThread = new Thread(() -> {
-            try {
-                producer.run();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            } finally {
-                producer.stop();
-            }
-        });
+        switch (brokerType)
+        {
+            case "complex":
+                var complexEvents = ComplexEventGenerator.getEvents();
+                producerThread = new Thread(() -> {
+                    try {
+                        producer.run(complexEvents);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    } finally {
+                        producer.stop();
+                    }
+                });
+                break;
+            case "dynatrace":
+                var eventGen = new DynatraceEventGenerator();
+                var dynatraceEvents = eventGen.readFile("src/main/resources/dynatraceLogs/1.csv");
+                dynatraceEvents.addAll(eventGen.readFile("src/main/resources/dynatraceLogs/2.csv"));
+                producerThread = new Thread(() -> {
+                    try {
+                        producer.run(dynatraceEvents);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    } finally {
+                        producer.stop();
+                    }
+                });
+                break;
+        }
 
         consumerThread.start();
         producerThread.start();
@@ -105,9 +129,17 @@ public class KafkaEventService {
     private MessageBrokerListener createListener(String type) {
         LSSEsperQueries queries = switch (type) {
             case "complex" -> new ComplexEsperQueries();
+            case "dynatrace" -> new DynatraceEsperQueries();
             default -> throw new IllegalArgumentException("Unknown listener type: " + type);
         };
 
-        return MessageListenerFactory.createListener("kafka", config.getKafkaTopic(), config.getKafkaBootstrapServers(), esperService, queries, ComplexEsperQueries.staticQueriesDeploymentId);
+        switch (type){
+            case "complex":
+                return MessageListenerFactory.createListener("kafka", "complexEvents", config.getKafkaTopic(), config.getKafkaBootstrapServers(), esperService, queries);
+            case "dynatrace":
+                return MessageListenerFactory.createListener("kafka", "dynatraceEvents", config.getKafkaTopic(), config.getKafkaBootstrapServers(), esperService, queries);
+            default:
+                throw new IllegalArgumentException("Unknown listener type: " + type);
+        }
     }
 }
