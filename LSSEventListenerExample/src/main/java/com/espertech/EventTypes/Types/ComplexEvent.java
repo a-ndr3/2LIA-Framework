@@ -1,12 +1,11 @@
-package com.espertech.events;
+package com.espertech.EventTypes.Types;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
+import com.espertech.EventTypes.LSSEvent;
+
 import java.util.List;
 import java.util.Map;
 
-public class ComplexEvent implements LSSKafkaEvent {
+public class ComplexEvent implements LSSEvent {
     public int eventId;
     public String eventName;
     public String eventType;

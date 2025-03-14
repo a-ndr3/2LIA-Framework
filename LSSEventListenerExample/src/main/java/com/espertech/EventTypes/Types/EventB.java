@@ -1,4 +1,4 @@
-package com.espertech.events.DifferentKindEventsTest;
+package com.espertech.EventTypes.Types;
 
 public class EventB {
     public boolean type;

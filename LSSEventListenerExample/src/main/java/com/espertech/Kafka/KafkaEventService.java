@@ -1,10 +1,13 @@
 package com.espertech.Kafka;
 
-import com.espertech.ESPERQueries.ComplexEsperQueries;
+import com.espertech.Brokers.Listeners.MessageBrokerListener;
+import com.espertech.Brokers.Listeners.MessageListenerFactory;
+import com.espertech.Brokers.Producers.MessageBrokerProducer;
+import com.espertech.Brokers.Producers.MessageProducerFactory;
+import com.espertech.ESPERQueries.ComplexeventQueries.ComplexEsperQueries;
 import com.espertech.ESPERQueries.LSSEsperQueries;
 import com.espertech.EsperService;
-import com.espertech.Kafka.KafkaListeners.KafkaComplexEventListener;
-import com.espertech.Kafka.KafkaProducers.KafkaComplexEventBulkProducer;
+import com.espertech.Kafka.KafkaProducers.ComplexEventGenerator;
 import com.espertech.Kafka.config.KafkaEventConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -16,8 +19,8 @@ public class KafkaEventService {
     private final KafkaEventConfig config;
     private final EsperService esperService;
 
-    private LSSKafkaProducer producer;
-    private LSSKafkaListener listener;
+    private MessageBrokerProducer producer;
+    private MessageBrokerListener listener;
 
     private Thread producerThread;
     private Thread consumerThread;
@@ -29,21 +32,21 @@ public class KafkaEventService {
         this.esperService = esperService;
     }
 
-    public synchronized void startAnalysis(String producerType, String listenerType) {
+    public synchronized void startAnalysis(String brokerType) {
         stopAnalysis();
 
-        producer = createProducer(producerType);
-        listener = createListener(listenerType);
+        producer = createProducer();
+        listener = createListener(brokerType);
 
         running = true;
 
         consumerThread = new Thread(() -> {
             try {
-                listener.run();
+                listener.startListening();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-            } finally {
-                listener.stop();
+            }finally {
+                listener.stopListening();
             }
         });
 
@@ -70,7 +73,7 @@ public class KafkaEventService {
             producer.stop();
         }
         if (listener != null) {
-            listener.stop();
+            listener.stopListening();
         }
 
         if (producerThread != null && producerThread.isAlive()) {
@@ -95,18 +98,16 @@ public class KafkaEventService {
         consumerThread = null;
     }
 
-    private LSSKafkaProducer createProducer(String type) {
-        return switch (type) {
-            case "complex" -> new KafkaComplexEventBulkProducer(config.getKafkaTopic(), config.getKafkaBootstrapServers());
-            default -> throw new IllegalArgumentException("Unknown producer type: " + type);
-        };
+    private MessageBrokerProducer createProducer() {
+        return MessageProducerFactory.createProducer("kafka", config.getKafkaTopic(), config.getKafkaBootstrapServers());
     }
 
-    private LSSKafkaListener createListener(String type) {
+    private MessageBrokerListener createListener(String type) {
         LSSEsperQueries queries = switch (type) {
             case "complex" -> new ComplexEsperQueries();
             default -> throw new IllegalArgumentException("Unknown listener type: " + type);
         };
-        return new KafkaComplexEventListener(config.getKafkaTopic(), config.getKafkaBootstrapServers(), esperService, queries);
+
+        return MessageListenerFactory.createListener("kafka", config.getKafkaTopic(), config.getKafkaBootstrapServers(), esperService, queries, ComplexEsperQueries.staticQueriesDeploymentId);
     }
 }

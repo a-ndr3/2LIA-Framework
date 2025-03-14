@@ -1,7 +1,9 @@
-package com.espertech.Kafka.KafkaProducers;
+package com.espertech.Kafka;
 
+import com.espertech.Brokers.Producers.AbstractMessageProducer;
+import com.espertech.EventTypes.LSSEvent;
+import com.espertech.Kafka.KafkaProducers.ComplexEventGenerator;
 import com.espertech.Main;
-import com.espertech.events.LSSKafkaEvent;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -12,15 +14,12 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
-public abstract class AbstractBulkKafkaProducer {
-    protected String topic;
-    protected String server;
-    protected KafkaProducer<String, LSSKafkaEvent> producer;
+public class KafkaEventProducer extends AbstractMessageProducer {
+    private final String server;
+    private KafkaProducer<String, LSSEvent> producer;
 
-    protected volatile boolean running = true;
-
-    public AbstractBulkKafkaProducer(String kafkaTopic, String kafkaBootstrapServers) {
-        this.topic = kafkaTopic;
+    public KafkaEventProducer(String kafkaTopic, String kafkaBootstrapServers) {
+        super(kafkaTopic);
         this.server = kafkaBootstrapServers;
         init();
     }
@@ -41,39 +40,49 @@ public abstract class AbstractBulkKafkaProducer {
             props.put("spring.json.trusted.packages", "*");
 
             this.producer = new KafkaProducer<>(props);
-
             producer.initTransactions();
 
-            System.out.println("Kafka Event BULK Producer initialized");
+            Main.logger.info("Kafka Event BULK Producer initialized");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public <T extends LSSKafkaEvent> void sendEventBatch(List<T> events) {
+    @Override
+    public <T extends LSSEvent> void sendEventBatch(List<T> events) {
         sendEvents(events, topic);
     }
 
-    public <T extends LSSKafkaEvent> void sendEventBatch(List<T> events, String topic) {
-        Main.topicManager.createTopicIfNotExists(topic);
-        sendEvents(events, topic);
-    }
-
-    private <T extends LSSKafkaEvent> void sendEvents(List<T> events, String topic) {
+    private <T extends LSSEvent> void sendEvents(List<T> events, String topic) {
         try {
             producer.beginTransaction();
 
             for (T event : events) {
                 producer.send(new ProducerRecord<>(topic, event), (metadata, exception) -> {
                     if (exception != null) {
-                        System.err.println("Error sending event: " + exception.getMessage());
+                        Main.logger.error("Error sending event: {}", exception.getMessage());
                     }
                 });
             }
             producer.commitTransaction();
+            Main.logger.info("Sent {} events to Kafka", events.size());
         } catch (Exception e) {
-            System.err.println("Exception in Kafka producer: " + e.getMessage());
+            Main.logger.error("Exception in Kafka producer: {}", e.getMessage());
             producer.abortTransaction();
         }
     }
+
+    @Override
+    public void run() {
+        var allEvents = ComplexEventGenerator.getEvents();
+
+        try {
+            for (int i = 0; i < allEvents.size(); i += 20000) {
+                sendEvents(allEvents.subList(i, Math.min(i + 20000, allEvents.size())), topic);
+            }
+        } catch (Exception e) {
+            Main.logger.error("Exception in Kafka producer: {}", e.getMessage());
+        }
+    }
 }
+

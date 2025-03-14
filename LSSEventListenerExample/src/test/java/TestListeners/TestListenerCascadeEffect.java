@@ -17,7 +17,7 @@ public class TestListenerCascadeEffect implements UpdateListener {
         for (EventBean newEvent : newEvents) {
             Object result = newEvent.getUnderlying();
 
-            // only store structured query results (not raw events)
+            // only store structured query results (not raw EventTypes)
             if (result instanceof Map) {
                 emittedList.add(result);
                 System.out.println("Query result: " + result);

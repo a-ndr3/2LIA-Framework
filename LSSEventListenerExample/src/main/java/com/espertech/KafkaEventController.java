@@ -27,7 +27,7 @@ public class KafkaEventController {
     @PostMapping("/start")
     public ResponseEntity<String> startAnalysis(@RequestParam(defaultValue = "complex", name = "producer") String producer,
                                                 @RequestParam(defaultValue = "complex", name = "listener") String listener) {
-        kafkaEventService.startAnalysis(producer, listener);
+        kafkaEventService.startAnalysis(listener);
         return ResponseEntity.ok("Kafka Analysis started with producer: " + producer + " and listener: " + listener);
     }
 

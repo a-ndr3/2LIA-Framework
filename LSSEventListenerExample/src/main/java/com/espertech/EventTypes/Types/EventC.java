@@ -1,9 +1,9 @@
-package com.espertech.events.DifferentKindEventsTest;
+package com.espertech.EventTypes.Types;
 
-public class EventA {
+public class EventC {
     public boolean type;
 
-    public EventA(boolean type) {
+    public EventC(boolean type) {
         this.type = type;
     }
 

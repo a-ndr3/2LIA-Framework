@@ -1,17 +1,17 @@
 import NotUsed.KafkaComplexEventProducer;
 import RemindsListeners.*;
 import TestListeners.*;
-import com.espertech.ESPERQueries.ComplexEsperQueries;
+import com.espertech.ESPERQueries.ComplexeventQueries.ComplexEsperQueries;
 import com.espertech.Kafka.KafkaProducers.KafkaComplexEventBulkProducer;
 import com.espertech.esper.common.client.EPCompiled;
 import com.espertech.esper.compiler.client.CompilerArguments;
 import com.espertech.esper.compiler.client.EPCompileException;
 import com.espertech.esper.compiler.client.EPCompilerProvider;
 import com.espertech.esper.runtime.client.*;
-import com.espertech.events.ComplexEvent;
-import com.espertech.events.DifferentKindEventsTest.EventA;
-import com.espertech.events.DifferentKindEventsTest.EventB;
-import com.espertech.events.DifferentKindEventsTest.EventC;
+import com.espertech.EventTypes.Types.ComplexEvent;
+import com.espertech.EventTypes.Types.EventA;
+import com.espertech.EventTypes.Types.EventB;
+import com.espertech.EventTypes.Types.EventC;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -61,7 +61,7 @@ public class ComplexEventsQueriesTests {
         events = new ArrayList<>();
         Configuration config = new Configuration();
 
-        //Config events
+        //Config EventTypes
         config.getCommon().addEventType(ComplexEvent.class);
 
         //DifferentKindEventsTest
@@ -179,7 +179,7 @@ public class ComplexEventsQueriesTests {
             System.out.println("Waiting for 14 seconds");
             timer(14);
             counter++;
-            System.out.println("Continue sending events");
+            System.out.println("Continue sending EventTypes");
             if (counter == 2) {
                 Assertions.assertEquals(0, testListenerTimeWindow.emittedList.size());
             }
@@ -199,7 +199,7 @@ public class ComplexEventsQueriesTests {
 
     @Test
     public void testSelectWithinBatchWindow() {
-        System.out.println("Sending events for batch test");
+        System.out.println("Sending EventTypes for batch test");
 
         runtime.getEventService().sendEventBean(new ComplexEvent(1, "Event1", 56.0), "ComplexEvent");
         timer(2);
@@ -218,7 +218,7 @@ public class ComplexEventsQueriesTests {
     @ParameterizedTest
     @ValueSource(ints = {9,10})
     public void testEventChainGetEventAfterA(int seconds) {
-        System.out.println("Sending events for chain test");
+        System.out.println("Sending EventTypes for chain test");
         for (var i = 0; i < events.size(); i++) {
             System.out.println("Current time: " + Instant.ofEpochMilli(runtime.getEventService().getCurrentTime()).atZone(ZoneId.of("Europe/Berlin")).format(DateTimeFormatter.ISO_LOCAL_TIME));
             runtime.getEventService().sendEventBean(events.get(i), "ComplexEvent");
@@ -239,7 +239,7 @@ public class ComplexEventsQueriesTests {
 
     @Test
     public void testEventChainNoEventAfterA() {
-        System.out.println("Sending events for chain test");
+        System.out.println("Sending EventTypes for chain test");
         for (var i = 0; i < events.size(); i++) {
             System.out.println("Current time: " + Instant.ofEpochMilli(runtime.getEventService().getCurrentTime()).atZone(ZoneId.of("Europe/Berlin")).format(DateTimeFormatter.ISO_LOCAL_TIME));
             runtime.getEventService().sendEventBean(events.get(i), "ComplexEvent");
@@ -495,7 +495,7 @@ public class ComplexEventsQueriesTests {
 
         timer(6);
 
-        //added random events to test if the query is still working
+        //added random EventTypes to test if the query is still working
         System.out.println("random event_0");
         runtime.getEventService().sendEventBean(new ComplexEvent(2, "RandomEvent", -1.0), "ComplexEvent");
 
@@ -630,7 +630,7 @@ public class ComplexEventsQueriesTests {
         Assertions.assertEquals(1, testEventBasedEvaluationCriteria.emittedList.size());
     }
 
-    //TODO: it works but requires FIX => b,c events return null
+    //TODO: it works but requires FIX => b,c EventTypes return null
     @Test
     public void testMultipleEvaluationCriteria() {
         System.out.println("ProductionStart");
@@ -761,7 +761,7 @@ public class ComplexEventsQueriesTests {
         double durationSeconds = durationNs / 1_000_000_000.0;
 
         double throughput = batchSize / durationSeconds;
-        System.out.printf("Esper Throughput: %.2f events/sec%n", throughput);
+        System.out.printf("Esper Throughput: %.2f EventTypes/sec%n", throughput);
 
         Assertions.assertTrue(throughput > 0);
     }
@@ -795,7 +795,7 @@ public class ComplexEventsQueriesTests {
         double durationSeconds = (endTime - startTime) / 1_000_000_000.0;
 
         double throughput = batchSize / durationSeconds;
-        System.out.printf("Esper Throughput for multipleDataChecks: %.2f events/sec%n", throughput);
+        System.out.printf("Esper Throughput for multipleDataChecks: %.2f EventTypes/sec%n", throughput);
 
         Assertions.assertTrue(throughput > 0);
     }

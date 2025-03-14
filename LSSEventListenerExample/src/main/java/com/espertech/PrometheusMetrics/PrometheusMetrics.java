@@ -8,7 +8,7 @@ public class PrometheusMetrics {
 
     public static final Counter esperEventCounter = Counter.build()
             .name("esper_events_total")
-            .help("Total events processed in Esper")
+            .help("Total EventTypes processed in Esper")
             .register();
 
     public static final Counter esperAlertCounter = Counter.build()
@@ -18,7 +18,7 @@ public class PrometheusMetrics {
 
     public static final Gauge eventBufferSize = Gauge.build()
             .name("esper_event_buffer_size")
-            .help("Number of events currently in the buffer waiting to be sent to Kafka")
+            .help("Number of EventTypes currently in the buffer waiting to be sent to Kafka")
             .register();
 
     private static HTTPServer server;

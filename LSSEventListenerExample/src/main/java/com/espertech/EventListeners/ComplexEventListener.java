@@ -4,12 +4,11 @@ import com.espertech.esper.common.client.EventBean;
 import com.espertech.esper.runtime.client.EPRuntime;
 import com.espertech.esper.runtime.client.EPStatement;
 import com.espertech.esper.runtime.client.UpdateListener;
-import com.espertech.events.ComplexEvent;
+import com.espertech.EventTypes.Types.ComplexEvent;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class ComplexEventListener implements UpdateListener {
     private List<ComplexEvent> emittedList = new LinkedList<>();
