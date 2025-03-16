@@ -1,8 +1,10 @@
 
 import RemindsListeners.*;
 import TestListeners.*;
-import com.espertech.ESPERQueries.ComplexEsperQueries;
 import com.espertech.EventGenerators.ComplexEventGenerator;
+import com.espertech.QueriesDatabase.Postgres.PostgresDB;
+import com.espertech.QueriesDatabase.QueriesDB;
+import com.espertech.QueriesDatabase.QueryMetadata;
 import com.espertech.esper.common.client.EPCompiled;
 import com.espertech.esper.compiler.client.CompilerArguments;
 import com.espertech.esper.compiler.client.EPCompileException;
@@ -13,6 +15,7 @@ import com.espertech.EventTypes.Types.EventA;
 import com.espertech.EventTypes.Types.EventB;
 import com.espertech.EventTypes.Types.EventC;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
 
@@ -25,9 +28,12 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class ComplexEventsQueriesTests {
     ArrayList<ComplexEvent> events;
+
+    static QueriesDB testDb = new PostgresDB();
 
     //general tests with complex event
     TestListenerChainTimer testListenerChainTimer;
@@ -54,11 +60,17 @@ public class ComplexEventsQueriesTests {
 
     TestCompositeConstraintListener testListenerCompositeTypeDifferentEvents;
 
-    EPRuntime runtime;
+    static EPRuntime runtime;
+
+    static Collection<QueryMetadata> queriesFromDb;
+
+    @BeforeAll
+    public static void init(){
+        queriesFromDb = testDb.fetchQueries();
+    }
 
     @BeforeEach
     public void setUp() {
-        events = new ArrayList<>();
         Configuration config = new Configuration();
 
         //Config EventTypes
@@ -74,6 +86,21 @@ public class ComplexEventsQueriesTests {
 
         runtime = EPRuntimeProvider.getDefaultRuntime(config);
         runtime.initialize();
+
+        for (var query : queriesFromDb) {
+            EPCompiled selectCompiled = null;
+            try {
+                var arguments = new CompilerArguments(config);
+                arguments.getPath().add(runtime.getRuntimePath());
+                selectCompiled = EPCompilerProvider.getCompiler().compile(query.query(), arguments);
+                runtime.getDeploymentService().deploy(selectCompiled, new DeploymentOptions().setDeploymentId(query.deploymentId()));
+            } catch (EPDeployException | EPCompileException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        events = new ArrayList<>();
+
         events.add(ComplexEventGenerator.getSpecificEvent("Event3", 44.0));
         events.add(ComplexEventGenerator.getSpecificEvent("Event4", 12.0));
         events.add(ComplexEventGenerator.getSpecificEvent("Event1", 56.0));
@@ -81,23 +108,6 @@ public class ComplexEventsQueriesTests {
         events.add(ComplexEventGenerator.getSpecificEvent("Event3", 95.0));
         events.add(ComplexEventGenerator.getSpecificEvent("Event2", 33.0));
         events.add(ComplexEventGenerator.getSpecificEvent("Event5", 1.0));
-
-        var queries = new ComplexEsperQueries();
-        queries.addMoreQueries();
-        queries.addLSSQueries();
-        queries.addRemindsConstraintsQueries();
-
-        for (var query : queries.queries) {
-            EPCompiled selectCompiled = null;
-            try {
-                var arguments = new CompilerArguments(config);
-                arguments.getPath().add(runtime.getRuntimePath());
-                selectCompiled = EPCompilerProvider.getCompiler().compile(query.statement, arguments);
-                runtime.getDeploymentService().deploy(selectCompiled, new DeploymentOptions().setDeploymentId(query.deploymentId));
-            } catch (EPDeployException | EPCompileException e) {
-                throw new RuntimeException(e);
-            }
-        }
 
         testListenerChainTimer = new TestListenerChainTimer();
         testListenerTimeWindow = new TestListenerTimeWindow();
@@ -109,7 +119,6 @@ public class ComplexEventsQueriesTests {
         runtime.getDeploymentService().getStatement("selectWithinBatchWindow", "selectWithinBatchWindowStatement").addListener(testListenerBatchWindow);
         runtime.getDeploymentService().getStatement("eventDependenciesCheck", "eventDependenciesCheckStatement").addListener(testListenerDependency);
         runtime.getDeploymentService().getStatement("twoEventsInOrder", "twoEventsInOrderStatement").addListener(testListenerOrder);
-
 
         //LSS queries
         testCascadeImpact = new TestListenerCascadeEffect();

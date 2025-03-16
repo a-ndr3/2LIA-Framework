@@ -8,9 +8,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class PostgresDB implements QueriesDB {
-    private static final String DB_URL = "jdbc:postgresql://host.docker.internal:5432/esper_queries";
+    private static final String DB_URL = "jdbc:postgresql://localhost:5432/esper_queries";
     private static final String DB_USER = "admin";
     private static final String DB_PASS = "admin";
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -54,6 +56,16 @@ public class PostgresDB implements QueriesDB {
             throw new RuntimeException(e);
         }
         return queries;
+    }
+
+    @Override
+    public CompletableFuture<Void> insertQueriesAsync(Collection<QueryMetadata> queries) {
+        return CompletableFuture.runAsync(() -> insertQueries(queries));
+    }
+
+    @Override
+    public CompletableFuture<Collection<QueryMetadata>> fetchQueriesAsync() {
+        return CompletableFuture.supplyAsync(this::fetchQueries);
     }
 
     @Override

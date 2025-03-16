@@ -159,24 +159,6 @@ public class EsperController {
 
         queries.add(new QueryMetadata(
                 UUID.randomUUID(),
-                "timeWindowForDynamicSelection",
-                "",
-                "timeWindowQueries",
-                """
-                        @public create context TestContext initiated @now and pattern [every timer:interval(2 min)] terminated after 2 minutes;
-                        @public create window TestWindow#keepall as select * from ComplexEvent;
-                        insert into TestWindow select * from ComplexEvent;
-                        """,
-                List.of("ComplexEvent"),
-                "System",
-                time,
-                time,
-                true,
-                "Time Window creation"
-        ));
-
-        queries.add(new QueryMetadata(
-                UUID.randomUUID(),
                 "selectWithinTimeWindow",
                 "selectWithinTimeWindowStatement",
                 "selectWithinTimeWindow",
@@ -197,7 +179,7 @@ public class EsperController {
                 UUID.randomUUID(),
                 "selectWithinBatchWindow",
                 "selectWithinBatchWindowStatement",
-                "selectWithinTimeWindow",
+                "selectWithinBatchWindow",
                 """
                         @name('selectWithinBatchWindowStatement')
                         context ComplexEventContext
