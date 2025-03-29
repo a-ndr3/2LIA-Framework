@@ -8,14 +8,14 @@ import com.espertech.Kafka.KafkaListeners.KafkaComplexListener;
 import com.espertech.Kafka.KafkaListeners.KafkaDynatraceListener;
 
 public class MessageListenerFactory {
-    public static MessageBrokerListener createListener(String brokerType, String eventClass, String topic, String brokerAddress, EsperService esperService, LSSEsperQueries esperQueries) {
+    public static MessageBrokerListener createListener(String brokerType, String eventClass, String topic, String brokerAddress, LSSEsperQueries esperQueries) {
         switch (brokerType.toLowerCase()) {
             case "kafka":
                 return switch (eventClass) {
                     case "complexEvents" ->
-                            new KafkaComplexListener(topic, brokerAddress, esperService, esperQueries, ComplexEsperQueries.staticQueriesDeploymentId);
+                            new KafkaComplexListener(topic, brokerAddress, esperQueries, ComplexEsperQueries.staticQueriesDeploymentId);
                     case "dynatraceEvents" ->
-                            new KafkaDynatraceListener(topic, brokerAddress, esperService, esperQueries, DynatraceEsperQueries.staticQueriesDeploymentId);
+                            new KafkaDynatraceListener(topic, brokerAddress, esperQueries, DynatraceEsperQueries.staticQueriesDeploymentId);
                     default -> throw new IllegalArgumentException("Unsupported event class: " + eventClass);
                 };
             default:

@@ -18,7 +18,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             logger.info("Application started");
-            esperService = new EsperServiceImpl();
+            esperService = EsperServiceImpl.getInstance();
             PrometheusMetrics.startMetricsServer();
             SpringApplication.run(Main.class, args);
         } catch (Exception e) {

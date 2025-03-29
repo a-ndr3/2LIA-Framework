@@ -13,4 +13,6 @@ public interface QueriesDB {
     void insertQuery(QueryMetadata query);
     void updateQueryStatus(UUID queryId, boolean status);
     boolean ping();
+    void deleteQuery(UUID queryId);
+    void saveUpdatedQuery(QueryMetadata query);
 }

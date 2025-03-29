@@ -1,5 +1,7 @@
 package com.espertech;
 
+import com.espertech.ESPERQueries.EsperQuery;
+import com.espertech.ESPERQueries.QueryFactory;
 import com.espertech.QueriesDatabase.Postgres.PostgresDB;
 import com.espertech.QueriesDatabase.QueriesDB;
 import com.espertech.QueriesDatabase.QueryMetadata;
@@ -8,39 +10,42 @@ import com.espertech.esper.common.client.EPCompiled;
 import com.espertech.esper.common.client.EventBean;
 import com.espertech.esper.common.client.configuration.Configuration;
 import com.espertech.esper.common.client.fireandforget.EPFireAndForgetQueryResult;
+import com.espertech.esper.common.client.util.DateTime;
 import com.espertech.esper.compiler.client.CompilerArguments;
+import com.espertech.esper.compiler.client.EPCompileException;
 import com.espertech.esper.compiler.client.EPCompilerProvider;
-import com.espertech.esper.runtime.client.EPDeployment;
-import com.espertech.esper.runtime.client.EPRuntime;
-import com.espertech.esper.runtime.client.EPRuntimeProvider;
+import com.espertech.esper.runtime.client.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 
 @RestController
 @RequestMapping("/queries")
+@CrossOrigin(origins = "*")
 public class EsperController {
 
     public EsperController() {
     }
 
-    @PostMapping("/add")
-    public String addQuery(@RequestBody String epl) {
-        try {
-            String tmp = String.format("@name('my-statement%s') %s;\n", UUID.randomUUID().getMostSignificantBits(), epl);
-            var compiled = EPCompilerProvider.getCompiler().compile(tmp, new CompilerArguments(Main.esperService.getConfiguration()));
-            EPDeployment deployment = Main.esperService.getRuntime().getDeploymentService().deploy(compiled); //todo make service that is responsible for creating correct sql queries
-            return "Query added: " + deployment.getDeploymentId();
-        } catch (Exception e) {
-            return "Failed to add query: " + e.getMessage();
-        }
-    }
+//    @CrossOrigin(origins = "*")
+//    @PostMapping("/add")
+//    public String addQuery(@RequestBody String epl) {
+//        try {
+//            String tmp = String.format("@name('my-statement%s') %s;\n", UUID.randomUUID().getMostSignificantBits(), epl);
+//            var compiled = EPCompilerProvider.getCompiler().compile(tmp, new CompilerArguments(Main.esperService.getConfiguration()));
+//            EPDeployment deployment = Main.esperService.getRuntime().getDeploymentService().deploy(compiled); //todo make service that is responsible for creating correct sql queries
+//            return "Query added: " + deployment.getDeploymentId();
+//        } catch (Exception e) {
+//            return "Failed to add query: " + e.getMessage();
+//        }
+//    }
 
     @GetMapping("/getQueries")
     public ResponseEntity<String> getEPLStatements() {
@@ -56,6 +61,7 @@ public class EsperController {
         }
     }
 
+    @CrossOrigin(origins = "*")
     @PostMapping("/onDemandQuery") //todo add sliding window ~ 2 mins
     public ResponseEntity<String> onDemandQuery(@RequestBody String epl) {
         try {
@@ -74,6 +80,23 @@ public class EsperController {
         }
     }
 
+    @CrossOrigin(origins = "*")
+    @PostMapping("/addQuery")
+    public ResponseEntity<String> onAddQuery(@RequestBody String epl,
+                                             @RequestParam String name,
+                                             @RequestParam List<String> classes,
+                                             @RequestParam String category,
+                                             @RequestParam String description) {
+
+        var result = addNewQuery(epl, name, classes, category, description);
+
+        if (result != null) {
+            return ResponseEntity.badRequest().body("Error adding query: " + result.getMessage());
+        }
+
+        return ResponseEntity.ok("Query added successfully");
+    }
+
     @PostMapping("/uploadTestEventsQueries")
     public ResponseEntity<String> uploadComplexEventsQueries() {
         try {
@@ -87,14 +110,131 @@ public class EsperController {
         return ResponseEntity.ok("Test queries uploaded to database");
     }
 
+    @CrossOrigin(origins = "*")
+    @PostMapping("/changeQuery")
+    public ResponseEntity<String> changeQuery(@RequestBody String queryData) {
+        QueryMetadata queryMetadata;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new ParameterNamesModule());
+            queryMetadata = objectMapper.readValue(queryData, QueryMetadata.class);
+
+            var result = changeExistingQuery(queryMetadata);
+
+            if (result != null) {
+                return ResponseEntity.badRequest().body("Error changing query: " + result.getMessage());
+            }
+
+            updateDB(queryMetadata);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error updating query in database: " + e.getMessage());
+        }
+
+        return ResponseEntity.ok("Query changed successfully");
+    }
+
+    private Exception addNewQuery(String epl, String name, List<String> classes, String category, String description) {
+        EPCompiled compiled = null;
+        var runtime = Main.esperService.getRuntime();
+        try {
+
+            CompilerArguments compilerArguments = new CompilerArguments(Main.esperService.getConfiguration());
+            compilerArguments.getPath().add(runtime.getRuntimePath());
+            compiled = EPCompilerProvider.getCompiler().compileQuery(epl, compilerArguments);
+
+        } catch (EPCompileException e) {
+            return e;
+        }
+
+        EsperQuery newQuery = null;
+        try {
+            newQuery = QueryFactory.getInstance().createQuery(epl);
+            runtime.getDeploymentService().deploy(compiled, new DeploymentOptions().setDeploymentId(newQuery.deploymentId));
+
+        } catch (EPDeployException | IllegalStateException e) {
+            return e;
+        }
+
+        try {
+            QueriesDB db = new PostgresDB();
+            QueryMetadata data = new QueryMetadata(
+                    newQuery.id,
+                    name,
+                    newQuery.queryStatement,
+                    newQuery.deploymentId,
+                    newQuery.query,
+                    classes,
+                    category,
+                    Instant.now().toEpochMilli(),
+                    Instant.now().toEpochMilli(),
+                    true,
+                    description
+            );
+            db.insertQuery(data);
+
+        } catch (Exception e) {
+            return e;
+        }
+
+        return null;
+    }
+
+    private void updateDB(QueryMetadata queryData) {
+        QueriesDB db = new PostgresDB();
+        try {
+            db.saveUpdatedQuery(queryData);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Exception changeExistingQuery(QueryMetadata queryData) {
+        EPCompiled compiled = null;
+        var runtime = Main.esperService.getRuntime();
+        ArrayList<UpdateListener> existingListeners = new ArrayList<>();
+        try {
+
+            try {
+                runtime.getDeploymentService().getStatement(queryData.deploymentId, queryData.queryStatement).getUpdateListeners().forEachRemaining(existingListeners::add);
+                runtime.getDeploymentService().undeploy(queryData.deploymentId);
+            } catch (EPUndeployException | NullPointerException e) {
+                return e;
+            }
+
+            try {
+                CompilerArguments compilerArguments = new CompilerArguments(Main.esperService.getConfiguration());
+                compilerArguments.getPath().add(runtime.getRuntimePath());
+                compiled = EPCompilerProvider.getCompiler().compileQuery(queryData.query, compilerArguments);
+            } catch (EPCompileException e) {
+                return e;
+            }
+
+            try {
+                runtime.getDeploymentService().deploy(compiled, new DeploymentOptions().setDeploymentId(queryData.deploymentId));
+
+                for (var listener : existingListeners) {
+                    runtime.getDeploymentService().getStatement(queryData.deploymentId, queryData.queryStatement).addListener(listener);
+                }
+
+            } catch (EPDeployException | IllegalStateException e) {
+                return e;
+            }
+
+            return null;
+        } catch (Exception e) {
+            return e;
+        }
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.POST})
     @PostMapping("/checkExistingQueriesInDatabase")
-    public ResponseEntity<String> checkExistingQueriesInDatabase() {
+    public ResponseEntity<Collection<QueryMetadata>> checkExistingQueriesInDatabase() {
         QueriesDB db = new PostgresDB();
         var queries = db.fetchQueries();
         if (queries.isEmpty()) {
-            return ResponseEntity.ok("No queries found in the database");
+            return ResponseEntity.ok(List.of());
         }
-        return ResponseEntity.ok("Queries found in the database" + queries.stream().map(QueryMetadata::toString).toList());
+        return ResponseEntity.ok(queries);
     }
 
     @PostMapping("/pingDB")
@@ -119,7 +259,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Simple select query"
         ));
 
@@ -137,7 +277,7 @@ public class EsperController {
                 "System",
                 time,
                 time,
-                true,
+                false,
                 "Time Window creation"
         ));
 
@@ -153,7 +293,7 @@ public class EsperController {
                 "System",
                 time,
                 time,
-                true,
+                false,
                 "Context creation query"
         ));
 
@@ -171,7 +311,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Select within time window"
         ));
 
@@ -189,7 +329,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Select within batch time window"
         ));
 
@@ -210,7 +350,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Check event chain within 10 seconds"
         ));
 
@@ -231,7 +371,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Check events dependencies"
         ));
 
@@ -253,7 +393,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Check that events occur in order"
         ));
 
@@ -276,7 +416,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Check cascade appearance of events"
         ));
 
@@ -297,7 +437,7 @@ public class EsperController {
                 "Performance Check",
                 time,
                 time,
-                true,
+                false,
                 "Check system response time"
         ));
 
@@ -318,7 +458,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Check chain of events"
         ));
 
@@ -338,7 +478,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Check event spikes after a particular event"
         ));
 
@@ -360,7 +500,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Check composite constraint where any of the events can trigger the alert"
         ));
 
@@ -385,7 +525,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Check multiple conditions in a single query"
         ));
 
@@ -409,7 +549,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Check cross event data access and comparison"
         ));
 
@@ -427,7 +567,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Check multiple conditions for a single event"
         ));
 
@@ -451,7 +591,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Check event sequence completion before next event"
         ));
 
@@ -479,7 +619,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Check multiple evaluation criteria for a sequence of events"
         ));
 
@@ -511,7 +651,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Check several event sequences"
         ));
 
@@ -531,7 +671,7 @@ public class EsperController {
                 "Thresholds",
                 time,
                 time,
-                true,
+                false,
                 "Simple check sequence of events of different types"
         ));
 

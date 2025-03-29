@@ -131,15 +131,15 @@ public class PostgresDB implements QueriesDB {
     }
 
     private void parseQuery(QueryMetadata query, PreparedStatement ps) throws SQLException, JsonProcessingException {
-        ps.setObject(1, query.id());
-        ps.setString(2, query.name());
-        ps.setString(3, query.queryStatement());
-        ps.setObject(4, query.deploymentId());
-        ps.setString(5, query.query());
-        ps.setString(6, objectMapper.writeValueAsString(query.eventClasses()));
-        ps.setString(7, query.category());
-        ps.setBoolean(8, query.status());
-        ps.setString(9, query.description());
+        ps.setObject(1, query.id);
+        ps.setString(2, query.name);
+        ps.setString(3, query.queryStatement);
+        ps.setObject(4, query.deploymentId);
+        ps.setString(5, query.query);
+        ps.setString(6, objectMapper.writeValueAsString(query.eventClasses));
+        ps.setString(7, query.category);
+        ps.setBoolean(8, query.status);
+        ps.setString(9, query.description);
     }
 
     @Override
@@ -164,6 +164,40 @@ public class PostgresDB implements QueriesDB {
             return true;
         } catch (SQLException e) {
             return false;
+        }
+    }
+
+    @Override
+    public void deleteQuery(UUID queryId) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM esper_queries WHERE id = ?")) {
+            pstmt.setObject(1, queryId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void saveUpdatedQuery(QueryMetadata query) {
+        String sql = "UPDATE esper_queries SET name = ?, query_statement = ?, deploymentId = ?, query = ?, event_classes = ?::jsonb, category_id = (SELECT id FROM query_category WHERE name = ?), status = ?, description = ? WHERE id = ?";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, query.name);
+            pstmt.setString(2, query.queryStatement);
+            pstmt.setObject(3, query.deploymentId);
+            pstmt.setString(4, query.query);
+            pstmt.setString(5, objectMapper.writeValueAsString(query.eventClasses));
+            pstmt.setString(6, query.category);
+            pstmt.setBoolean(7, query.status);
+            pstmt.setString(8, query.description);
+            pstmt.setObject(9, query.id);
+
+            pstmt.executeUpdate();
+        } catch (SQLException | JsonProcessingException e) {
+            e.printStackTrace();
         }
     }
 }

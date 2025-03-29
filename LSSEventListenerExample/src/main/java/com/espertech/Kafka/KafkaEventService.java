@@ -21,7 +21,6 @@ import java.io.IOException;
 @Scope("singleton")
 public class KafkaEventService {
     private final KafkaEventConfig config;
-    private final EsperService esperService;
 
     private MessageBrokerProducer producer;
     private MessageBrokerListener listener;
@@ -30,10 +29,10 @@ public class KafkaEventService {
     private Thread consumerThread;
 
     private volatile boolean running = false;
+
     @Autowired
-    public KafkaEventService(KafkaEventConfig config, EsperService esperService) {
+    public KafkaEventService(KafkaEventConfig config) {
         this.config = config;
-        this.esperService = esperService;
     }
 
     public synchronized void startAnalysis(String brokerType) throws IOException {
@@ -135,9 +134,9 @@ public class KafkaEventService {
 
         switch (type){
             case "complex":
-                return MessageListenerFactory.createListener("kafka", "complexEvents", config.getKafkaTopic(), config.getKafkaBootstrapServers(), esperService, queries);
+                return MessageListenerFactory.createListener("kafka", "complexEvents", config.getKafkaTopic(), config.getKafkaBootstrapServers(), queries);
             case "dynatrace":
-                return MessageListenerFactory.createListener("kafka", "dynatraceEvents", config.getKafkaTopic(), config.getKafkaBootstrapServers(), esperService, queries);
+                return MessageListenerFactory.createListener("kafka", "dynatraceEvents", config.getKafkaTopic(), config.getKafkaBootstrapServers(), queries);
             default:
                 throw new IllegalArgumentException("Unknown listener type: " + type);
         }

@@ -6,13 +6,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class KafkaEventConfig {
 
-    @Value("${kafka.topic:dynatraceEvents}")
+    @Value("${kafka.topic:complexEvents}")
     public String kafkaTopic;
 
     @Value("${kafka.bootstrap-servers:localhost:9092}")
     public String kafkaBootstrapServers;
 
-    private ConfigType configType = ConfigType.Dynatrace;
+    private ConfigType configType = ConfigType.Complex;
 
     public KafkaEventConfig() {
         updateConfig(configType);

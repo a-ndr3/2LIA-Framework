@@ -9,13 +9,22 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EsperServiceImpl implements EsperService {
+    private static EsperServiceImpl instance = null;
+
     private EPRuntime runtime;
     private EPDeployment deployment;
     private EPCompiled compiled;
     private Configuration configuration;
 
-    public EsperServiceImpl() {
+    private EsperServiceImpl(){
 
+    }
+
+    public static EsperServiceImpl getInstance() {
+        if (instance == null) {
+            instance = new EsperServiceImpl();
+        }
+        return instance;
     }
 
     public void setRuntime(EPRuntime runtime) {

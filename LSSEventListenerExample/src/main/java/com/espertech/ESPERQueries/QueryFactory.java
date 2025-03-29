@@ -1,0 +1,32 @@
+package com.espertech.ESPERQueries;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class QueryFactory {
+    public static QueryFactory instance;
+    private static AtomicInteger idCounter = new AtomicInteger(0);
+    private static IQueryID queryIDImpl;
+
+    public static QueryFactory getInstance() {
+        if (instance == null) {
+            instance = new QueryFactory();
+            queryIDImpl = IDCreator.getInstance();
+        }
+        return instance;
+    }
+
+    public EsperQuery createQuery(String query){
+        var deploymentId = "deploymentId" + idCounter.incrementAndGet();
+        return createQuery(query, deploymentId);
+    }
+
+    public EsperQuery createQuery(String query, String deploymentId){
+        var queryStatement = "queryStatement" + idCounter.incrementAndGet();
+        return createQuery(query, deploymentId, queryStatement);
+    }
+
+    public EsperQuery createQuery(String query, String deploymentId, String queryStatement){
+        var id = queryIDImpl.getQueryID();
+        return new EsperQuery(query, deploymentId, queryStatement, id);
+    }
+}

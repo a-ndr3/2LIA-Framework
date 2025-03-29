@@ -23,11 +23,11 @@ public class KafkaComplexListener extends AbstractMessageListener {
     private final String server;
     private KafkaConsumer<String, String> consumer;
 
-    ESPERAnalysisOutputUpdateListener listener = new ESPERAnalysisOutputUpdateListener(
-            MessageProducerFactory.createProducer("kafka", Main.config.kafkaTopic, Main.config.kafkaBootstrapServers));
+    ESPERAnalysisOutputUpdateListener listener;
 
-    public KafkaComplexListener(String kafkaTopic, String kafkaBootstrapServers, EsperService esperService, LSSEsperQueries esperQueries, String initDeploymentId) {
-        super(kafkaTopic, esperService, esperQueries, initDeploymentId);
+    public KafkaComplexListener(String kafkaTopic, String kafkaBootstrapServers, LSSEsperQueries esperQueries, String initDeploymentId) {
+        super(kafkaTopic, esperQueries, initDeploymentId);
+        listener = new ESPERAnalysisOutputUpdateListener(MessageProducerFactory.createProducer("kafka", kafkaTopic, kafkaBootstrapServers));
         this.server = kafkaBootstrapServers;
         this.consumer = createKafkaConsumer();
         Main.logger.info("Kafka Listener initialized for topic: {}", kafkaTopic);

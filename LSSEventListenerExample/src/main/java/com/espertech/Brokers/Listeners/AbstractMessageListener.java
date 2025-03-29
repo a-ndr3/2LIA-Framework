@@ -13,7 +13,6 @@ import com.espertech.esper.runtime.client.EPRuntimeProvider;
 
 public abstract class AbstractMessageListener implements MessageBrokerListener {
     protected String topic;
-    protected EsperService esperService;
     protected volatile boolean running = true;
 
     protected String queriesDeploymentId;
@@ -22,18 +21,17 @@ public abstract class AbstractMessageListener implements MessageBrokerListener {
     protected EPDeployment deployment;
     protected Configuration configuration;
 
-    public AbstractMessageListener(String topic, EsperService esperService, LSSEsperQueries esperQueries, String queriesDeploymentId) {
+    public AbstractMessageListener(String topic, LSSEsperQueries esperQueries, String queriesDeploymentId) {
         this.topic = topic;
-        this.esperService = esperService;
         this.queriesDeploymentId = queriesDeploymentId;
         try {
-            init(esperQueries, queriesDeploymentId);
+            init(EsperServiceImpl.getInstance(), esperQueries, queriesDeploymentId);
         } catch (EPCompileException | EPDeployException | RuntimeException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void init(LSSEsperQueries esperQueries, String queriesDeploymentId) throws EPCompileException, EPDeployException, RuntimeException {
+    private void init(EsperServiceImpl esperService, LSSEsperQueries esperQueries, String queriesDeploymentId) throws EPCompileException, EPDeployException, RuntimeException {
         configuration = esperQueries.getConfiguration();
 
         runtime = EPRuntimeProvider.getRuntime("EventListener", configuration);
@@ -42,9 +40,9 @@ public abstract class AbstractMessageListener implements MessageBrokerListener {
         esperQueries.compileEpl(runtime);
         deployment = runtime.getDeploymentService().getDeployment(queriesDeploymentId);
 
-        ((EsperServiceImpl) this.esperService).setRuntime(runtime);
-        ((EsperServiceImpl) this.esperService).setDeployment(deployment);
-        ((EsperServiceImpl) this.esperService).setConfiguration(configuration);
+        esperService.setRuntime(runtime);
+        esperService.setDeployment(deployment);
+        esperService.setConfiguration(configuration);
 
         Main.logger.info("ESPER deployed");
     }
