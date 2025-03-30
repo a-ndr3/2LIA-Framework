@@ -30,8 +30,10 @@ import java.util.*;
 @RequestMapping("/queries")
 @CrossOrigin(origins = "*")
 public class EsperController {
+    QueriesDB db;
 
     public EsperController() {
+        db = new PostgresDB();
     }
 
 //    @CrossOrigin(origins = "*")
@@ -119,10 +121,12 @@ public class EsperController {
             objectMapper.registerModule(new ParameterNamesModule());
             queryMetadata = objectMapper.readValue(queryData, QueryMetadata.class);
 
-            var result = changeExistingQuery(queryMetadata);
+            if (queryMetadata.status) {
+                var result = changeExistingQuery(queryMetadata);
 
-            if (result != null) {
-                return ResponseEntity.badRequest().body("Error changing query: " + result.getMessage());
+                if (result != null) {
+                    return ResponseEntity.badRequest().body("Error changing query: " + result.getMessage());
+                }
             }
 
             updateDB(queryMetadata);
@@ -133,6 +137,46 @@ public class EsperController {
         return ResponseEntity.ok("Query changed successfully");
     }
 
+    @CrossOrigin(origins = "*")
+    @PostMapping("/deployQueryFromDB")
+    public ResponseEntity<String> deployQueryFromDB(@RequestBody String queryData){
+        QueryMetadata queryMetaData;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new ParameterNamesModule());
+            queryMetaData = objectMapper.readValue(queryData, QueryMetadata.class);
+
+            var result = deployQuery(queryMetaData);
+
+            if (result != null) {
+                return ResponseEntity.badRequest().body("Error deploying query: " + result.getMessage());
+            }
+
+            queryMetaData.status = true;
+
+            updateDB(queryMetaData);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error deploying query from database: " + e.getMessage());
+        }
+
+        return ResponseEntity.ok("Query deployed successfully");
+    }
+
+    private Exception deployQuery(QueryMetadata queryData){
+        EPCompiled compiled = null;
+        var runtime = Main.esperService.getRuntime();
+        try {
+            CompilerArguments compilerArguments = new CompilerArguments(Main.esperService.getConfiguration());
+            compilerArguments.getPath().add(runtime.getRuntimePath());
+            compiled = EPCompilerProvider.getCompiler().compile(queryData.query, compilerArguments);
+            runtime.getDeploymentService().deploy(compiled, new DeploymentOptions().setDeploymentId(queryData.deploymentId));
+        } catch (EPCompileException | EPDeployException | IllegalStateException e) {
+            return e;
+        }
+        return null;
+    }
+
     private Exception addNewQuery(String epl, String name, List<String> classes, String category, String description) {
         EPCompiled compiled = null;
         var runtime = Main.esperService.getRuntime();
@@ -140,7 +184,7 @@ public class EsperController {
 
             CompilerArguments compilerArguments = new CompilerArguments(Main.esperService.getConfiguration());
             compilerArguments.getPath().add(runtime.getRuntimePath());
-            compiled = EPCompilerProvider.getCompiler().compileQuery(epl, compilerArguments);
+            compiled = EPCompilerProvider.getCompiler().compile(epl, compilerArguments);
 
         } catch (EPCompileException e) {
             return e;
@@ -156,7 +200,6 @@ public class EsperController {
         }
 
         try {
-            QueriesDB db = new PostgresDB();
             QueryMetadata data = new QueryMetadata(
                     newQuery.id,
                     name,
@@ -180,7 +223,6 @@ public class EsperController {
     }
 
     private void updateDB(QueryMetadata queryData) {
-        QueriesDB db = new PostgresDB();
         try {
             db.saveUpdatedQuery(queryData);
         } catch (Exception e) {
@@ -229,7 +271,6 @@ public class EsperController {
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.POST})
     @PostMapping("/checkExistingQueriesInDatabase")
     public ResponseEntity<Collection<QueryMetadata>> checkExistingQueriesInDatabase() {
-        QueriesDB db = new PostgresDB();
         var queries = db.fetchQueries();
         if (queries.isEmpty()) {
             return ResponseEntity.ok(List.of());
@@ -239,7 +280,6 @@ public class EsperController {
 
     @PostMapping("/pingDB")
     public ResponseEntity<String> pingDB() {
-        QueriesDB db = new PostgresDB();
         if (db.ping()) {
             return ResponseEntity.ok("DB is UP");
         }

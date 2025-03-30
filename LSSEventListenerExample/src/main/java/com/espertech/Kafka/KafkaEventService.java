@@ -58,13 +58,13 @@ public class KafkaEventService {
             case "complex":
                 var complexEvents = ComplexEventGenerator.getEvents();
                 producerThread = new Thread(() -> {
-                    try {
-                        producer.run(complexEvents);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    } finally {
-                        producer.stop();
-                    }
+//                    try {
+//                        producer.run(complexEvents);
+//                    } catch (InterruptedException e) {
+//                        Thread.currentThread().interrupt();
+//                    } finally {
+//                        producer.stop();
+//                    }
                 });
                 break;
             case "dynatrace":

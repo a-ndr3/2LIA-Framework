@@ -57,7 +57,7 @@ public class KafkaComplexListener extends AbstractMessageListener {
 
     @Override
     public void startListening() {
-        runtime.getDeploymentService().getStatement(ComplexEsperQueries.staticQueriesDeploymentId, "my-statement").addListener(listener);
+        //runtime.getDeploymentService().getStatement(ComplexEsperQueries.staticQueriesDeploymentId, "my-statement").addListener(listener);
 
         consumer.subscribe(Collections.singletonList(topic));
 
