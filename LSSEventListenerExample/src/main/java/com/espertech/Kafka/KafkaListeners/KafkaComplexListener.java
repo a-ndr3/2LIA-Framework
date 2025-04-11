@@ -2,9 +2,7 @@ package com.espertech.Kafka.KafkaListeners;
 
 import com.espertech.Brokers.Listeners.AbstractMessageListener;
 import com.espertech.Brokers.Producers.MessageProducerFactory;
-import com.espertech.ESPERQueries.ComplexEsperQueries;
 import com.espertech.ESPERQueries.LSSEsperQueries;
-import com.espertech.EsperService;
 import com.espertech.Kafka.ESPERAnalysisOutputUpdateListener;
 import com.espertech.Main;
 import com.espertech.EventTypes.Types.ComplexEvent;

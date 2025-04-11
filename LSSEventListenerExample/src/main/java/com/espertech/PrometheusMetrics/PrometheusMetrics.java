@@ -1,4 +1,5 @@
 package com.espertech.PrometheusMetrics;
+import com.espertech.Main;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.HTTPServer;
@@ -26,7 +27,7 @@ public class PrometheusMetrics {
     public static void startMetricsServer() {
         try {
             server = new HTTPServer(8083);
-            System.out.println("Prometheus metrics server started on port 8083");
+            Main.logger.info("Prometheus metrics server started on port 8083");
         } catch (IOException e) {
             throw new RuntimeException("Failed to start Prometheus metrics server", e);
         }

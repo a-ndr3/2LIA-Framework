@@ -13,11 +13,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.FutureTask;
 
 public class ESPERAnalysisOutputUpdateListener implements UpdateListener {
     private final MessageBrokerProducer producer;
     private final Map<String, List<LSSEvent>> eventBuffers = new ConcurrentHashMap<>();
-    private final int BATCH_SIZE = 100; //TODO: what to do if we never reach this size
+    private final int BATCH_SIZE = 10;
 
     public ESPERAnalysisOutputUpdateListener(MessageBrokerProducer producer) {
         this.producer = producer;

@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class Main {
     public static final Logger logger = LoggerFactory.getLogger(Main.class);
-    public static EsperService esperService; //todo inject into controller
+    public static EsperService esperService;
     public static KafkaEventConfig config = new KafkaEventConfig();
     public static KafkaTopicManager topicManager = new KafkaTopicManager(config.kafkaBootstrapServers);
 

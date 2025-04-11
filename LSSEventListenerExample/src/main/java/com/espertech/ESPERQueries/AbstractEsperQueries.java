@@ -11,19 +11,19 @@ import com.espertech.esper.runtime.client.EPRuntime;
 
 import java.util.ArrayList;
 
-public abstract class AbstractQueries {
+public abstract class AbstractEsperQueries {
     public Configuration configuration;
-    public ArrayList<LSSQuery> queries;
+    public ArrayList<EsperQueryDTO> queries;
 
-    public AbstractQueries(){
+    public AbstractEsperQueries(){
         configuration = new Configuration();
         queries = new ArrayList<>();
     }
 
-    public void compileAndDeploy(EPRuntime runtime, Configuration conf, ArrayList<LSSQuery> queries) {
-        for (LSSQuery query : queries) {
+    public void compileAndDeploy(EPRuntime runtime, Configuration conf, ArrayList<EsperQueryDTO> queries) {
+        for (var query : queries) {
             try {
-                EPCompiled selectCompiled = EPCompilerProvider.getCompiler().compile(query.statement, new CompilerArguments(conf));
+                EPCompiled selectCompiled = EPCompilerProvider.getCompiler().compile(query.query, new CompilerArguments(conf));
                 runtime.getDeploymentService().deploy(selectCompiled, new DeploymentOptions().setDeploymentId(query.deploymentId));
             } catch (EPCompileException | EPDeployException ex) {
                 throw new RuntimeException(ex);
@@ -34,6 +34,14 @@ public abstract class AbstractQueries {
     public Configuration setConfiguration(Class<?> eventClass) {
         configuration.getCommon().addEventType(eventClass);
         return configuration;
+    }
+
+    public Configuration setConfiguration(Class<?>[] eventClasses) {
+        for (Class<?> eventClass : eventClasses) {
+            configuration.getCommon().addEventType(eventClass);
+        }
+        return configuration;
+
     }
 
     public Configuration getConfiguration() {

@@ -1,15 +1,13 @@
 package com.espertech.QueriesDatabase.Postgres;
 
 import com.espertech.QueriesDatabase.QueriesDB;
-import com.espertech.QueriesDatabase.QueryMetadata;
+import com.espertech.QueriesDatabase.QueryMetadataDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class PostgresDB implements QueriesDB {
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/esper_queries";
@@ -26,8 +24,8 @@ public class PostgresDB implements QueriesDB {
     }
 
     @Override
-    public Collection<QueryMetadata> fetchQueries() {
-        List<QueryMetadata> queries = new ArrayList<>();
+    public Collection<QueryMetadataDTO> fetchQueries() {
+        List<QueryMetadataDTO> queries = new ArrayList<>();
         String sql = "SELECT q.id, q.name, q.query_statement, q.deploymentId, q.query, q.event_classes, c.name as category, q.created_at, q.updated_at, q.status, q.description " +
                      "FROM esper_queries q JOIN query_category c ON q.category_id = c.id"; //WHERE q.status = TRUE
 
@@ -35,7 +33,7 @@ public class PostgresDB implements QueriesDB {
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
-                QueryMetadata qm = new QueryMetadata(
+                QueryMetadataDTO qm = new QueryMetadataDTO(
                         UUID.fromString(rs.getString("id")),
                         rs.getString("name"),
                         rs.getString("query_statement"),
@@ -59,12 +57,12 @@ public class PostgresDB implements QueriesDB {
     }
 
     @Override
-    public CompletableFuture<Void> insertQueriesAsync(Collection<QueryMetadata> queries) {
+    public CompletableFuture<Void> insertQueriesAsync(Collection<QueryMetadataDTO> queries) {
         return CompletableFuture.runAsync(() -> insertQueries(queries));
     }
 
     @Override
-    public CompletableFuture<Collection<QueryMetadata>> fetchQueriesAsync() {
+    public CompletableFuture<Collection<QueryMetadataDTO>> fetchQueriesAsync() {
         return CompletableFuture.supplyAsync(this::fetchQueries);
     }
 
@@ -87,7 +85,7 @@ public class PostgresDB implements QueriesDB {
     }
 
     @Override
-    public void insertQueries(Collection<QueryMetadata> queries) {
+    public void insertQueries(Collection<QueryMetadataDTO> queries) {
         String sql = "INSERT INTO esper_queries (id, name, query_statement, deploymentId, query, event_classes, category_id, status, description) " +
                      "VALUES (?, ?, ?, ?, ?, ?::jsonb, (SELECT id FROM query_category WHERE name = ?), ?, ?)";
 
@@ -113,7 +111,7 @@ public class PostgresDB implements QueriesDB {
     }
 
     @Override
-    public void insertQuery(QueryMetadata query) {
+    public void insertQuery(QueryMetadataDTO query) {
         String sql = "INSERT INTO esper_queries (id, name, query_statement, deploymentId, query, event_classes, category_id, status, description) " +
                      "VALUES (?, ?, ?, ?, ?, ?::jsonb, (SELECT id FROM query_category WHERE name = ?), ?, ?)";
 
@@ -130,7 +128,7 @@ public class PostgresDB implements QueriesDB {
         }
     }
 
-    private void parseQuery(QueryMetadata query, PreparedStatement ps) throws SQLException, JsonProcessingException {
+    private void parseQuery(QueryMetadataDTO query, PreparedStatement ps) throws SQLException, JsonProcessingException {
         ps.setObject(1, query.id);
         ps.setString(2, query.name);
         ps.setString(3, query.queryStatement);
@@ -179,7 +177,7 @@ public class PostgresDB implements QueriesDB {
     }
 
     @Override
-    public void saveUpdatedQuery(QueryMetadata query) {
+    public void saveUpdatedQuery(QueryMetadataDTO query) {
         String sql = "UPDATE esper_queries SET name = ?, query_statement = ?, deploymentId = ?, query = ?, event_classes = ?::jsonb, category_id = (SELECT id FROM query_category WHERE name = ?), status = ?, description = ? WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);

@@ -5,14 +5,14 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public interface QueriesDB {
-    Collection<QueryMetadata> fetchQueries();
-    CompletableFuture<Void> insertQueriesAsync(Collection<QueryMetadata> queries);
-    CompletableFuture<Collection<QueryMetadata>> fetchQueriesAsync();
+    Collection<QueryMetadataDTO> fetchQueries();
+    CompletableFuture<Void> insertQueriesAsync(Collection<QueryMetadataDTO> queries);
+    CompletableFuture<Collection<QueryMetadataDTO>> fetchQueriesAsync();
     Collection<String> getAvailableCategories();
-    void insertQueries(Collection<QueryMetadata> queries);
-    void insertQuery(QueryMetadata query);
+    void insertQueries(Collection<QueryMetadataDTO> queries);
+    void insertQuery(QueryMetadataDTO query);
     void updateQueryStatus(UUID queryId, boolean status);
     boolean ping();
     void deleteQuery(UUID queryId);
-    void saveUpdatedQuery(QueryMetadata query);
+    void saveUpdatedQuery(QueryMetadataDTO query);
 }

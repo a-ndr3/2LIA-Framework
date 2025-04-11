@@ -15,18 +15,18 @@ public class QueryFactory {
         return instance;
     }
 
-    public EsperQuery createQuery(String query){
+    public EsperQueryDTO createQuery(String query){
         var deploymentId = "deploymentId" + idCounter.incrementAndGet();
         return createQuery(query, deploymentId);
     }
 
-    public EsperQuery createQuery(String query, String deploymentId){
+    public EsperQueryDTO createQuery(String query, String deploymentId){
         var queryStatement = "queryStatement" + idCounter.incrementAndGet();
         return createQuery(query, deploymentId, queryStatement);
     }
 
-    public EsperQuery createQuery(String query, String deploymentId, String queryStatement){
+    public EsperQueryDTO createQuery(String query, String deploymentId, String queryStatement){
         var id = queryIDImpl.getQueryID();
-        return new EsperQuery(query, deploymentId, queryStatement, id);
+        return new EsperQueryDTO(query, deploymentId, queryStatement, id);
     }
 }

@@ -3,7 +3,7 @@ package com.espertech.QueriesDatabase;
 import java.util.List;
 import java.util.UUID;
 
-public class QueryMetadata {
+public class QueryMetadataDTO {
 //    public QueryMetadata{
 //        Objects.requireNonNull(name);
 //        Objects.requireNonNull(deploymentId);
@@ -23,9 +23,9 @@ public class QueryMetadata {
     public Boolean status;
     public String description;
 
-    public QueryMetadata(String id, String name, String queryStatement, String deploymentId,
-                         String query, List<String> eventClasses, String category, Long createdAt,
-                         Long updatedAt, Boolean status, String description){
+    public QueryMetadataDTO(String id, String name, String queryStatement, String deploymentId,
+                            String query, List<String> eventClasses, String category, Long createdAt,
+                            Long updatedAt, Boolean status, String description){
 
         this.id = UUID.fromString(id);
         this.name = name;
@@ -40,11 +40,11 @@ public class QueryMetadata {
         this.description = description;
     }
 
-    public QueryMetadata() {
+    public QueryMetadataDTO() {
 
     }
 
-    public QueryMetadata(UUID id, String name, String queryStatement, String deploymentId,
+    public QueryMetadataDTO(UUID id, String name, String queryStatement, String deploymentId,
                             String query, List<String> eventClasses, String category, Long createdAt,
                             Long updatedAt, Boolean status, String description) {
         this(id.toString(), name, queryStatement, deploymentId, query, eventClasses, category, createdAt, updatedAt, status, description);

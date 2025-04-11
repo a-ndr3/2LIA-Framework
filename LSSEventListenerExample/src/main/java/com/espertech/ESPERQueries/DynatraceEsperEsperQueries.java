@@ -3,10 +3,10 @@ package com.espertech.ESPERQueries;
 import com.espertech.EventTypes.Types.DynatraceEvent;
 import com.espertech.esper.runtime.client.EPRuntime;
 
-public class DynatraceEsperQueries extends AbstractQueries implements LSSEsperQueries {
+public class DynatraceEsperEsperQueries extends AbstractEsperQueries implements LSSEsperQueries {
     public static final String staticQueriesDeploymentId = "dynatraceSelectQuery";
 
-    public DynatraceEsperQueries() {
+    public DynatraceEsperEsperQueries() {
         configuration = setConfiguration(DynatraceEvent.class);
     }
 
@@ -15,7 +15,7 @@ public class DynatraceEsperQueries extends AbstractQueries implements LSSEsperQu
 
         String simpleSelect = "@name('my-statement') select * from DynatraceEvent;";
 
-        queries.add(new LSSQuery(simpleSelect, staticQueriesDeploymentId));
+        queries.add(new EsperQueryDTO(simpleSelect, staticQueriesDeploymentId));
 
         compileAndDeploy(runtime, configuration, queries);
     }

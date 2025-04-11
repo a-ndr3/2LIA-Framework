@@ -4,7 +4,7 @@ import TestListeners.*;
 import com.espertech.EventGenerators.ComplexEventGenerator;
 import com.espertech.QueriesDatabase.Postgres.PostgresDB;
 import com.espertech.QueriesDatabase.QueriesDB;
-import com.espertech.QueriesDatabase.QueryMetadata;
+import com.espertech.QueriesDatabase.QueryMetadataDTO;
 import com.espertech.esper.common.client.EPCompiled;
 import com.espertech.esper.compiler.client.CompilerArguments;
 import com.espertech.esper.compiler.client.EPCompileException;
@@ -62,7 +62,7 @@ public class ComplexEventsQueriesTests {
 
     static EPRuntime runtime;
 
-    static Collection<QueryMetadata> queriesFromDb;
+    static Collection<QueryMetadataDTO> queriesFromDb;
 
     Configuration config = new Configuration();
 

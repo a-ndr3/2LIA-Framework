@@ -4,10 +4,9 @@ import com.espertech.Brokers.Listeners.MessageBrokerListener;
 import com.espertech.Brokers.Listeners.MessageListenerFactory;
 import com.espertech.Brokers.Producers.MessageBrokerProducer;
 import com.espertech.Brokers.Producers.MessageProducerFactory;
-import com.espertech.ESPERQueries.DynatraceEsperQueries;
-import com.espertech.ESPERQueries.ComplexEsperQueries;
+import com.espertech.ESPERQueries.DynatraceEsperEsperQueries;
+import com.espertech.ESPERQueries.ComplexEsperEsperQueries;
 import com.espertech.ESPERQueries.LSSEsperQueries;
-import com.espertech.EsperService;
 import com.espertech.EventGenerators.ComplexEventGenerator;
 import com.espertech.EventGenerators.DynatraceEventGenerator;
 import com.espertech.Kafka.config.KafkaEventConfig;
@@ -127,8 +126,8 @@ public class KafkaEventService {
 
     private MessageBrokerListener createListener(String type) {
         LSSEsperQueries queries = switch (type) {
-            case "complex" -> new ComplexEsperQueries();
-            case "dynatrace" -> new DynatraceEsperQueries();
+            case "complex" -> new ComplexEsperEsperQueries();
+            case "dynatrace" -> new DynatraceEsperEsperQueries();
             default -> throw new IllegalArgumentException("Unknown listener type: " + type);
         };
 

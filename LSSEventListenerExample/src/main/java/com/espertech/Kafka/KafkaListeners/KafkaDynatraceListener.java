@@ -2,10 +2,8 @@ package com.espertech.Kafka.KafkaListeners;
 
 import com.espertech.Brokers.Listeners.AbstractMessageListener;
 import com.espertech.Brokers.Producers.MessageProducerFactory;
-import com.espertech.ESPERQueries.ComplexEsperQueries;
-import com.espertech.ESPERQueries.DynatraceEsperQueries;
+import com.espertech.ESPERQueries.DynatraceEsperEsperQueries;
 import com.espertech.ESPERQueries.LSSEsperQueries;
-import com.espertech.EsperService;
 import com.espertech.EventTypes.Types.DynatraceEvent;
 import com.espertech.Kafka.ESPERAnalysisOutputUpdateListener;
 import com.espertech.Main;
@@ -60,7 +58,7 @@ public class KafkaDynatraceListener extends AbstractMessageListener {
 
     @Override
     public void startListening() {
-        runtime.getDeploymentService().getStatement(DynatraceEsperQueries.staticQueriesDeploymentId, "my-statement").addListener(listener);
+        runtime.getDeploymentService().getStatement(DynatraceEsperEsperQueries.staticQueriesDeploymentId, "my-statement").addListener(listener);
 
         consumer.subscribe(Collections.singletonList(topic));
 

@@ -1,29 +1,18 @@
 package com.espertech;
 
-import com.espertech.ESPERQueries.EsperQuery;
-import com.espertech.ESPERQueries.QueryFactory;
+import com.espertech.ESPERQueries.EsperQueryDTO;
 import com.espertech.QueriesDatabase.Postgres.PostgresDB;
 import com.espertech.QueriesDatabase.QueriesDB;
-import com.espertech.QueriesDatabase.QueryMetadata;
-import com.espertech.QueriesDatabase.QueryUploader;
-import com.espertech.esper.common.client.EPCompiled;
+import com.espertech.QueriesDatabase.QueryMetadataDTO;
 import com.espertech.esper.common.client.EventBean;
-import com.espertech.esper.common.client.configuration.Configuration;
 import com.espertech.esper.common.client.fireandforget.EPFireAndForgetQueryResult;
-import com.espertech.esper.common.client.util.DateTime;
 import com.espertech.esper.compiler.client.CompilerArguments;
-import com.espertech.esper.compiler.client.EPCompileException;
 import com.espertech.esper.compiler.client.EPCompilerProvider;
-import com.espertech.esper.runtime.client.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
-import java.time.Instant;
 import java.util.*;
 
 @RestController
@@ -31,28 +20,17 @@ import java.util.*;
 @CrossOrigin(origins = "*")
 public class EsperController {
     QueriesDB db;
+    EsperService esperService;
 
     public EsperController() {
         db = new PostgresDB();
+        esperService = EsperServiceImpl.getInstance();
     }
-
-//    @CrossOrigin(origins = "*")
-//    @PostMapping("/add")
-//    public String addQuery(@RequestBody String epl) {
-//        try {
-//            String tmp = String.format("@name('my-statement%s') %s;\n", UUID.randomUUID().getMostSignificantBits(), epl);
-//            var compiled = EPCompilerProvider.getCompiler().compile(tmp, new CompilerArguments(Main.esperService.getConfiguration()));
-//            EPDeployment deployment = Main.esperService.getRuntime().getDeploymentService().deploy(compiled); //todo make service that is responsible for creating correct sql queries
-//            return "Query added: " + deployment.getDeploymentId();
-//        } catch (Exception e) {
-//            return "Failed to add query: " + e.getMessage();
-//        }
-//    }
 
     @GetMapping("/getQueries")
     public ResponseEntity<String> getEPLStatements() {
         try {
-            var queries = Arrays.stream(Main.esperService.getDeployment().getStatements()).toList(); //todo get service injected
+            var queries = Arrays.stream(esperService.getDeployment().getStatements()).toList();
             var sb = new StringBuilder();
             for (var query : queries) {
                 sb.append(query.getName()).append("\n");
@@ -64,11 +42,11 @@ public class EsperController {
     }
 
     @CrossOrigin(origins = "*")
-    @PostMapping("/onDemandQuery") //todo add sliding window ~ 2 mins
+    @PostMapping("/onDemandQuery")
     public ResponseEntity<String> onDemandQuery(@RequestBody String epl) {
         try {
-            var runtime = Main.esperService.getRuntime();
-            CompilerArguments compilerArguments = new CompilerArguments(Main.esperService.getConfiguration());
+            var runtime = esperService.getRuntime();
+            CompilerArguments compilerArguments = new CompilerArguments(esperService.getConfiguration());
             compilerArguments.getPath().add(runtime.getRuntimePath());
             var compiled = EPCompilerProvider.getCompiler().compileQuery(epl, compilerArguments);
             EPFireAndForgetQueryResult result = runtime.getFireAndForgetService().executeQuery(compiled);
@@ -102,10 +80,7 @@ public class EsperController {
     @PostMapping("/uploadTestEventsQueries")
     public ResponseEntity<String> uploadComplexEventsQueries() {
         try {
-            QueryUploader qu = new QueryUploader(new PostgresDB());
-            for (var query : getComplexEventsQueries()) {
-                qu.uploadQuery(query);
-            }
+            db.insertQueries(getComplexEventsQueries());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error uploading test events queries to database");
         }
@@ -115,21 +90,22 @@ public class EsperController {
     @CrossOrigin(origins = "*")
     @PostMapping("/changeQuery")
     public ResponseEntity<String> changeQuery(@RequestBody String queryData) {
-        QueryMetadata queryMetadata;
+        QueryMetadataDTO queryMetaDataDTO;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new ParameterNamesModule());
-            queryMetadata = objectMapper.readValue(queryData, QueryMetadata.class);
+            queryMetaDataDTO = objectMapper.readValue(queryData, QueryMetadataDTO.class);
 
-            if (queryMetadata.status) {
-                var result = changeExistingQuery(queryMetadata);
+            if (queryMetaDataDTO.status) {
+                var result = esperService.changeExistingQuery(new EsperQueryDTO(queryMetaDataDTO.query, queryMetaDataDTO.deploymentId, queryMetaDataDTO.queryStatement, queryMetaDataDTO.id));
 
                 if (result != null) {
-                    return ResponseEntity.badRequest().body("Error changing query: " + result.getMessage());
+                    return ResponseEntity.badRequest().body("Error changing query: " + result);
                 }
             }
 
-            updateDB(queryMetadata);
+            db.saveUpdatedQuery(queryMetaDataDTO);
+
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error updating query in database: " + e.getMessage());
         }
@@ -139,22 +115,22 @@ public class EsperController {
 
     @CrossOrigin(origins = "*")
     @PostMapping("/deployQueryFromDB")
-    public ResponseEntity<String> deployQueryFromDB(@RequestBody String queryData){
-        QueryMetadata queryMetaData;
+    public ResponseEntity<String> deployQueryFromDB(@RequestBody String queryData) {
+        QueryMetadataDTO queryMetaDataDTO;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new ParameterNamesModule());
-            queryMetaData = objectMapper.readValue(queryData, QueryMetadata.class);
+            queryMetaDataDTO = objectMapper.readValue(queryData, QueryMetadataDTO.class);
 
-            var result = deployQuery(queryMetaData);
+            var result = esperService.deployQuery(new EsperQueryDTO(queryMetaDataDTO.query, queryMetaDataDTO.deploymentId, queryMetaDataDTO.queryStatement, queryMetaDataDTO.id));
 
-            if (result != null) {
-                return ResponseEntity.badRequest().body("Error deploying query: " + result.getMessage());
+            if (!result.isEmpty()) {
+                return ResponseEntity.badRequest().body("Error deploying query: " + result);
             }
 
-            queryMetaData.status = true;
+            queryMetaDataDTO.status = true;
 
-            updateDB(queryMetaData);
+            db.saveUpdatedQuery(queryMetaDataDTO);
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error deploying query from database: " + e.getMessage());
@@ -163,114 +139,25 @@ public class EsperController {
         return ResponseEntity.ok("Query deployed successfully");
     }
 
-    private Exception deployQuery(QueryMetadata queryData){
-        EPCompiled compiled = null;
-        var runtime = Main.esperService.getRuntime();
-        try {
-            CompilerArguments compilerArguments = new CompilerArguments(Main.esperService.getConfiguration());
-            compilerArguments.getPath().add(runtime.getRuntimePath());
-            compiled = EPCompilerProvider.getCompiler().compile(queryData.query, compilerArguments);
-            runtime.getDeploymentService().deploy(compiled, new DeploymentOptions().setDeploymentId(queryData.deploymentId));
-        } catch (EPCompileException | EPDeployException | IllegalStateException e) {
-            return e;
-        }
-        return null;
-    }
-
     private Exception addNewQuery(String epl, String name, List<String> classes, String category, String description) {
-        EPCompiled compiled = null;
-        var runtime = Main.esperService.getRuntime();
-        try {
+        var result = esperService.deployNewQuery(epl, name, classes, category, description);
 
-            CompilerArguments compilerArguments = new CompilerArguments(Main.esperService.getConfiguration());
-            compilerArguments.getPath().add(runtime.getRuntimePath());
-            compiled = EPCompilerProvider.getCompiler().compile(epl, compilerArguments);
-
-        } catch (EPCompileException e) {
-            return e;
-        }
-
-        EsperQuery newQuery = null;
-        try {
-            newQuery = QueryFactory.getInstance().createQuery(epl);
-            runtime.getDeploymentService().deploy(compiled, new DeploymentOptions().setDeploymentId(newQuery.deploymentId));
-
-        } catch (EPDeployException | IllegalStateException e) {
-            return e;
-        }
-
-        try {
-            QueryMetadata data = new QueryMetadata(
-                    newQuery.id,
-                    name,
-                    newQuery.queryStatement,
-                    newQuery.deploymentId,
-                    newQuery.query,
-                    classes,
-                    category,
-                    Instant.now().toEpochMilli(),
-                    Instant.now().toEpochMilli(),
-                    true,
-                    description
-            );
-            db.insertQuery(data);
-
-        } catch (Exception e) {
-            return e;
-        }
-
-        return null;
-    }
-
-    private void updateDB(QueryMetadata queryData) {
-        try {
-            db.saveUpdatedQuery(queryData);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Exception changeExistingQuery(QueryMetadata queryData) {
-        EPCompiled compiled = null;
-        var runtime = Main.esperService.getRuntime();
-        ArrayList<UpdateListener> existingListeners = new ArrayList<>();
-        try {
-
+        if (result == null)
+            return new Exception("Failed to deploy query");
+        else {
             try {
-                runtime.getDeploymentService().getStatement(queryData.deploymentId, queryData.queryStatement).getUpdateListeners().forEachRemaining(existingListeners::add);
-                runtime.getDeploymentService().undeploy(queryData.deploymentId);
-            } catch (EPUndeployException | NullPointerException e) {
-                return e;
-            }
-
-            try {
-                CompilerArguments compilerArguments = new CompilerArguments(Main.esperService.getConfiguration());
-                compilerArguments.getPath().add(runtime.getRuntimePath());
-                compiled = EPCompilerProvider.getCompiler().compileQuery(queryData.query, compilerArguments);
-            } catch (EPCompileException e) {
-                return e;
-            }
-
-            try {
-                runtime.getDeploymentService().deploy(compiled, new DeploymentOptions().setDeploymentId(queryData.deploymentId));
-
-                for (var listener : existingListeners) {
-                    runtime.getDeploymentService().getStatement(queryData.deploymentId, queryData.queryStatement).addListener(listener);
-                }
-
-            } catch (EPDeployException | IllegalStateException e) {
+                db.insertQuery(result);
+            } catch (Exception e) {
                 return e;
             }
 
             return null;
-        } catch (Exception e) {
-            return e;
         }
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.POST})
     @PostMapping("/checkExistingQueriesInDatabase")
-    public ResponseEntity<Collection<QueryMetadata>> checkExistingQueriesInDatabase() {
+    public ResponseEntity<Collection<QueryMetadataDTO>> checkExistingQueriesInDatabase() {
         var queries = db.fetchQueries();
         if (queries.isEmpty()) {
             return ResponseEntity.ok(List.of());
@@ -286,10 +173,10 @@ public class EsperController {
         return ResponseEntity.status(500).body("DB is DOWN");
     }
 
-    private ArrayList<QueryMetadata> getComplexEventsQueries() {
+    private ArrayList<QueryMetadataDTO> getComplexEventsQueries() {
         var time = System.currentTimeMillis();
-        var queries = new ArrayList<QueryMetadata>();
-        queries.add(new QueryMetadata(
+        var queries = new ArrayList<QueryMetadataDTO>();
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "SimpleSelect",
                 "my-statement",
@@ -303,7 +190,7 @@ public class EsperController {
                 "Simple select query"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "timeWindowForDynamicSelection",
                 "",
@@ -321,7 +208,7 @@ public class EsperController {
                 "Time Window creation"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "context",
                 "",
@@ -337,7 +224,7 @@ public class EsperController {
                 "Context creation query"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "selectWithinTimeWindow",
                 "selectWithinTimeWindowStatement",
@@ -355,7 +242,7 @@ public class EsperController {
                 "Select within time window"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "selectWithinBatchWindow",
                 "selectWithinBatchWindowStatement",
@@ -373,7 +260,7 @@ public class EsperController {
                 "Select within batch time window"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "eventChainCheck",
                 "eventChainCheckStatement",
@@ -394,7 +281,7 @@ public class EsperController {
                 "Check event chain within 10 seconds"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "eventDependenciesCheck",
                 "eventDependenciesCheckStatement",
@@ -415,7 +302,7 @@ public class EsperController {
                 "Check events dependencies"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "twoEventsInOrder",
                 "twoEventsInOrderStatement",
@@ -437,7 +324,7 @@ public class EsperController {
                 "Check that events occur in order"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "cascadeImpact",
                 "cascadeImpactStatement",
@@ -460,7 +347,7 @@ public class EsperController {
                 "Check cascade appearance of events"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "slowDetection",
                 "slowdownDetectionStatement",
@@ -481,7 +368,7 @@ public class EsperController {
                 "Check system response time"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "conflictingEvents",
                 "conflictDetectionStatement",
@@ -502,7 +389,7 @@ public class EsperController {
                 "Check chain of events"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "eventSpikes",
                 "eventSpikesStatement",
@@ -522,7 +409,7 @@ public class EsperController {
                 "Check event spikes after a particular event"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "compositeConstraint",
                 "compositeConstraintStatement",
@@ -544,7 +431,7 @@ public class EsperController {
                 "Check composite constraint where any of the events can trigger the alert"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "multipleDataChecks",
                 "multipleDataChecksStatement",
@@ -569,7 +456,7 @@ public class EsperController {
                 "Check multiple conditions in a single query"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "crossEventDataAccess",
                 "crossEventDataStatement",
@@ -593,7 +480,7 @@ public class EsperController {
                 "Check cross event data access and comparison"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "multipleDataChecksForOneEvent",
                 "multipleDataChecksStatement",
@@ -611,7 +498,7 @@ public class EsperController {
                 "Check multiple conditions for a single event"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "eventBasedEvaluationCriteria",
                 "eventBasedEvaluationCriteriaStatement",
@@ -635,7 +522,7 @@ public class EsperController {
                 "Check event sequence completion before next event"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "multipleEvaluationCriteria",
                 "multipleEvaluationCriteriaStatement",
@@ -663,7 +550,7 @@ public class EsperController {
                 "Check multiple evaluation criteria for a sequence of events"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "flexibleEventSequences",
                 "flexibleEventSequencesStatement",
@@ -695,7 +582,7 @@ public class EsperController {
                 "Check several event sequences"
         ));
 
-        queries.add(new QueryMetadata(
+        queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "compositeConstraintGeneralEvents",
                 "compositeConstraintCheckTypeStatement",
