@@ -30,7 +30,6 @@
         <module name="esper-compiler" />
         <module name="esper-example-autoid" />
         <module name="esper-example-trivia" />
-        <module name="LSSEventListenerExample" />
         <module name="esper-regression-lib" />
         <module name="esper_examples_benchmark" />
         <module name="esper-common" />
@@ -42,6 +41,7 @@
         <module name="esper-example-servershell" />
         <module name="esper-regression-run" />
         <module name="example-terminalsvc-mdb" />
+        <module name="LSSAnalysisService" />
       </profile>
     </annotationProcessing>
   </component>
