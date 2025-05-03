@@ -100,7 +100,9 @@ class _QueryPageState extends State<QueryPage> {
   Future<List<QueryMetadata>> _existingQueriesAnalytics() async {
     try {
       final response = await http.post(
-        Uri.parse(ApiEndpoints.checkExistingQueriesInDatabase),
+        //Uri.parse(ApiEndpoints.checkExistingQueriesInDatabase),
+        Uri.parse(
+            "http://127.0.0.1:8081/queries/checkExistingQueriesInDatabase"),
       );
 
       if (response.statusCode == 200) {
