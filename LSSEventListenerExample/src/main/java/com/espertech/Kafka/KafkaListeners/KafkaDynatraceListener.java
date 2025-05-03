@@ -1,10 +1,11 @@
 package com.espertech.Kafka.KafkaListeners;
 
+import com.espertech.Brokers.BrokerType;
 import com.espertech.Brokers.Listeners.AbstractMessageListener;
 import com.espertech.Brokers.Producers.MessageProducerFactory;
-import com.espertech.ESPERQueries.DynatraceEsperEsperQueries;
+import com.espertech.ESPERQueries.DynatraceAnalysisEsperQueries;
 import com.espertech.ESPERQueries.LSSEsperQueries;
-import com.espertech.EventTypes.Types.DynatraceEvent;
+import com.espertech.EventTypes.Types.dynatrace.DynatraceLog;
 import com.espertech.Kafka.ESPERAnalysisOutputUpdateListener;
 import com.espertech.Main;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -22,13 +23,11 @@ public class KafkaDynatraceListener extends AbstractMessageListener {
     private final String server;
     private KafkaConsumer<String, String> consumer;
 
-    //ESPERAnalysisOutputUpdateListener listener = new ESPERAnalysisOutputUpdateListener(
-     //       MessageProducerFactory.createProducer("kafka", Main.config.kafkaTopic, Main.config.kafkaBootstrapServers));
     ESPERAnalysisOutputUpdateListener listener;
 
     public KafkaDynatraceListener(String kafkaTopic, String kafkaBootstrapServers, LSSEsperQueries esperQueries, String initDeploymentId) {
         super(kafkaTopic, esperQueries, initDeploymentId);
-        listener = new ESPERAnalysisOutputUpdateListener(MessageProducerFactory.createProducer("kafka", kafkaTopic, kafkaBootstrapServers));
+        listener = new ESPERAnalysisOutputUpdateListener(MessageProducerFactory.createProducer(BrokerType.KAFKA, kafkaTopic + "-out", kafkaBootstrapServers));
         this.server = kafkaBootstrapServers;
         this.consumer = createKafkaConsumer();
         Main.logger.info("Kafka Listener initialized for topic: {}", kafkaTopic);
@@ -50,7 +49,7 @@ public class KafkaDynatraceListener extends AbstractMessageListener {
         properties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "6000");
         properties.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, "1000");
 
-        properties.put("spring.json.value.default.type", DynatraceEvent.class.getName());
+        properties.put("spring.json.value.default.type", DynatraceLog.class.getName());
         properties.put("spring.json.trusted.packages", "*");
 
         return new KafkaConsumer<>(properties);
@@ -58,7 +57,8 @@ public class KafkaDynatraceListener extends AbstractMessageListener {
 
     @Override
     public void startListening() {
-        runtime.getDeploymentService().getStatement(DynatraceEsperEsperQueries.staticQueriesDeploymentId, "my-statement").addListener(listener);
+        runtime.getDeploymentService().getStatement(DynatraceAnalysisEsperQueries.staticQueriesDeploymentId, "my-statement").addListener(listener);
+        runtime.getDeploymentService().getStatement(DynatraceAnalysisEsperQueries.staticQueriesAnotherId, "statusCodeSelect").addListener(listener);
 
         consumer.subscribe(Collections.singletonList(topic));
 
@@ -75,7 +75,7 @@ public class KafkaDynatraceListener extends AbstractMessageListener {
 
     private void processRecords(ConsumerRecords<String, String> records) {
         for (var record : records) {
-            runtime.getEventService().sendEventBean(record.value(), "DynatraceEvent");
+            runtime.getEventService().sendEventBean(record.value(), "DynatraceRecord");
         }
         Main.logger.info("Processed {} records", records.count());
     }

@@ -7,6 +7,7 @@ import java.util.List;
 public interface MessageBrokerProducer {
     <T extends LSSEvent> void sendEventBatch(List<T> events);
     <T extends LSSEvent> void run(List<T> events) throws InterruptedException;
+    <T extends LSSEvent> void sendEventBatch(List<T> events, String newTopic);
     void stop();
 }
 

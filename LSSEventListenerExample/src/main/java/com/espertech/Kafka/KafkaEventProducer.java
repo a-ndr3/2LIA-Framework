@@ -52,6 +52,11 @@ public class KafkaEventProducer extends AbstractMessageProducer {
         sendEvents(events, topic);
     }
 
+    @Override
+    public <T extends LSSEvent> void sendEventBatch(List<T> events, String newTopic) {
+        sendEvents(events, newTopic);
+    }
+
     private <T extends LSSEvent> void sendEvents(List<T> events, String topic) {
         try {
             producer.beginTransaction();

@@ -29,7 +29,7 @@ public class ESPERAnalysisOutputUpdateListener implements UpdateListener {
         if (newEvents != null) {
             for (EventBean e : newEvents) {
                 var event = (LSSEvent) e.getUnderlying();
-                String topic = getTopicForEvent(event);
+                String topic = getTopicForEvent(event, stmt.getName());
                 eventBuffers.computeIfAbsent(topic, k -> Collections.synchronizedList(new ArrayList<>())).add(event);
 
                 PrometheusMetrics.esperAlertCounter.inc();
@@ -49,11 +49,11 @@ public class ESPERAnalysisOutputUpdateListener implements UpdateListener {
             batch = new ArrayList<>(eventBuffers.get(topic));
             eventBuffers.get(topic).clear();
         }
-        producer.sendEventBatch(batch);
+        producer.sendEventBatch(batch, topic);
     }
 
-    private String getTopicForEvent(LSSEvent event) {
-        return "esper-" + event.getClass().getSimpleName().toLowerCase();
+    private String getTopicForEvent(LSSEvent event ,String statementName) {
+        return "esper-" + event.getClass().getSimpleName().toLowerCase() + "-" + statementName;
     }
 }
 

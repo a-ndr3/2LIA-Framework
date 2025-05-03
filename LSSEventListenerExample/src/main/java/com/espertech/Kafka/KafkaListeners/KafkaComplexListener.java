@@ -1,5 +1,6 @@
 package com.espertech.Kafka.KafkaListeners;
 
+import com.espertech.Brokers.BrokerType;
 import com.espertech.Brokers.Listeners.AbstractMessageListener;
 import com.espertech.Brokers.Producers.MessageProducerFactory;
 import com.espertech.ESPERQueries.LSSEsperQueries;
@@ -25,7 +26,7 @@ public class KafkaComplexListener extends AbstractMessageListener {
 
     public KafkaComplexListener(String kafkaTopic, String kafkaBootstrapServers, LSSEsperQueries esperQueries, String initDeploymentId) {
         super(kafkaTopic, esperQueries, initDeploymentId);
-        listener = new ESPERAnalysisOutputUpdateListener(MessageProducerFactory.createProducer("kafka", kafkaTopic, kafkaBootstrapServers));
+        listener = new ESPERAnalysisOutputUpdateListener(MessageProducerFactory.createProducer(BrokerType.KAFKA, kafkaTopic, kafkaBootstrapServers));
         this.server = kafkaBootstrapServers;
         this.consumer = createKafkaConsumer();
         Main.logger.info("Kafka Listener initialized for topic: {}", kafkaTopic);

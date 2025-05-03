@@ -30,11 +30,21 @@ public class KafkaEventController {
     public ResponseEntity<String> startAnalysis(@RequestParam(defaultValue = "dynatrace", name = "producer") String producer,
                                                 @RequestParam(defaultValue = "dynatrace", name = "listener") String listener) {
         try {
-            kafkaEventService.startAnalysis(listener);
+            var type = resolveType(listener);
+            kafkaEventService.startAnalysis(type);
         } catch (IOException e) {
             return ResponseEntity.badRequest().body("Error starting analysis: " + e.getMessage());
         }
         return ResponseEntity.ok("Kafka Analysis started with producer: " + producer + " and listener: " + listener);
+    }
+
+    private KafkaEventConfig.ConfigType resolveType(String type) {
+        return switch (type) {
+            case "dynatrace" -> KafkaEventConfig.ConfigType.Dynatrace;
+            case "complex" -> KafkaEventConfig.ConfigType.Complex;
+            case "simple" -> KafkaEventConfig.ConfigType.Simple;
+            default -> throw new IllegalArgumentException("Invalid type: " + type);
+        };
     }
 
     @PostMapping("/stop")

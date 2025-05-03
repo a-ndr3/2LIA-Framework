@@ -4,11 +4,11 @@ import com.espertech.EventTypes.Types.ComplexEvent;
 import com.espertech.esper.runtime.client.EPRuntime;
 
 
-public class ComplexEsperEsperQueries extends AbstractEsperQueries implements LSSEsperQueries {
+public class ComplexEsperQueries extends AbstractEsperQueries implements LSSEsperQueries {
     public static final String staticQueriesDeploymentId = "complexSelectQueries";
     //public static final String runtimeQueriesDeploymentId = "timeWindowQueries";
 
-    public ComplexEsperEsperQueries() {
+    public ComplexEsperQueries() {
         configuration = setConfiguration(ComplexEvent.class);
     }
 
