@@ -117,5 +117,17 @@ public class DynatraceEventGenerator {
         this.groupByTime = builder.groupByTime;
         this.log = new DynatraceLog();
         readFile(builder.file);
+        if (groupByTraceId) {
+            groupByTraceId();
+        }
+        if (groupByServiceId) {
+            groupByServiceId();
+        }
+        if (groupByServiceName) {
+            groupByServiceName();
+        }
+        if (groupByTime) {
+            groupByTime();
+        }
     }
 }

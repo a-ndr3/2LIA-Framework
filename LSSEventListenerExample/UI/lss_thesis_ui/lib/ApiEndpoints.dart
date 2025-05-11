@@ -2,6 +2,7 @@ class ApiEndpoints {
   static const String baseUrl = "http://127.0.0.1:8081";
   static const String queries = "$baseUrl/queries";
   static const String onDemand = "$queries/onDemandQuery";
+  static const String addQueryAuto = "$queries/addQueryAuto";
   static const String checkExistingQueriesInDatabase =
       "$queries/checkExistingQueriesInDatabase";
   static const String changeQuery = "$queries/changeQuery";

@@ -23,6 +23,8 @@ public class EsperServiceImpl implements EsperService {
     private EPDeployment deployment;
     private Configuration configuration;
 
+    private UpdateListener listener; //TODO FIX we need to pass listeners based on the events we listen to -> this one is quick fix for now
+
     private EsperServiceImpl() {
 
     }
@@ -32,6 +34,14 @@ public class EsperServiceImpl implements EsperService {
             instance = new EsperServiceImpl();
         }
         return instance;
+    }
+
+    public UpdateListener getListener() {
+        return listener;
+    }
+
+    public void setListener(UpdateListener listener) { //TODO FIX we need to pass listeners based on the events we listen to -> this one is quick fix for now
+        this.listener = listener;
     }
 
     public void setRuntime(EPRuntime runtime) {
@@ -69,6 +79,7 @@ public class EsperServiceImpl implements EsperService {
             compilerArguments.getPath().add(runtime.getRuntimePath());
             compiled = EPCompilerProvider.getCompiler().compile(query.query, compilerArguments);
             runtime.getDeploymentService().deploy(compiled, new DeploymentOptions().setDeploymentId(query.deploymentId));
+            runtime.getDeploymentService().getStatement(query.deploymentId, query.queryStatement).addListener(listener); //TODO FIX we need to pass listeners based on the events we listen to -> this one is quick fix for now
         } catch (EPCompileException | EPDeployException | IllegalStateException e) {
             return e.getMessage();
         }
@@ -79,11 +90,9 @@ public class EsperServiceImpl implements EsperService {
     public QueryMetadataDTO deployNewQuery(String epl, String name, List<String> classes, String category, String description) {
         EPCompiled compiled;
         try {
-
             CompilerArguments compilerArguments = new CompilerArguments(configuration);
             compilerArguments.getPath().add(runtime.getRuntimePath());
             compiled = EPCompilerProvider.getCompiler().compile(epl, compilerArguments);
-
         } catch (EPCompileException e) {
             return null;
         }
@@ -92,7 +101,7 @@ public class EsperServiceImpl implements EsperService {
         try {
             newQuery = QueryFactory.getInstance().createQuery(epl);
             runtime.getDeploymentService().deploy(compiled, new DeploymentOptions().setDeploymentId(newQuery.deploymentId));
-
+            runtime.getDeploymentService().getStatement(newQuery.deploymentId, newQuery.queryStatement).addListener(listener); //TODO FIX we need to pass listeners based on the events we listen to -> this one is quick fix for now
         } catch (EPDeployException | IllegalStateException e) {
             return null;
         }

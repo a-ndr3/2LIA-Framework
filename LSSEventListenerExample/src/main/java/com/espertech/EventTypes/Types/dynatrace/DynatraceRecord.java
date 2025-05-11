@@ -1,13 +1,16 @@
 package com.espertech.EventTypes.Types.dynatrace;
 
+import com.espertech.AnalysisCore.Types.SpanEvent;
 import com.espertech.EventTypes.LSSEvent;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DynatraceRecord implements LSSEvent {
+public class DynatraceRecord extends SpanEvent implements LSSEvent {
     @JsonProperty("start_time")
     public OffsetDateTime startTime;
 
@@ -79,11 +82,36 @@ public class DynatraceRecord implements LSSEvent {
         return traceId;
     }
 
+    @Override
+    public String getSpanId() {
+        return spanId;
+    }
+
     public String getServiceId() {
         return serviceId;
     }
 
     public String getServiceName() {
         return serviceEntityName;
+    }
+
+    @Override
+    public String getEndpoint() {
+        return endpointName;
+    }
+
+    @Override
+    public long getDuration() {
+        return duration;
+    }
+
+    @Override
+    public int getStatusCode() {
+         return httpResponseStatusCode != null ? Math.toIntExact(httpResponseStatusCode) : 0;
+    }
+
+    @Override
+    public Instant getTime() {
+        return startTime.toInstant();
     }
 }

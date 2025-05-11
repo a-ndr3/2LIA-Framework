@@ -4,13 +4,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class QueryMetadataDTO {
-//    public QueryMetadata{
-//        Objects.requireNonNull(name);
-//        Objects.requireNonNull(deploymentId);
-//        Objects.requireNonNull(query);
-//        Objects.requireNonNull(eventClasses);
-//        Objects.requireNonNull(category);
-//    }
     public UUID id;
     public String name;
     public String queryStatement;

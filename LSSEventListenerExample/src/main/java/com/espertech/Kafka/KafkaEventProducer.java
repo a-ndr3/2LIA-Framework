@@ -79,9 +79,11 @@ public class KafkaEventProducer extends AbstractMessageProducer {
     @Override
     public <T extends LSSEvent> void run(List<T> events) {
         try {
-            for (int i = 0; i < events.size(); i += 1000) {
-                sendEvents(events.subList(i, Math.min(i + 1000, events.size())), topic);
+            for (int i = 0; i < events.size(); i += 250) { //TODO: change to higher number (was 5000), added for testing
+                sendEvents(events.subList(i, Math.min(i + 250, events.size())), topic); //TODO: change to higher number (was 5000), added for testing
+                Thread.sleep(2000); //TODO: REMOVE, added for testing
             }
+
         } catch (Exception e) {
             Main.logger.error("Exception in Kafka producer: {}", e.getMessage());
         }

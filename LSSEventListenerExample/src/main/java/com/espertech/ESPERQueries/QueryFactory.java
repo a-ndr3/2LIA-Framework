@@ -21,8 +21,11 @@ public class QueryFactory {
     }
 
     public EsperQueryDTO createQuery(String query, String deploymentId){
-        var queryStatement = "queryStatement" + idCounter.incrementAndGet();
-        return createQuery(query, deploymentId, queryStatement);
+        var statement = query.split("@name\\('")[1].split("'")[0];
+        if (statement == null || statement.isEmpty()) {
+            statement = "queryStatement" + idCounter.incrementAndGet();
+        }
+        return createQuery(query, deploymentId, statement);
     }
 
     public EsperQueryDTO createQuery(String query, String deploymentId, String queryStatement){

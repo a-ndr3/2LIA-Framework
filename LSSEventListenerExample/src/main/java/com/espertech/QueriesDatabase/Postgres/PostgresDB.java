@@ -198,4 +198,16 @@ public class PostgresDB implements QueriesDB {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void resetTable(String tableName) {
+        String sql = "TRUNCATE TABLE " + tableName;
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

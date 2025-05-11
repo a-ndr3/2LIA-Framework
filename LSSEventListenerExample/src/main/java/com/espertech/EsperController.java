@@ -61,6 +61,22 @@ public class EsperController {
     }
 
     @CrossOrigin(origins = "*")
+    @PostMapping("/addQueryAuto")
+    public ResponseEntity<String> onAddQueryAuto(@RequestBody String epl) {
+        try {
+            var name = epl.split("@name\\('")[1].split("'")[0];
+            ObjectMapper objectMapper = new ObjectMapper();
+            var rootNode = objectMapper.readTree(epl);
+            String actualEpl = rootNode.get("query").asText();
+            return onAddQuery(actualEpl, name, List.of("DynatraceRecord"),
+                    "System", "On demand query");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to run query: " + e.getMessage());
+        }
+    }
+
+
+    @CrossOrigin(origins = "*")
     @PostMapping("/addQuery")
     public ResponseEntity<String> onAddQuery(@RequestBody String epl,
                                              @RequestParam String name,
@@ -85,6 +101,26 @@ public class EsperController {
             return ResponseEntity.badRequest().body("Error uploading test events queries to database");
         }
         return ResponseEntity.ok("Test queries uploaded to database");
+    }
+
+    @PostMapping("/uploadTestDynatraceQueries")
+    public ResponseEntity<String> uploadDynatraceEventQueries() {
+        try {
+            db.insertQueries(getDynatraceTestQueries());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error uploading test events queries to database");
+        }
+        return ResponseEntity.ok("Dynatrace Test queries uploaded to database");
+    }
+
+    @PostMapping("/clearTable")
+    public ResponseEntity<String> clearTable() {
+        try {
+            db.resetTable("esper_queries");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error clearing table: " + e.getMessage());
+        }
+        return ResponseEntity.ok("Table cleared successfully");
     }
 
     @CrossOrigin(origins = "*")
@@ -600,6 +636,40 @@ public class EsperController {
                 time,
                 false,
                 "Simple check sequence of events of different types"
+        ));
+
+        return queries;
+    }
+
+    private ArrayList<QueryMetadataDTO> getDynatraceTestQueries() {
+        var time = System.currentTimeMillis();
+        var queries = new ArrayList<QueryMetadataDTO>();
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "queryTraceId",
+                "queryTraceIdStatement",
+                "queryTraceId",
+                "@name('queryTraceIdStatement') select * from DynatraceRecord (traceId = '13f1df51a834445a22d69eb58796aa71');",
+                List.of("DynatraceRecord"),
+                "System",
+                time,
+                time,
+                false,
+                "Simple select query"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "queryStatusCode",
+                "queryStatusCodeStatement",
+                "queryStatusCode",
+                "@name('queryStatusCodeStatement') select * from DynatraceRecord (httpResponseStatusCode != 200);",
+                List.of("DynatraceRecord"),
+                "System",
+                time,
+                time,
+                false,
+                "Simple select query"
         ));
 
         return queries;

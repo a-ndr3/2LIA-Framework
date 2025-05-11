@@ -15,4 +15,5 @@ public interface QueriesDB {
     boolean ping();
     void deleteQuery(UUID queryId);
     void saveUpdatedQuery(QueryMetadataDTO query);
+    void resetTable(String tableName);
 }

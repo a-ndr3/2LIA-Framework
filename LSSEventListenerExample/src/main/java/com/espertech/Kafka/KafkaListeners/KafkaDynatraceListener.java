@@ -5,6 +5,7 @@ import com.espertech.Brokers.Listeners.AbstractMessageListener;
 import com.espertech.Brokers.Producers.MessageProducerFactory;
 import com.espertech.ESPERQueries.DynatraceAnalysisEsperQueries;
 import com.espertech.ESPERQueries.LSSEsperQueries;
+import com.espertech.EsperServiceImpl;
 import com.espertech.EventTypes.Types.dynatrace.DynatraceLog;
 import com.espertech.Kafka.ESPERAnalysisOutputUpdateListener;
 import com.espertech.Main;
@@ -57,8 +58,7 @@ public class KafkaDynatraceListener extends AbstractMessageListener {
 
     @Override
     public void startListening() {
-        runtime.getDeploymentService().getStatement(DynatraceAnalysisEsperQueries.staticQueriesDeploymentId, "my-statement").addListener(listener);
-        runtime.getDeploymentService().getStatement(DynatraceAnalysisEsperQueries.staticQueriesAnotherId, "statusCodeSelect").addListener(listener);
+        EsperServiceImpl.getInstance().setListener(listener);
 
         consumer.subscribe(Collections.singletonList(topic));
 

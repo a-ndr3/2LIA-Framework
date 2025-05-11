@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class IDCreator implements IQueryID {
     private static IDCreator instance;
-    private static HashSet<UUID> ids;
+    private static HashSet<UUID> ids = new HashSet<>();
 
     private IDCreator() {
     }
