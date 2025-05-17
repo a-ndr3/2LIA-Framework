@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class TraceRepo {
+public class TraceBuffer {
     private final Map<String, TraceContext> activeTraces = new ConcurrentHashMap<>();
     private final Duration retentionPeriod = Duration.ofMinutes(10);
 

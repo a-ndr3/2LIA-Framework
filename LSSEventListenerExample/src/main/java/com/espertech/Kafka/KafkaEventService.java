@@ -1,5 +1,10 @@
 package com.espertech.Kafka;
 
+import com.espertech.AnalysisCore.AnalysisService.EventAnalyzer;
+import com.espertech.AnalysisCore.TopicWatcherService;
+import com.espertech.AnalysisCore.Topology.TopologyService;
+import com.espertech.AnalysisCore.Types.SpanEvent;
+import com.espertech.AnalysisCore.Types.TraceBuffer;
 import com.espertech.Brokers.BrokerType;
 import com.espertech.Brokers.Listeners.MessageBrokerListener;
 import com.espertech.Brokers.Listeners.MessageListenerFactory;
@@ -12,13 +17,22 @@ import com.espertech.EventGenerators.ComplexEventGenerator;
 import com.espertech.EventGenerators.DynatraceEventGenerator;
 import com.espertech.EventTypes.Types.dynatrace.DynatraceLog;
 import com.espertech.Kafka.config.KafkaEventConfig;
+import org.apache.kafka.clients.admin.KafkaAdminClient;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Properties;
+import java.util.UUID;
+
+import static com.espertech.Main.config;
 
 @Service("kafkaEventServiceV1")
 @Scope("singleton")
@@ -38,11 +52,40 @@ public class KafkaEventService {
         this.config = config;
     }
 
+    private void initAnalysis() {
+        var traceBuffer = new TraceBuffer();
+        var analyzer = new EventAnalyzer(traceBuffer, TopologyService.getInstance());
+
+        var properties = new Properties();
+
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getKafkaBootstrapServers());
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, UUID.randomUUID().toString());
+        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class.getName());
+
+        properties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "5000");
+        properties.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, "1048576");
+        properties.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, "104857600");
+        properties.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, "10485760");
+        properties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "6000");
+        properties.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, "1000");
+
+        properties.put("spring.json.value.default.type", DynatraceLog.class.getName());
+        properties.put("spring.json.trusted.packages", "*");
+
+
+        var kafkaAdmin = KafkaAdminClient.create(properties);
+        var topicWatcher = new TopicWatcherService(kafkaAdmin);
+        topicWatcher.startMonitoring(analyzer::handle);
+    }
+
     public synchronized void startAnalysis(KafkaEventConfig.ConfigType brokerType) throws IOException {
         stopAnalysis();
 
         producer = createProducer();
         listener = createListener(brokerType);
+        initAnalysis();
 
         running = true;
 
@@ -51,13 +94,12 @@ public class KafkaEventService {
                 listener.startListening();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-            }finally {
+            } finally {
                 listener.stopListening();
             }
         });
 
-        switch (brokerType)
-        {
+        switch (brokerType) {
             case KafkaEventConfig.ConfigType.Complex:
                 var complexEvents = ComplexEventGenerator.getEvents();
                 producerThread = new Thread(() -> {
@@ -71,17 +113,18 @@ public class KafkaEventService {
                 });
                 break;
             case KafkaEventConfig.ConfigType.Dynatrace:
-                ClassPathResource timeframe1 = new ClassPathResource("traces_spans_astroshop_timeframe1.json");
-                ClassPathResource timeframe2 = new ClassPathResource("traces_spans_astroshop_timeframe2.json");
+                //ClassPathResource timeframe1 = new ClassPathResource("traces_spans_astroshop_timeframe1.json");
+                //ClassPathResource timeframe2 = new ClassPathResource("traces_spans_astroshop_timeframe2.json");
+                ClassPathResource timeframe1 = new ClassPathResource("testAnalysisEvents.json");
                 var eventGen = new DynatraceEventGenerator.Builder(timeframe1.getFile()).setGroupByTraceId(true)
                         .build();
 
                 var logs = new ArrayList<DynatraceLog>();
                 logs.add(eventGen.log);
 
-                eventGen.readFile(timeframe2.getFile());
-                eventGen.groupByTraceId();
-                logs.add(eventGen.log);
+                //eventGen.readFile(timeframe2.getFile());
+                //eventGen.groupByTraceId();
+                //logs.add(eventGen.log);
 
                 var allRecords = logs.stream().flatMap(log -> log.records.stream()).toList();
 
@@ -146,7 +189,7 @@ public class KafkaEventService {
             default -> throw new IllegalArgumentException("Unknown listener type: " + type);
         };
 
-        switch (type){
+        switch (type) {
             case KafkaEventConfig.ConfigType.Complex:
                 return MessageListenerFactory.createListener(BrokerType.KAFKA, KafkaEventConfig.ConfigType.Complex, config.getKafkaTopic(), config.getKafkaBootstrapServers(), queries);
             case KafkaEventConfig.ConfigType.Dynatrace:

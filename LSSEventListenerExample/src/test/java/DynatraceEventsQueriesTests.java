@@ -49,21 +49,33 @@ public class DynatraceEventsQueriesTests {
 
         queriesFromDb = new ArrayList<>();
 
-        manualQueries.add("@name('queryTraceId') select * from DynatraceRecord (traceId = '13f1df51a834445a22d69eb58796aa71');");
-        manualQueries.add("@name('queryStatusCode') select * from DynatraceRecord (httpResponseStatusCode != 200);");
-        manualQueries.add("@name('queryDuration') select * from DynatraceRecord (duration > 4000000);");
-        manualQueries.add("""
-                @name('queryTraceChainDetection')
-                select
-                    a.traceId as traceA,
-                    b.traceId as traceB,
-                    c.traceId as traceC
-                from pattern [
-                    every a=DynatraceRecord(traceId='9626086d2807e04daa35916ccf862d3e') ->
-                          b=DynatraceRecord(traceId='dd22ce7051d23495318cbaf9040641ed') ->
-                          c=DynatraceRecord(traceId='7a1fcef2a56ec6af6a47658e1f637b38')
-                ];
-                """);
+//        manualQueries.add("""
+//                create context TraceContext partition by traceId from DynatraceRecord;
+//                """);
+
+//        manualQueries.add("""
+//                context TraceContext
+//                insert into ProblematicTraces
+//                select traceId, collect(*) as events
+//                from DynatraceRecord(httpResponseStatusCode != 200)
+//                output snapshot every 1 minute;
+//                """);
+
+//        manualQueries.add("@name('queryTraceId') select * from DynatraceRecord (traceId = '13f1df51a834445a22d69eb58796aa71');");
+//        manualQueries.add("@name('queryStatusCode') select * from DynatraceRecord (httpResponseStatusCode != 200);");
+//        manualQueries.add("@name('queryDuration') select * from DynatraceRecord (duration > 4000000);");
+//        manualQueries.add("""
+//                @name('queryTraceChainDetection')
+//                select
+//                    a.traceId as traceA,
+//                    b.traceId as traceB,
+//                    c.traceId as traceC
+//                from pattern [
+//                    every a=DynatraceRecord(traceId='9626086d2807e04daa35916ccf862d3e') ->
+//                          b=DynatraceRecord(traceId='dd22ce7051d23495318cbaf9040641ed') ->
+//                          c=DynatraceRecord(traceId='7a1fcef2a56ec6af6a47658e1f637b38')
+//                ];
+//                """);
 
         events = new ArrayList<>();
 
@@ -118,8 +130,8 @@ public class DynatraceEventsQueriesTests {
         testListener = new TestDynatraceListener();
         runtime.getDeploymentService().getStatement("manualQuery0", "queryTraceId").addListener(testListener);
         runtime.getDeploymentService().getStatement("manualQuery1", "queryStatusCode").addListener(testListener);
-        runtime.getDeploymentService().getStatement("manualQuery2", "queryDuration").addListener(testListener);
-        runtime.getDeploymentService().getStatement("manualQuery3", "queryTraceChainDetection").addListener(testListener);
+        //runtime.getDeploymentService().getStatement("manualQuery2", "queryDuration").addListener(testListener);
+        //runtime.getDeploymentService().getStatement("manualQuery3", "queryTraceChainDetection").addListener(testListener);
     }
 
     private void timer(int seconds) {

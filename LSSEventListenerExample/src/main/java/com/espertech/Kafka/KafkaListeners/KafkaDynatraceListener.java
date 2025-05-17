@@ -58,6 +58,8 @@ public class KafkaDynatraceListener extends AbstractMessageListener {
 
     @Override
     public void startListening() {
+        runtime.getDeploymentService().getStatement(DynatraceAnalysisEsperQueries.staticQueriesAnotherId, "networkIssues-statusCodeSelect404").addListener(listener);
+
         EsperServiceImpl.getInstance().setListener(listener);
 
         consumer.subscribe(Collections.singletonList(topic));
