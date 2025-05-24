@@ -9,6 +9,7 @@ import com.espertech.EsperServiceImpl;
 import com.espertech.EventTypes.Types.dynatrace.DynatraceLog;
 import com.espertech.Kafka.ESPERAnalysisOutputUpdateListener;
 import com.espertech.Main;
+import com.espertech.esper.runtime.client.UpdateListener;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -58,8 +59,6 @@ public class KafkaDynatraceListener extends AbstractMessageListener {
 
     @Override
     public void startListening() {
-        runtime.getDeploymentService().getStatement(DynatraceAnalysisEsperQueries.staticQueriesAnotherId, "networkIssues-statusCodeSelect404").addListener(listener);
-
         EsperServiceImpl.getInstance().setListener(listener);
 
         consumer.subscribe(Collections.singletonList(topic));
@@ -87,5 +86,10 @@ public class KafkaDynatraceListener extends AbstractMessageListener {
         running = false;
         consumer.close();
         Main.logger.info("Kafka listener stopped for topic: " + topic);
+    }
+
+    @Override
+    public UpdateListener getListener() {
+        return listener;
     }
 }

@@ -39,23 +39,4 @@ public class EventAnalyzer {
             e.printStackTrace();
         }
     }
-
-    public void deployAnalysisQueries(List<Pair<IssueTopicHelper,String>> eplTopicStatement) {
-        for (var pair : eplTopicStatement) {
-            try {
-                var epl = pair.getSecond();
-                var topic = pair.getFirst();
-                var dto = esperService.deployNewQueryNoDefaultListener(epl, "AnalysisQuery" + epl.length(), List.of("SpanEvent"), "System", "SpanEvent");
-                var deployment = esperService.getDeployment().getDeployment(dto.deploymentId);
-                Arrays.stream(deployment.getStatements()).findAny()
-                        .filter(stmt -> stmt.getName().equals(dto.queryStatement))
-                        .ifPresent(stmt -> {
-                            stmt.addListener(AnalysisListenerFactory.createListenerForQuery(topic, stmt.getName(), true)); //TODO: add check topology only for queries that need it
-                            System.out.printf("Deployed query '%s' for topic %s and attached listener %n", stmt.getName(), topic.toString());
-                        });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }

@@ -2,6 +2,7 @@ package com.espertech.QueriesDatabase.Postgres;
 
 import com.espertech.QueriesDatabase.QueriesDB;
 import com.espertech.QueriesDatabase.QueryMetadataDTO;
+import com.espertech.esper.common.internal.collection.Pair;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -52,6 +53,29 @@ public class PostgresDB implements QueriesDB {
             e.printStackTrace();
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
+        }
+        return queries;
+    }
+
+    @Override
+    public Collection<QueryMetadataDTO> fetchAnalysisQueries() {
+        List<QueryMetadataDTO> queries = new ArrayList<>();
+        String sql = "SELECT query, query_type, check_topology, status FROM analysis_queries";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                QueryMetadataDTO qm = new QueryMetadataDTO(
+                        rs.getString("query"),
+                        rs.getString("query_type"),
+                        rs.getBoolean("check_topology"),
+                        rs.getBoolean("status")
+                );
+                queries.add(qm);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return queries;
     }
@@ -140,6 +164,13 @@ public class PostgresDB implements QueriesDB {
         ps.setString(9, query.description);
     }
 
+    private void parseAnalysisQuery(QueryMetadataDTO query, PreparedStatement ps) throws SQLException, JsonProcessingException {
+        ps.setString(1, query.query);
+        ps.setString(2, query.category);
+        ps.setBoolean(3, query.status);
+        ps.setBoolean(4, query.description.equals("1"));
+    }
+
     @Override
     public void updateQueryStatus(UUID queryId, boolean status) {
         String sql = "UPDATE esper_queries SET status = ?, updated_at = NOW() WHERE id = ?";
@@ -208,6 +239,23 @@ public class PostgresDB implements QueriesDB {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void insertAnalysisQueries(Collection<QueryMetadataDTO> queries) {
+        String sql = "INSERT INTO analysis_queries (query, query_type, check_topology, status) VALUES (?, ?, ?, ?)";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            for (QueryMetadataDTO query : queries) {
+                parseAnalysisQuery(query, ps);
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        } catch (SQLException | JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 }

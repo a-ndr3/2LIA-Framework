@@ -6,11 +6,11 @@ CREATE TABLE IF NOT EXISTS query_category (
 );
 
 INSERT INTO query_category (name) VALUES 
-('Thresholds'),
-('Sequence Check'),
-('Anomaly Detection'),
-('Performance Check'),
-('System')
+('network'),
+('exception'),
+('endpoint'),
+('time'),
+('generic')
 ON CONFLICT (name) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS esper_queries (
@@ -25,4 +25,11 @@ CREATE TABLE IF NOT EXISTS esper_queries (
     updated_at TIMESTAMP DEFAULT NOW(),
     status BOOLEAN NOT NULL DEFAULT TRUE,
     description TEXT
+);
+
+CREATE TABLE IF NOT EXISTS analysis_queries (
+    query TEXT NOT NULL,
+    query_type VARCHAR(50) NOT NULL,
+    check_topology BOOLEAN NOT NULL DEFAULT TRUE,
+    status BOOLEAN NOT NULL DEFAULT TRUE
 );

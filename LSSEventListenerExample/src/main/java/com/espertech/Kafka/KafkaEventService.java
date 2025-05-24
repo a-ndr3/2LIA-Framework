@@ -13,12 +13,15 @@ import com.espertech.Brokers.Producers.MessageBrokerProducer;
 import com.espertech.Brokers.Producers.MessageProducerFactory;
 import com.espertech.ESPERQueries.DynatraceAnalysisEsperQueries;
 import com.espertech.ESPERQueries.ComplexEsperQueries;
+import com.espertech.ESPERQueries.IQueryID;
 import com.espertech.ESPERQueries.LSSEsperQueries;
 import com.espertech.EventGenerators.ComplexEventGenerator;
 import com.espertech.EventGenerators.DynatraceEventGenerator;
 import com.espertech.EventTypes.Types.dynatrace.DynatraceLog;
 import com.espertech.Kafka.config.KafkaEventConfig;
 import com.espertech.Main;
+import com.espertech.QueriesDatabase.Postgres.PostgresDB;
+import com.espertech.QueriesDatabase.QueriesDB;
 import com.espertech.esper.common.internal.collection.Pair;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.KafkaAdminClient;
@@ -39,6 +42,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static com.espertech.Main.config;
+import static com.espertech.Main.esperService;
 
 @Service("kafkaEventServiceV1")
 @Scope("singleton")
@@ -51,6 +55,8 @@ public class KafkaEventService {
     private Thread producerThread;
     private Thread consumerThread;
 
+    private QueriesDB queriesDB = new PostgresDB();
+
     private volatile boolean running = false;
 
     @Autowired
@@ -61,22 +67,6 @@ public class KafkaEventService {
     private void initAnalysis() {
         var traceBuffer = TraceBuffer.getInstance();
         var analyzer = new EventAnalyzer(traceBuffer, Main.esperService);
-
-        analyzer.deployAnalysisQueries(List.of(new Pair<>(IssueTopicHelper.NETWORK,"""
-                @name('DetectDownstreamErrors')
-                select
-                    a.traceId as traceId,
-                    a.serviceId as origin,
-                    b.serviceId as affected
-                from
-                    SpanEvent.win:time_batch(10 sec) as a
-                    inner join SpanEvent.win:time_batch(10 sec) as b
-                on
-                    a.traceId = b.traceId
-                where
-                    a.serviceId != b.serviceId and
-                    b.httpResponseStatusCode >= 404;
-                """)));
 
         var properties = new Properties();
 
@@ -129,6 +119,25 @@ public class KafkaEventService {
 
         producer = createProducer();
         listener = createListener(brokerType);
+
+        //fetch analysis & analytics queries
+        var analyticsQueries = queriesDB.fetchQueries();
+        var analysisQueries = queriesDB.fetchAnalysisQueries();
+
+        //deploy queries
+
+        esperService.setListener(listener.getListener());
+
+        try{
+            analyticsQueries.forEach(x -> esperService.deployNewQuery(
+                    x.query, x.deploymentId, x.eventClasses, x.category, x.description
+            ));
+            esperService.deployAnalysisQueries(analysisQueries);
+        }
+        catch (Exception e) {
+            Main.logger.error("Failed to deploy queries: {}", e.getMessage());
+        }
+
         initAnalysis();
 
         running = true;

@@ -1,5 +1,7 @@
 package com.espertech.QueriesDatabase;
 
+import com.espertech.esper.common.internal.collection.Pair;
+
 import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -16,4 +18,6 @@ public interface QueriesDB {
     void deleteQuery(UUID queryId);
     void saveUpdatedQuery(QueryMetadataDTO query);
     void resetTable(String tableName);
+    void insertAnalysisQueries(Collection<QueryMetadataDTO> queriesWithTypes);
+    Collection<QueryMetadataDTO>fetchAnalysisQueries();
 }

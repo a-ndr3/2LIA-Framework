@@ -1,11 +1,13 @@
 package com.espertech;
 
+import com.espertech.AnalysisCore.IssueTopicHelper;
 import com.espertech.ESPERQueries.EsperQueryDTO;
 import com.espertech.QueriesDatabase.Postgres.PostgresDB;
 import com.espertech.QueriesDatabase.QueriesDB;
 import com.espertech.QueriesDatabase.QueryMetadataDTO;
 import com.espertech.esper.common.client.EventBean;
 import com.espertech.esper.common.client.fireandforget.EPFireAndForgetQueryResult;
+import com.espertech.esper.common.internal.collection.Pair;
 import com.espertech.esper.compiler.client.CompilerArguments;
 import com.espertech.esper.compiler.client.EPCompilerProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -107,17 +109,19 @@ public class EsperController {
     @PostMapping("/uploadTestDynatraceQueries")
     public ResponseEntity<String> uploadDynatraceEventQueries() {
         try {
-            db.insertQueries(getDynatraceTestQueries());
+            db.insertQueries(getTestAnalyticsQueries());
+            db.insertAnalysisQueries(getTestAnalysisQueries());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error uploading test events queries to database");
         }
         return ResponseEntity.ok("Dynatrace Test queries uploaded to database");
     }
 
-    @PostMapping("/clearTable")
+    @PostMapping("/clearTables")
     public ResponseEntity<String> clearTable() {
         try {
             db.resetTable("esper_queries");
+            db.resetTable("analysis_queries");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error clearing table: " + e.getMessage());
         }
@@ -196,6 +200,16 @@ public class EsperController {
     @PostMapping("/checkExistingQueriesInDatabase")
     public ResponseEntity<Collection<QueryMetadataDTO>> checkExistingQueriesInDatabase() {
         var queries = db.fetchQueries();
+        if (queries.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+        return ResponseEntity.ok(queries);
+    }
+
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.POST})
+    @PostMapping("/checkExistingAnalysisQueriesInDatabase")
+    public ResponseEntity<Collection<QueryMetadataDTO>> checkExistingAnalysisQueriesInDatabase() {
+        var queries = db.fetchAnalysisQueries();
         if (queries.isEmpty()) {
             return ResponseEntity.ok(List.of());
         }
@@ -652,7 +666,7 @@ public class EsperController {
                 "queryTraceId",
                 "@name('queryTraceIdStatement') select * from DynatraceRecord (traceId = '13f1df51a834445a22d69eb58796aa71');",
                 List.of("DynatraceRecord"),
-                "System",
+                "generic",
                 time,
                 time,
                 false,
@@ -666,11 +680,105 @@ public class EsperController {
                 "queryStatusCode",
                 "@name('queryStatusCodeStatement') select * from DynatraceRecord (httpResponseStatusCode != 200);",
                 List.of("DynatraceRecord"),
-                "System",
+                "generic",
                 time,
                 time,
                 false,
                 "Simple select query"
+        ));
+
+        return queries;
+    }
+
+    private ArrayList<QueryMetadataDTO> getTestAnalyticsQueries(){
+        var time = System.currentTimeMillis();
+        var queries = new ArrayList<QueryMetadataDTO>();
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "networkIssues-statusCode",
+                "queryStatusCodeStatement",
+                "networkIssues-statusCode",
+                "@name('networkIssues-statusCodeSelect404') select * from DynatraceRecord (httpResponseStatusCode = 404);",
+                List.of("DynatraceRecord"),
+                IssueTopicHelper.NETWORK.toString(),
+                time,
+                time,
+                false,
+                "404 status code select query for Dynatrace records"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "endpointsIssues-callChainCheck",
+                "queryCallChainCheckStatement",
+                "endpointsIssues-callChainCheck",
+                "@name('endpointsIssue-callChainCheckTest') select * from DynatraceRecord (serviceId='SERVICE-53C7C4CB159DE777');",
+                List.of("DynatraceRecord"),
+                IssueTopicHelper.NETWORK.toString(),
+                time,
+                time,
+                false,
+                "500 status code select query for Dynatrace records"
+        ));
+
+        return queries;
+    }
+
+    private ArrayList<QueryMetadataDTO> getTestAnalysisQueries(){
+        var queries = new ArrayList<QueryMetadataDTO>();
+
+        queries.add(new QueryMetadataDTO(
+                """
+                @name('DetectDownstreamErrors')
+                select
+                    a.traceId as traceId,
+                    a.serviceId as origin,
+                    b.serviceId as affected
+                from
+                    SpanEvent.win:time_batch(10 sec) as a
+                    inner join SpanEvent.win:time_batch(10 sec) as b
+                on
+                    a.traceId = b.traceId
+                where
+                    a.serviceId != b.serviceId and
+                    b.httpResponseStatusCode >= 404;
+                """,
+                IssueTopicHelper.NETWORK.toString(),
+                false,
+                true
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                """
+                        @name('IncorrectCallChain')
+                        select
+                            a.endpointName as step1,
+                            b.endpointName as step2,
+                            c.endpointName as step3,
+                            d.endpointName as step4,
+                            e.endpointName as step5,
+                            a.serviceId as service
+                        from pattern [
+                            every (
+                                a=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
+                                b=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
+                                c=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
+                                d=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
+                                e=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777')
+                            )
+                            where timer:within(10 sec)
+                        ]
+                        where not (
+                            a.endpointName = '/api/cart' and
+                            b.endpointName = '/api/cart/update' and
+                            c.endpointName = '/api/cart/apply' and
+                            d.endpointName = '/api/checkout' and
+                            e.endpointName = '/api/checkout/confirm'
+                        );
+                """,
+                IssueTopicHelper.ENDPOINT.toString(),
+                false,
+                false
         ));
 
         return queries;

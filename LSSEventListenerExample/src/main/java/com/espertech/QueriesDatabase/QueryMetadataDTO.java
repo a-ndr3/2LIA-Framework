@@ -37,6 +37,20 @@ public class QueryMetadataDTO {
 
     }
 
+    public QueryMetadataDTO(String query, String category, Boolean status, Boolean checkTopology){
+        this.query = query;
+        this.category = category;
+        this.status = status;
+        this.id = UUID.fromString("00000000-0000-0000-0000-000000000000");
+        this.name = "";
+        this.queryStatement = "";
+        this.deploymentId = "";
+        this.eventClasses = List.of("");
+        this.createdAt = 0L;
+        this.updatedAt = 0L;
+        this.description = checkTopology ? "1" : "";
+    }
+
     public QueryMetadataDTO(UUID id, String name, String queryStatement, String deploymentId,
                             String query, List<String> eventClasses, String category, Long createdAt,
                             Long updatedAt, Boolean status, String description) {

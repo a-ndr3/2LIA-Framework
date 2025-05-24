@@ -7,6 +7,7 @@ import com.espertech.ESPERQueries.LSSEsperQueries;
 import com.espertech.Kafka.ESPERAnalysisOutputUpdateListener;
 import com.espertech.Main;
 import com.espertech.EventTypes.Types.ComplexEvent;
+import com.espertech.esper.runtime.client.UpdateListener;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -94,5 +95,10 @@ public class KafkaComplexListener extends AbstractMessageListener {
         running = false;
         consumer.close();
         Main.logger.info("Kafka listener stopped for topic: " + topic);
+    }
+
+    @Override
+    public UpdateListener getListener() {
+        return listener;
     }
 }

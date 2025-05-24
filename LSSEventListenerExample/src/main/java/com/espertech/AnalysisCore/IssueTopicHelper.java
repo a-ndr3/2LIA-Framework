@@ -22,6 +22,15 @@ public enum IssueTopicHelper {
                 GENERIC.name().toLowerCase());
     }
 
+    public static IssueTopicHelper fromString(String name) {
+        for (IssueTopicHelper topic : IssueTopicHelper.values()) {
+            if (topic.name().equalsIgnoreCase(name)) {
+                return topic;
+            }
+        }
+        throw new IllegalArgumentException("No IssueTopicHelper found for name: " + name);
+    }
+
     public static String getTopicForEvent(LSSEvent event, String statementName) {
        String issuePrefix;
        if (statementName.contains("network")) {

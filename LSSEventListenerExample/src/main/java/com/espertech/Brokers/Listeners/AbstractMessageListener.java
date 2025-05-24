@@ -41,8 +41,8 @@ public abstract class AbstractMessageListener implements MessageBrokerListener {
         runtime = EPRuntimeProvider.getRuntime("EventListener", configuration);
         runtime.initialize();
 
-        esperQueries.compileEpl(runtime);
-        deployment = runtime.getDeploymentService().getDeployment(queriesDeploymentId);
+        //esperQueries.compileEpl(runtime);
+        //deployment = runtime.getDeploymentService().getDeployment(queriesDeploymentId);
 
         esperService.setRuntime(runtime);
         //esperService.setDeployment(deployment);

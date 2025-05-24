@@ -1,10 +1,13 @@
 package com.espertech;
 
+import com.espertech.AnalysisCore.AnalysisListenerFactory;
+import com.espertech.AnalysisCore.IssueTopicHelper;
 import com.espertech.ESPERQueries.EsperQueryDTO;
 import com.espertech.ESPERQueries.QueryFactory;
 import com.espertech.QueriesDatabase.QueryMetadataDTO;
 import com.espertech.esper.common.client.EPCompiled;
 import com.espertech.esper.common.client.configuration.Configuration;
+import com.espertech.esper.common.internal.collection.Pair;
 import com.espertech.esper.compiler.client.CompilerArguments;
 import com.espertech.esper.compiler.client.EPCompileException;
 import com.espertech.esper.compiler.client.EPCompilerProvider;
@@ -13,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -123,6 +128,24 @@ public class EsperServiceImpl implements EsperService {
             return e.getMessage();
         }
         return "";
+    }
+
+    @Override
+    public void deployAnalysisQueries(Collection<QueryMetadataDTO> queries) {
+        for (var q : queries) {
+            try {
+                var dto = this.deployNewQueryNoDefaultListener(q.query, "AnalysisQuery" + q.query.length(), List.of("SpanEvent"), "System", "SpanEvent");
+                var deployment = this.getDeployment().getDeployment(dto.deploymentId);
+                Arrays.stream(deployment.getStatements()).findAny()
+                        .filter(stmt -> stmt.getName().equals(dto.queryStatement))
+                        .ifPresent(stmt -> {
+                            stmt.addListener(AnalysisListenerFactory.createListenerForQuery(IssueTopicHelper.fromString(q.category), stmt.getName(), q.description.equals("1")));
+                            Main.logger.info("Deployed query '{}' for topic {} with an auto-attached listener", stmt.getName(), q.category);
+                        });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
