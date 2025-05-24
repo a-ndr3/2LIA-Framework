@@ -1,5 +1,6 @@
 package com.espertech.Brokers.Listeners;
 
+import com.espertech.AnalysisCore.Types.SpanEvent;
 import com.espertech.ESPERQueries.LSSEsperQueries;
 import com.espertech.EsperService;
 import com.espertech.EsperServiceImpl;
@@ -33,6 +34,9 @@ public abstract class AbstractMessageListener implements MessageBrokerListener {
 
     private void init(EsperServiceImpl esperService, LSSEsperQueries esperQueries, String queriesDeploymentId) throws EPCompileException, EPDeployException, RuntimeException {
         configuration = esperQueries.getConfiguration();
+        configuration.getCommon().addEventType("SpanEvent", SpanEvent.class);
+        //configuration.getCommon().addEventType("com.espertech.AnalysisCore.Types.SpanEvent",
+        //        com.espertech.AnalysisCore.Types.SpanEvent.class);
 
         runtime = EPRuntimeProvider.getRuntime("EventListener", configuration);
         runtime.initialize();
@@ -41,7 +45,7 @@ public abstract class AbstractMessageListener implements MessageBrokerListener {
         deployment = runtime.getDeploymentService().getDeployment(queriesDeploymentId);
 
         esperService.setRuntime(runtime);
-        esperService.setDeployment(deployment);
+        //esperService.setDeployment(deployment);
         esperService.setConfiguration(configuration);
 
         Main.logger.info("ESPER deployed");

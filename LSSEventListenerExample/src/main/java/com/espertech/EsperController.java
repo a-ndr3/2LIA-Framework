@@ -29,8 +29,9 @@ public class EsperController {
 
     @GetMapping("/getQueries")
     public ResponseEntity<String> getEPLStatements() {
-        try {
-            var queries = Arrays.stream(esperService.getDeployment().getStatements()).toList();
+        try { //todo check correctness
+            var deployments = Arrays.stream(esperService.getDeployment().getDeployments()).toList();
+            var queries = esperService.getDeployment().getDeployment(deployments.getFirst()).getStatements();
             var sb = new StringBuilder();
             for (var query : queries) {
                 sb.append(query.getName()).append("\n");

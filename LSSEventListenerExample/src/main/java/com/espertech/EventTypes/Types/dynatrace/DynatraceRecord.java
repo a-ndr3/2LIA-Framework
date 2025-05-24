@@ -10,7 +10,7 @@ import java.time.OffsetDateTime;
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DynatraceRecord extends SpanEvent implements LSSEvent {
+public class DynatraceRecord implements LSSEvent {
     @JsonProperty("start_time")
     public OffsetDateTime startTime;
 
@@ -82,7 +82,6 @@ public class DynatraceRecord extends SpanEvent implements LSSEvent {
         return traceId;
     }
 
-    @Override
     public String getSpanId() {
         return spanId;
     }
@@ -93,25 +92,5 @@ public class DynatraceRecord extends SpanEvent implements LSSEvent {
 
     public String getServiceName() {
         return serviceEntityName;
-    }
-
-    @Override
-    public String getEndpoint() {
-        return endpointName;
-    }
-
-    @Override
-    public long getDuration() {
-        return duration;
-    }
-
-    @Override
-    public int getStatusCode() {
-         return httpResponseStatusCode != null ? Math.toIntExact(httpResponseStatusCode) : 0;
-    }
-
-    @Override
-    public Instant getTime() {
-        return startTime.toInstant();
     }
 }

@@ -1,6 +1,8 @@
 package com.espertech.Kafka;
 
+import com.espertech.AnalysisCore.IssueTopicHelper;
 import com.espertech.AnalysisCore.TopicWatcherService;
+import com.espertech.AnalysisCore.Types.SpanEvent;
 import com.espertech.Brokers.Producers.MessageBrokerProducer;
 import com.espertech.PrometheusMetrics.PrometheusMetrics;
 import com.espertech.esper.common.client.EventBean;
@@ -19,7 +21,6 @@ import java.util.concurrent.FutureTask;
 public class ESPERAnalysisOutputUpdateListener implements UpdateListener {
     private final MessageBrokerProducer producer;
     private final Map<String, List<LSSEvent>> eventBuffers = new ConcurrentHashMap<>();
-    private final int BATCH_SIZE = 1;
 
     public ESPERAnalysisOutputUpdateListener(MessageBrokerProducer producer) {
         this.producer = producer;
@@ -30,16 +31,14 @@ public class ESPERAnalysisOutputUpdateListener implements UpdateListener {
         if (newEvents != null) {
             for (EventBean e : newEvents) {
                 var event = (LSSEvent) e.getUnderlying();
-                String topic = getTopicForEvent(event, stmt.getName()); //todo add list of statements from TopicWatcher
+                String topic = IssueTopicHelper.getTopicForEvent(event, stmt.getName());
                 eventBuffers.computeIfAbsent(topic, k -> Collections.synchronizedList(new ArrayList<>())).add(event);
 
-                PrometheusMetrics.esperAlertCounter.inc();
+                PrometheusMetrics.esperEventCounter.inc();
 
-                if (eventBuffers.get(topic).size() >= BATCH_SIZE) {
+                if (!eventBuffers.get(topic).isEmpty()) {
                     flushBuffer(topic);
                 }
-
-                PrometheusMetrics.eventBufferSize.set(eventBuffers.get(topic).size());
             }
         }
     }
@@ -51,13 +50,6 @@ public class ESPERAnalysisOutputUpdateListener implements UpdateListener {
             eventBuffers.get(topic).clear();
         }
         producer.sendEventBatch(batch, topic);
-    }
-
-    private String getTopicForEvent(LSSEvent event ,String statementName) {
-        if (statementName.contains(TopicWatcherService.NETWORK_TOPIC)) {
-            return "networkIssues-" + event.getClass().getSimpleName().toLowerCase() + "-" + statementName;
-        }
-        return "esper-" + event.getClass().getSimpleName().toLowerCase() + "-" + statementName;
     }
 }
 

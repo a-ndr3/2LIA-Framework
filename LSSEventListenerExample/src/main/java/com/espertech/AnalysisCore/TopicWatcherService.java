@@ -1,6 +1,9 @@
 package com.espertech.AnalysisCore;
 
 import com.espertech.AnalysisCore.Types.SpanEvent;
+import com.espertech.EventTypes.LSSEvent;
+import com.espertech.EventTypes.Types.dynatrace.DynatraceRecord;
+import com.espertech.esper.common.internal.collection.Pair;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.KafkaAdminClient;
 import org.apache.kafka.clients.admin.ListTopicsResult;
@@ -16,35 +19,35 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class TopicWatcherService {
-    public static final String NETWORK_TOPIC = "networkIssues";
     private final AdminClient adminClient;
-    private final Pattern topicPattern = Pattern.compile("networkIssues-.*");
     private final Set<String> subscribedTopics = ConcurrentHashMap.newKeySet();
 
-    public TopicWatcherService(AdminClient adminClient) {
+    private final List<String> issuePrefixes;
+    private final Pattern topicPattern;
+    private final Consumer<DynatraceRecord> eventHandler;
+
+    public TopicWatcherService(AdminClient adminClient, Consumer<DynatraceRecord> eventHandler) {
+        issuePrefixes = IssueTopicHelper.getProperties();
+        topicPattern = Pattern.compile(String.join("|", issuePrefixes) + "-.*");
+        this.eventHandler = eventHandler;
         this.adminClient = adminClient;
     }
 
-    public List<String> discoverNewTopics() throws ExecutionException, InterruptedException {
-        ListTopicsResult topicsResult = adminClient.listTopics();
-        Set<String> allTopics = topicsResult.names().get();
-        return allTopics.stream()
-                .filter(topicPattern.asPredicate())
-                .filter(topic -> !subscribedTopics.contains(topic))
-                .collect(Collectors.toList());
-    }
-
-    public void startMonitoring(Consumer<SpanEvent> eventHandler) {
+    public void startMonitoring() {
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
-            List<String> newTopics = null;
             try {
-                newTopics = discoverNewTopics();
-            } catch (ExecutionException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            for (String topic : newTopics) {
-                subscribedTopics.add(topic);
-                KafkaConsumerService.startListening(topic, eventHandler);
+                Set<String> allTopics = adminClient.listTopics().names().get();
+                List<String> newTopics = allTopics.stream()
+                        .filter(topicPattern.asPredicate())
+                        .filter(t -> !subscribedTopics.contains(t))
+                        .collect(Collectors.toList());
+
+                for (String topic : newTopics) {
+                    subscribedTopics.add(topic);
+                    KafkaConsumerService.startListening(topic, eventHandler);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }, 0, 10, TimeUnit.SECONDS);
     }

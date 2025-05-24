@@ -1,6 +1,7 @@
 package com.espertech.Kafka;
 
 import com.espertech.AnalysisCore.AnalysisService.EventAnalyzer;
+import com.espertech.AnalysisCore.IssueTopicHelper;
 import com.espertech.AnalysisCore.TopicWatcherService;
 import com.espertech.AnalysisCore.Topology.TopologyService;
 import com.espertech.AnalysisCore.Types.SpanEvent;
@@ -17,6 +18,9 @@ import com.espertech.EventGenerators.ComplexEventGenerator;
 import com.espertech.EventGenerators.DynatraceEventGenerator;
 import com.espertech.EventTypes.Types.dynatrace.DynatraceLog;
 import com.espertech.Kafka.config.KafkaEventConfig;
+import com.espertech.Main;
+import com.espertech.esper.common.internal.collection.Pair;
+import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.KafkaAdminClient;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -29,8 +33,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import static com.espertech.Main.config;
 
@@ -53,8 +59,24 @@ public class KafkaEventService {
     }
 
     private void initAnalysis() {
-        var traceBuffer = new TraceBuffer();
-        var analyzer = new EventAnalyzer(traceBuffer, TopologyService.getInstance());
+        var traceBuffer = TraceBuffer.getInstance();
+        var analyzer = new EventAnalyzer(traceBuffer, Main.esperService);
+
+        analyzer.deployAnalysisQueries(List.of(new Pair<>(IssueTopicHelper.NETWORK,"""
+                @name('DetectDownstreamErrors')
+                select
+                    a.traceId as traceId,
+                    a.serviceId as origin,
+                    b.serviceId as affected
+                from
+                    SpanEvent.win:time_batch(10 sec) as a
+                    inner join SpanEvent.win:time_batch(10 sec) as b
+                on
+                    a.traceId = b.traceId
+                where
+                    a.serviceId != b.serviceId and
+                    b.httpResponseStatusCode >= 404;
+                """)));
 
         var properties = new Properties();
 
@@ -71,13 +93,35 @@ public class KafkaEventService {
         properties.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "6000");
         properties.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, "1000");
 
-        properties.put("spring.json.value.default.type", DynatraceLog.class.getName());
+        properties.put("spring.json.value.default.type", SpanEvent.class.getName());
         properties.put("spring.json.trusted.packages", "*");
 
 
         var kafkaAdmin = KafkaAdminClient.create(properties);
-        var topicWatcher = new TopicWatcherService(kafkaAdmin);
-        topicWatcher.startMonitoring(analyzer::handle);
+
+        try {
+            deleteTopics(kafkaAdmin);
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        var topicWatcher = new TopicWatcherService(kafkaAdmin, analyzer::handle);
+        topicWatcher.startMonitoring();
+    }
+
+    private void deleteTopics(AdminClient kafkaAdmin) throws ExecutionException, InterruptedException {
+        var topicNames = kafkaAdmin.listTopics().names().get();
+
+        topicNames.removeIf(t -> t.startsWith("_"));
+
+        if (!topicNames.isEmpty()) {
+            System.out.println("Deleting topics: " + topicNames);
+            var deleteTopicsResult = kafkaAdmin.deleteTopics(topicNames);
+            deleteTopicsResult.all().get();
+            System.out.println("All topics deleted.");
+        } else {
+            System.out.println("No topics to delete.");
+        }
     }
 
     public synchronized void startAnalysis(KafkaEventConfig.ConfigType brokerType) throws IOException {

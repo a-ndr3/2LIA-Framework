@@ -20,4 +20,6 @@ public interface ITopology {
     List<String> getServicesCalls(String name);
 
     List<String> getServicesCalledBy(String name);
+
+    boolean isSourceCallsTarget(String idSource, String idTarget);
 }

@@ -7,8 +7,20 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TraceBuffer {
-    private final Map<String, TraceContext> activeTraces = new ConcurrentHashMap<>();
-    private final Duration retentionPeriod = Duration.ofMinutes(10);
+    private static TraceBuffer INSTANCE;
+    private static final Map<String, TraceContext> activeTraces = new ConcurrentHashMap<>();
+    private static final Duration retentionPeriod = Duration.ofMinutes(10);
+
+    public static TraceBuffer getInstance() {
+        if (INSTANCE == null) {
+            return new TraceBuffer();
+        }
+        return INSTANCE;
+    }
+
+    private TraceBuffer() {
+
+    }
 
     public TraceContext getOrCreate(String traceId) {
         return activeTraces.computeIfAbsent(traceId, TraceContext::new);

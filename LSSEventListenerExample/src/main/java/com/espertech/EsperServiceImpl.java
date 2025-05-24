@@ -44,12 +44,51 @@ public class EsperServiceImpl implements EsperService {
         this.listener = listener;
     }
 
-    public void setRuntime(EPRuntime runtime) {
-        this.runtime = runtime;
+    @Override
+    public QueryMetadataDTO deployNewQueryNoDefaultListener(String epl, String name, List<String> classes, String category, String description) {
+        EPCompiled compiled;
+        try {
+            CompilerArguments compilerArguments = new CompilerArguments(configuration);
+            compilerArguments.getPath().add(runtime.getRuntimePath());
+            compiled = EPCompilerProvider.getCompiler().compile(epl, compilerArguments);
+        } catch (EPCompileException e) {
+            return null;
+        }
+
+        EsperQueryDTO newQuery;
+        try {
+            newQuery = QueryFactory.getInstance().createQuery(epl);
+            runtime.getDeploymentService().deploy(compiled, new DeploymentOptions().setDeploymentId(newQuery.deploymentId));
+        } catch (EPDeployException | IllegalStateException e) {
+            return null;
+        }
+
+        QueryMetadataDTO data;
+
+        try {
+            data = new QueryMetadataDTO(
+                    newQuery.id,
+                    name,
+                    newQuery.queryStatement,
+                    newQuery.deploymentId,
+                    newQuery.query,
+                    classes,
+                    category,
+                    Instant.now().toEpochMilli(),
+                    Instant.now().toEpochMilli(),
+                    true,
+                    description
+            );
+
+        } catch (Exception e) {
+            return null;
+        }
+
+        return data;
     }
 
-    public void setDeployment(EPDeployment deployment) {
-        this.deployment = deployment;
+    public void setRuntime(EPRuntime runtime) {
+        this.runtime = runtime;
     }
 
     public void setConfiguration(Configuration configuration) {
@@ -62,8 +101,8 @@ public class EsperServiceImpl implements EsperService {
     }
 
     @Override
-    public EPDeployment getDeployment() {
-        return deployment;
+    public EPDeploymentService getDeployment() {
+        return Main.esperService.getRuntime().getDeploymentService();
     }
 
     @Override
