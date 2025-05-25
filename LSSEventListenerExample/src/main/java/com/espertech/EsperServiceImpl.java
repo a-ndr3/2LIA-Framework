@@ -4,6 +4,7 @@ import com.espertech.AnalysisCore.AnalysisListenerFactory;
 import com.espertech.AnalysisCore.IssueTopicHelper;
 import com.espertech.ESPERQueries.EsperQueryDTO;
 import com.espertech.ESPERQueries.QueryFactory;
+import com.espertech.PrometheusMetrics.PrometheusMetrics;
 import com.espertech.QueriesDatabase.QueryMetadataDTO;
 import com.espertech.esper.common.client.EPCompiled;
 import com.espertech.esper.common.client.configuration.Configuration;
@@ -140,10 +141,12 @@ public class EsperServiceImpl implements EsperService {
                         .filter(stmt -> stmt.getName().equals(dto.queryStatement))
                         .ifPresent(stmt -> {
                             stmt.addListener(AnalysisListenerFactory.createListenerForQuery(IssueTopicHelper.fromString(q.category), stmt.getName(), q.description.equals("1")));
+                            PrometheusMetrics.analysisQueriesDeployed.inc();
                             Main.logger.info("Deployed query '{}' for topic {} with an auto-attached listener", stmt.getName(), q.category);
                         });
             } catch (Exception e) {
                 e.printStackTrace();
+                PrometheusMetrics.queryDeploymentErrorsTotal.labels(q.name).inc();
             }
         }
     }

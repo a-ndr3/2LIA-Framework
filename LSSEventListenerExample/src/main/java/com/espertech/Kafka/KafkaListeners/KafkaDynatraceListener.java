@@ -9,6 +9,7 @@ import com.espertech.EsperServiceImpl;
 import com.espertech.EventTypes.Types.dynatrace.DynatraceLog;
 import com.espertech.Kafka.ESPERAnalysisOutputUpdateListener;
 import com.espertech.Main;
+import com.espertech.PrometheusMetrics.PrometheusMetrics;
 import com.espertech.esper.runtime.client.UpdateListener;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -70,6 +71,9 @@ public class KafkaDynatraceListener extends AbstractMessageListener {
             if (records.isEmpty()) {
                 continue;
             }
+
+            PrometheusMetrics.overallEventsPolled.inc(records.count());
+
             processRecords(records);
         }
     }

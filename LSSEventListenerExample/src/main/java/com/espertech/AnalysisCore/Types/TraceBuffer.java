@@ -13,7 +13,8 @@ public class TraceBuffer {
 
     public static TraceBuffer getInstance() {
         if (INSTANCE == null) {
-            return new TraceBuffer();
+            INSTANCE = new TraceBuffer();
+            return INSTANCE;
         }
         return INSTANCE;
     }

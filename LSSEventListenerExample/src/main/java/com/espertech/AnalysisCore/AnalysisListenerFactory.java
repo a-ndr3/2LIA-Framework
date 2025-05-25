@@ -4,6 +4,7 @@ import com.espertech.AnalysisCore.Topology.TopologyService;
 import com.espertech.AnalysisCore.Types.SpanEvent;
 import com.espertech.AnalysisCore.Types.TraceBuffer;
 import com.espertech.Main;
+import com.espertech.PrometheusMetrics.PrometheusMetrics;
 import com.espertech.esper.common.client.EventBean;
 import com.espertech.esper.common.internal.event.map.MapEventBean;
 import com.espertech.esper.runtime.client.EPRuntime;
@@ -21,6 +22,7 @@ public class AnalysisListenerFactory {
 
     public static UpdateListener createListenerForQuery(IssueTopicHelper topic, String queryName, boolean checkTopology) {
         return (newEvents, oldEvents, stmt, runtime) -> {
+            try{
             if (newEvents != null) {
                 for (EventBean e : newEvents) {
                     if (e instanceof MapEventBean meb) {
@@ -38,23 +40,37 @@ public class AnalysisListenerFactory {
 
                         if (checkTopology && topic == IssueTopicHelper.NETWORK) {
                             var event = e.getUnderlying();
+
                             if (topologyService.isSourceCallsTarget(((HashMap) event).get("origin").toString(), ((HashMap) event).get("affected").toString())) {
                                 Main.logger.info("Query {} fired for Topic: {}", queryName, topic);
                                 for (var property : meb.getProperties().entrySet()) {
                                     Main.logger.info("      Property: {} = {}", property.getKey(), property.getValue());
                                 }
                             }
+
+                            PrometheusMetrics.esperQueryMatchCounter
+                                    .labels(queryName, IssueTopicHelper.NETWORK.toString())
+                                    .inc();
                         }
                         if (topic == IssueTopicHelper.ENDPOINT) {
+
                             Main.logger.info("Query {} fired for Topic: {}", queryName, topic);
                             for (var property : meb.getProperties().entrySet()) {
                                 Main.logger.info("      Property: {} = {}", property.getKey(), property.getValue());
                             }
+
+                            PrometheusMetrics.esperQueryMatchCounter
+                                    .labels(queryName, IssueTopicHelper.ENDPOINT.toString())
+                                    .inc();
                         }
                     } else if (e instanceof SpanEvent se) {
                         Main.logger.info("Query '{}' fired for Topic: {}", queryName, topic);
                     }
                 }
+            }}
+            catch (Exception ex) {
+                Main.logger.error("Error processing events for query {}: {}", queryName, ex.getMessage(), ex);
+                PrometheusMetrics.listenerExceptionsTotal.labels(queryName).inc();
             }
         };
     }

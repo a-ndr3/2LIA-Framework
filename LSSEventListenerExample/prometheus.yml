@@ -6,6 +6,10 @@ scrape_configs:
     static_configs:
       - targets: ['host.docker.internal:9308']
 
-  - job_name: 'esper'
+  - job_name: 'esper-analysis'
+    metrics_path: '/'
     static_configs:
-      - targets: ['host.docker.internal:8083'] # http://host.docker.internal:9090 grafana
+      - targets: ['host.docker.internal:8083']
+
+
+      # http://host.docker.internal:9090 grafana

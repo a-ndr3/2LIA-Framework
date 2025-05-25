@@ -8,6 +8,7 @@ import com.espertech.AnalysisCore.Types.TraceBuffer;
 import com.espertech.AnalysisCore.Types.TraceContext;
 import com.espertech.EsperService;
 import com.espertech.EventTypes.Types.dynatrace.DynatraceRecord;
+import com.espertech.PrometheusMetrics.PrometheusMetrics;
 import com.espertech.esper.common.internal.collection.Pair;
 
 import java.util.Arrays;
@@ -33,6 +34,9 @@ public class EventAnalyzer {
         try {
             var event = SpanEventConverter.convertToSpanEvent(dynatraceRecord);
             TraceContext ctx = traceBuffer.getOrCreate(event.getTraceId());
+
+            //PrometheusMetrics.esperEventCounter.inc();
+
             ctx.addSpan(event);
             esperService.getRuntime().getEventService().sendEventBean(event, "SpanEvent");
         }catch (Exception e) {
