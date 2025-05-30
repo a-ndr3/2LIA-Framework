@@ -167,8 +167,8 @@ public class PostgresDB implements QueriesDB {
     private void parseAnalysisQuery(QueryMetadataDTO query, PreparedStatement ps) throws SQLException, JsonProcessingException {
         ps.setString(1, query.query);
         ps.setString(2, query.category);
-        ps.setBoolean(3, query.status);
-        ps.setBoolean(4, query.description.equals("1"));
+        ps.setBoolean(3, query.description.equals("1"));
+        ps.setBoolean(4, query.status);
     }
 
     @Override
@@ -181,7 +181,8 @@ public class PostgresDB implements QueriesDB {
             pstmt.setBoolean(1, status);
             pstmt.setObject(2, queryId);
 
-            pstmt.executeUpdate();
+            var result = pstmt.executeUpdate();
+            var x = 1;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -201,6 +202,25 @@ public class PostgresDB implements QueriesDB {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
              PreparedStatement pstmt = conn.prepareStatement("DELETE FROM esper_queries WHERE id = ?")) {
             pstmt.setObject(1, queryId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void saveUpdatedAnalysisQuery(QueryMetadataDTO query) {
+        String sql = "UPDATE analysis_queries SET query = ?, query_type = ?, check_topology = ?, status = ? WHERE query = ?";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, query.query);
+            pstmt.setString(2, query.category);
+            pstmt.setBoolean(3, query.description.equals("1"));
+            pstmt.setBoolean(4, query.status);
+            pstmt.setString(5, query.query);
+
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

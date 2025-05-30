@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lss_thesis_ui/AppColors.dart';
 import 'package:lss_thesis_ui/SupportMethods.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HoverIconButton extends StatefulWidget {
   final Icon icon;
@@ -146,6 +147,44 @@ class _HoverableTextButtonState extends State<HoverableTextButton> {
             translation: _isHovering ? Offset(-0.010, -0.005) : Offset.zero,
             child: widget.child,
           ),
+        ),
+      ),
+    );
+  }
+
+  void _setHovering(bool isHovering) {
+    setState(() {
+      _isHovering = isHovering;
+    });
+  }
+}
+
+class HoverableImageButton extends StatefulWidget {
+  final Widget imageWidget;
+  final VoidCallback onPressed;
+
+  const HoverableImageButton(
+      {required this.imageWidget, required this.onPressed, Key? key})
+      : super(key: key);
+
+  @override
+  _HoverableImageButtonState createState() => _HoverableImageButtonState();
+}
+
+class _HoverableImageButtonState extends State<HoverableImageButton> {
+  bool _isHovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => _setHovering(true),
+      onExit: (_) => _setHovering(false),
+      child: Transform.scale(
+        scale: _isHovering ? 1.15 : 1,
+        alignment: Alignment.center,
+        child: GestureDetector(
+          onTap: widget.onPressed,
+          child: widget.imageWidget,
         ),
       ),
     );

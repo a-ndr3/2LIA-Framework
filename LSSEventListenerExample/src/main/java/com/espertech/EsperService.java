@@ -19,7 +19,9 @@ public interface EsperService {
     Configuration getConfiguration();
     String deployQuery(EsperQueryDTO query);
     QueryMetadataDTO deployNewQuery(String query, String name, List<String> classes, String category, String description);
+    QueryMetadataDTO deployNewQueryFromDB(QueryMetadataDTO queryMetadata);
     String changeExistingQuery(EsperQueryDTO query);
+    String changeExistingAnalysisQuery(EsperQueryDTO query);
     UpdateListener getListener();
     void setListener(UpdateListener listener);
     QueryMetadataDTO deployNewQueryNoDefaultListener(String query, String name, List<String> classes, String category, String description);

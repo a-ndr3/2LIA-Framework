@@ -30,6 +30,6 @@ CREATE TABLE IF NOT EXISTS esper_queries (
 CREATE TABLE IF NOT EXISTS analysis_queries (
     query TEXT NOT NULL,
     query_type VARCHAR(50) NOT NULL,
-    check_topology BOOLEAN NOT NULL DEFAULT TRUE,
-    status BOOLEAN NOT NULL DEFAULT TRUE
+    check_topology BOOLEAN NOT NULL DEFAULT FALSE,
+    status BOOLEAN NOT NULL DEFAULT FALSE
 );

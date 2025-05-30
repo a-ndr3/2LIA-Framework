@@ -78,6 +78,30 @@ public class EsperController {
         }
     }
 
+    @CrossOrigin(origins = "*")
+    @PostMapping("/addAnalysisQuery")
+    public ResponseEntity<String> onAddAnalysisQuery(@RequestBody String epl) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            var rootNode = objectMapper.readTree(epl);
+            var actualEpl = rootNode.get("query").asText();
+            var category = rootNode.get("category").asText();
+            var status = rootNode.get("status").asBoolean();
+            var checkTopology = rootNode.get("checkTopology").asBoolean();
+
+            var result = addNewAnalysisQuery(actualEpl, category, status, checkTopology);
+
+            if (result != null) {
+                return ResponseEntity.badRequest().body("Error adding analysis query: " + result.getMessage());
+            } else {
+                return ResponseEntity.ok("Analysis query added successfully");
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to run query: " + e.getMessage());
+        }
+    }
+
 
     @CrossOrigin(origins = "*")
     @PostMapping("/addQuery")
@@ -155,6 +179,33 @@ public class EsperController {
     }
 
     @CrossOrigin(origins = "*")
+    @PostMapping("/changeAnalysisQuery")
+    public ResponseEntity<String> changeAnalysisQuery(@RequestBody String queryData) {
+        QueryMetadataDTO queryMetaDataDTO;
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new ParameterNamesModule());
+            queryMetaDataDTO = objectMapper.readValue(queryData, QueryMetadataDTO.class);
+
+            if (queryMetaDataDTO.status) {
+                var result = esperService.changeExistingAnalysisQuery(new EsperQueryDTO(queryMetaDataDTO.query));
+
+                if (result != null) {
+                    return ResponseEntity.badRequest().body("Error changing query: " + result);
+                }
+            }
+
+            db.saveUpdatedQuery(queryMetaDataDTO);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error updating query in database: " + e.getMessage());
+        }
+
+        return ResponseEntity.ok("Query changed successfully");
+    }
+
+    @CrossOrigin(origins = "*")
     @PostMapping("/deployQueryFromDB")
     public ResponseEntity<String> deployQueryFromDB(@RequestBody String queryData) {
         QueryMetadataDTO queryMetaDataDTO;
@@ -180,6 +231,32 @@ public class EsperController {
         return ResponseEntity.ok("Query deployed successfully");
     }
 
+    @CrossOrigin(origins = "*")
+    @PostMapping("/deployAnalysisQueryFromDB")
+    public ResponseEntity<String> deployAnalysisQueryFromDB(@RequestBody String queryData) {
+        QueryMetadataDTO queryMetaDataDTO;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new ParameterNamesModule());
+            queryMetaDataDTO = objectMapper.readValue(queryData, QueryMetadataDTO.class);
+
+            try{
+                esperService.deployAnalysisQueries(List.of(queryMetaDataDTO));
+            }
+            catch (Exception e){
+                return ResponseEntity.badRequest().body("Error deploying query: " + e.getMessage());
+            }
+
+            queryMetaDataDTO.status = true;
+
+            db.saveUpdatedAnalysisQuery(queryMetaDataDTO);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error deploying query from database: " + e.getMessage());
+        }
+
+        return ResponseEntity.ok("Query deployed successfully");
+    }
+
     private Exception addNewQuery(String epl, String name, List<String> classes, String category, String description) {
         var result = esperService.deployNewQuery(epl, name, classes, category, description);
 
@@ -194,6 +271,26 @@ public class EsperController {
 
             return null;
         }
+    }
+
+    private Exception addNewAnalysisQuery(String epl, String category, Boolean status, Boolean checkTopology) {
+        var query = new QueryMetadataDTO(epl, category, status, checkTopology);
+
+        if (status) {
+            try {
+                esperService.deployAnalysisQueries(List.of(query));
+            } catch (Exception e) {
+                return e;
+            }
+        }
+
+        try {
+            db.insertAnalysisQueries(List.of(query));
+        } catch (Exception e) {
+            return e;
+        }
+
+        return null;
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.POST})
@@ -690,13 +787,13 @@ public class EsperController {
         return queries;
     }
 
-    private ArrayList<QueryMetadataDTO> getTestAnalyticsQueries(){
+    private ArrayList<QueryMetadataDTO> getTestAnalyticsQueries() {
         var time = System.currentTimeMillis();
         var queries = new ArrayList<QueryMetadataDTO>();
         queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "networkIssues-statusCode",
-                "queryStatusCodeStatement",
+                "networkIssues-statusCodeSelect404",
                 "networkIssues-statusCode",
                 "@name('networkIssues-statusCodeSelect404') select * from DynatraceRecord (httpResponseStatusCode = 404);",
                 List.of("DynatraceRecord"),
@@ -710,7 +807,7 @@ public class EsperController {
         queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "endpointsIssues-callChainCheck",
-                "queryCallChainCheckStatement",
+                "endpointsIssue-callChainCheckTest",
                 "endpointsIssues-callChainCheck",
                 "@name('endpointsIssue-callChainCheckTest') select * from DynatraceRecord (serviceId='SERVICE-53C7C4CB159DE777');",
                 List.of("DynatraceRecord"),
@@ -724,58 +821,58 @@ public class EsperController {
         return queries;
     }
 
-    private ArrayList<QueryMetadataDTO> getTestAnalysisQueries(){
+    private ArrayList<QueryMetadataDTO> getTestAnalysisQueries() {
         var queries = new ArrayList<QueryMetadataDTO>();
 
         queries.add(new QueryMetadataDTO(
                 """
-                @name('DetectDownstreamErrors')
-                select
-                    a.traceId as traceId,
-                    a.serviceId as origin,
-                    b.serviceId as affected
-                from
-                    SpanEvent.win:time_batch(10 sec) as a
-                    inner join SpanEvent.win:time_batch(10 sec) as b
-                on
-                    a.traceId = b.traceId
-                where
-                    a.serviceId != b.serviceId and
-                    b.httpResponseStatusCode >= 404;
-                """,
+                        @name('DetectDownstreamErrors')
+                        select
+                            a.traceId as traceId,
+                            a.serviceId as origin,
+                            b.serviceId as affected
+                        from
+                            SpanEvent.win:time_batch(10 sec) as a
+                            inner join SpanEvent.win:time_batch(10 sec) as b
+                        on
+                            a.traceId = b.traceId
+                        where
+                            a.serviceId != b.serviceId and
+                            b.httpResponseStatusCode >= 404;
+                        """,
                 IssueTopicHelper.NETWORK.toString(),
-                false,
-                true
+                true,
+                false
         ));
 
         queries.add(new QueryMetadataDTO(
                 """
-                        @name('IncorrectCallChain')
-                        select
-                            a.endpointName as step1,
-                            b.endpointName as step2,
-                            c.endpointName as step3,
-                            d.endpointName as step4,
-                            e.endpointName as step5,
-                            a.serviceId as service
-                        from pattern [
-                            every (
-                                a=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
-                                b=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
-                                c=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
-                                d=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
-                                e=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777')
-                            )
-                            where timer:within(10 sec)
-                        ]
-                        where not (
-                            a.endpointName = '/api/cart' and
-                            b.endpointName = '/api/cart/update' and
-                            c.endpointName = '/api/cart/apply' and
-                            d.endpointName = '/api/checkout' and
-                            e.endpointName = '/api/checkout/confirm'
-                        );
-                """,
+                                @name('IncorrectCallChain')
+                                select
+                                    a.endpointName as step1,
+                                    b.endpointName as step2,
+                                    c.endpointName as step3,
+                                    d.endpointName as step4,
+                                    e.endpointName as step5,
+                                    a.serviceId as service
+                                from pattern [
+                                    every (
+                                        a=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
+                                        b=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
+                                        c=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
+                                        d=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
+                                        e=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777')
+                                    )
+                                    where timer:within(10 sec)
+                                ]
+                                where not (
+                                    a.endpointName = '/api/cart' and
+                                    b.endpointName = '/api/cart/update' and
+                                    c.endpointName = '/api/cart/apply' and
+                                    d.endpointName = '/api/checkout' and
+                                    e.endpointName = '/api/checkout/confirm'
+                                );
+                        """,
                 IssueTopicHelper.ENDPOINT.toString(),
                 false,
                 false

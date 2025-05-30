@@ -26,8 +26,13 @@ public class PrometheusMetrics {
             .register();
 
     public static final Counter analysisQueriesDeployed = Counter.build()
-            .name("esper_query_matches_total")
+            .name("analysis_queries_deployed")
             .help("Total number of analysis queries deployed in Esper")
+            .register();
+
+    public static final Counter analyticsQueriesDeployed = Counter.build()
+            .name("analytics_queries_deployed")
+            .help("Total number of analytics queries deployed in Esper")
             .register();
 
     public static final Counter listenerExceptionsTotal = Counter.build()

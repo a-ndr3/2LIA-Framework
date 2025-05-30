@@ -22,56 +22,65 @@ public class AnalysisListenerFactory {
 
     public static UpdateListener createListenerForQuery(IssueTopicHelper topic, String queryName, boolean checkTopology) {
         return (newEvents, oldEvents, stmt, runtime) -> {
-            try{
-            if (newEvents != null) {
-                for (EventBean e : newEvents) {
-                    if (e instanceof MapEventBean meb) {
+            try {
+                if (newEvents != null) {
+                    for (EventBean e : newEvents) {
+                        if (e instanceof MapEventBean meb) {
 
-                        //calculate hashString using all properties
-                        var hashString = meb.getProperties().entrySet().stream()
-                                .map(entry -> entry.getKey() + "=" + entry.getValue())
-                                .sorted()
-                                .reduce("", (a, b) -> a + b).hashCode();
+                            var hashString = meb.getProperties().entrySet().stream()
+                                    .map(entry -> entry.getKey() + "=" + entry.getValue())
+                                    .sorted()
+                                    .reduce("", (a, b) -> a + b).hashCode();
 
-                        if (checkedObjects.containsKey(queryName + hashString)) {
-                            continue; // skip already processed events
-                        }
-                        checkedObjects.put(queryName + hashString, e);
+                            if (checkedObjects.containsKey(queryName + hashString)) {
+                                // skip already processed events
+                            } else {
+                                checkedObjects.put(queryName + hashString, e);
 
-                        if (checkTopology && topic == IssueTopicHelper.NETWORK) {
-                            var event = e.getUnderlying();
+                                if (checkTopology && topic == IssueTopicHelper.NETWORK) {
 
-                            if (topologyService.isSourceCallsTarget(((HashMap) event).get("origin").toString(), ((HashMap) event).get("affected").toString())) {
-                                Main.logger.info("Query {} fired for Topic: {}", queryName, topic);
-                                for (var property : meb.getProperties().entrySet()) {
-                                    Main.logger.info("      Property: {} = {}", property.getKey(), property.getValue());
+                                    var event = e.getUnderlying();
+
+                                    if (topologyService.isSourceCallsTarget(((HashMap) event).get("origin").toString(), ((HashMap) event).get("affected").toString())) {
+                                        PrometheusMetrics.esperQueryMatchCounter
+                                                .labels(queryName, IssueTopicHelper.NETWORK.toString())
+                                                .inc(1.0);
+
+                                        writeToLog(topic, queryName, meb);
+                                    }
+                                }
+                                else if (!checkTopology && topic == IssueTopicHelper.NETWORK) {
+                                    PrometheusMetrics.esperQueryMatchCounter
+                                            .labels(queryName, IssueTopicHelper.NETWORK.toString())
+                                            .inc(1.0);
+
+                                    writeToLog(topic, queryName, meb);
+                                }
+                                else if (topic == IssueTopicHelper.ENDPOINT) {
+
+                                    PrometheusMetrics.esperQueryMatchCounter
+                                            .labels(queryName, IssueTopicHelper.ENDPOINT.toString())
+                                            .inc(1.0);
+
+                                    writeToLog(topic, queryName, meb);
                                 }
                             }
-
-                            PrometheusMetrics.esperQueryMatchCounter
-                                    .labels(queryName, IssueTopicHelper.NETWORK.toString())
-                                    .inc();
+                        } else if (e instanceof SpanEvent se) {
+                            Main.logger.info("Query '{}' fired for Topic: {}", queryName, topic);
                         }
-                        if (topic == IssueTopicHelper.ENDPOINT) {
-
-                            Main.logger.info("Query {} fired for Topic: {}", queryName, topic);
-                            for (var property : meb.getProperties().entrySet()) {
-                                Main.logger.info("      Property: {} = {}", property.getKey(), property.getValue());
-                            }
-
-                            PrometheusMetrics.esperQueryMatchCounter
-                                    .labels(queryName, IssueTopicHelper.ENDPOINT.toString())
-                                    .inc();
-                        }
-                    } else if (e instanceof SpanEvent se) {
-                        Main.logger.info("Query '{}' fired for Topic: {}", queryName, topic);
                     }
                 }
-            }}
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Main.logger.error("Error processing events for query {}: {}", queryName, ex.getMessage(), ex);
-                PrometheusMetrics.listenerExceptionsTotal.labels(queryName).inc();
+                PrometheusMetrics.listenerExceptionsTotal.labels(queryName).inc(1.0);
             }
         };
+    }
+
+    private static void writeToLog(IssueTopicHelper topic, String queryName, MapEventBean meb) {
+        Main.logger.info("Query {} fired for Topic: {}", queryName, topic);
+        for (var property : meb.getProperties().entrySet()) {
+            Main.logger.info("      Property: {} = {}", property.getKey(), property.getValue());
+        }
     }
 }

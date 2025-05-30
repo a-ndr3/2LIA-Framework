@@ -37,7 +37,7 @@ public class QueryMetadataDTO {
 
     }
 
-    public QueryMetadataDTO(String query, String category, Boolean status, Boolean checkTopology){
+    public QueryMetadataDTO(String query, String category, Boolean checkTopology, Boolean status){
         this.query = query;
         this.category = category;
         this.status = status;

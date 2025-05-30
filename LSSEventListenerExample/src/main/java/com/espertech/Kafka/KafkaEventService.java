@@ -128,13 +128,24 @@ public class KafkaEventService {
 
         esperService.setListener(listener.getListener());
 
-        try{
-            analyticsQueries.forEach(x -> esperService.deployNewQuery(
-                    x.query, x.deploymentId, x.eventClasses, x.category, x.description
-            ));
+        try {
+            analyticsQueries.forEach(x ->
+            {
+                if (!x.status) {
+                    var res = esperService.deployNewQueryFromDB(x);
+
+                    if (res != null) {
+                        queriesDB.updateQueryStatus(res.id, true);
+                    }
+                }
+            });
+
             esperService.deployAnalysisQueries(analysisQueries);
-        }
-        catch (Exception e) {
+            analysisQueries.forEach(x -> {
+                x.status = true;
+                queriesDB.saveUpdatedAnalysisQuery(x); //todo we should use updateQueryStatus to update by uuid
+            });
+        } catch (Exception e) {
             Main.logger.error("Failed to deploy queries: {}", e.getMessage());
         }
 

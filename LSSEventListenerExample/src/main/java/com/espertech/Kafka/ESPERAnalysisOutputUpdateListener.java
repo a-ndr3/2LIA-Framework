@@ -34,7 +34,7 @@ public class ESPERAnalysisOutputUpdateListener implements UpdateListener {
                 String topic = IssueTopicHelper.getTopicForEvent(event, stmt.getName());
                 eventBuffers.computeIfAbsent(topic, k -> Collections.synchronizedList(new ArrayList<>())).add(event);
 
-                PrometheusMetrics.esperEventCounter.inc();
+                PrometheusMetrics.esperEventCounter.inc(1.0);
 
                 if (!eventBuffers.get(topic).isEmpty()) {
                     flushBuffer(topic);

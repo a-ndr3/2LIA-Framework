@@ -17,6 +17,7 @@ public interface QueriesDB {
     boolean ping();
     void deleteQuery(UUID queryId);
     void saveUpdatedQuery(QueryMetadataDTO query);
+    void saveUpdatedAnalysisQuery(QueryMetadataDTO query);
     void resetTable(String tableName);
     void insertAnalysisQueries(Collection<QueryMetadataDTO> queriesWithTypes);
     Collection<QueryMetadataDTO>fetchAnalysisQueries();

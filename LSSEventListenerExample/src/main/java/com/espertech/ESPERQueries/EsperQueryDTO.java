@@ -15,6 +15,13 @@ public class EsperQueryDTO {
         this.id = id;
     }
 
+    public EsperQueryDTO(String query) {
+        this.query = query;
+        this.deploymentId = "";
+        this.queryStatement = "";
+        this.id = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    }
+
     public EsperQueryDTO(String query, String deploymentId) {
         this.query = query;
         this.deploymentId = deploymentId;

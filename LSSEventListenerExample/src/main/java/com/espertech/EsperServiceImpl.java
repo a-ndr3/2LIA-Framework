@@ -141,14 +141,58 @@ public class EsperServiceImpl implements EsperService {
                         .filter(stmt -> stmt.getName().equals(dto.queryStatement))
                         .ifPresent(stmt -> {
                             stmt.addListener(AnalysisListenerFactory.createListenerForQuery(IssueTopicHelper.fromString(q.category), stmt.getName(), q.description.equals("1")));
-                            PrometheusMetrics.analysisQueriesDeployed.inc();
+                            PrometheusMetrics.analysisQueriesDeployed.inc(1.0);
                             Main.logger.info("Deployed query '{}' for topic {} with an auto-attached listener", stmt.getName(), q.category);
                         });
             } catch (Exception e) {
                 e.printStackTrace();
-                PrometheusMetrics.queryDeploymentErrorsTotal.labels(q.name).inc();
+                PrometheusMetrics.queryDeploymentErrorsTotal.labels(q.name).inc(1.0);
             }
         }
+    }
+
+    @Override
+    public QueryMetadataDTO deployNewQueryFromDB(QueryMetadataDTO queryMetadata) {
+        EPCompiled compiled;
+        try {
+            CompilerArguments compilerArguments = new CompilerArguments(configuration);
+            compilerArguments.getPath().add(runtime.getRuntimePath());
+            compiled = EPCompilerProvider.getCompiler().compile(queryMetadata.query, compilerArguments);
+        } catch (EPCompileException e) {
+            return null;
+        }
+
+        try {
+            runtime.getDeploymentService().deploy(compiled, new DeploymentOptions().setDeploymentId(queryMetadata.deploymentId));
+            runtime.getDeploymentService().getStatement(queryMetadata.deploymentId, queryMetadata.queryStatement).addListener(listener);
+        } catch (EPDeployException | IllegalStateException e) {
+            return null;
+        }
+
+        QueryMetadataDTO data;
+
+        try {
+            data = new QueryMetadataDTO(
+                    queryMetadata.id,
+                    queryMetadata.name,
+                    queryMetadata.queryStatement,
+                    queryMetadata.deploymentId,
+                    queryMetadata.query,
+                    queryMetadata.eventClasses,
+                    queryMetadata.category,
+                    Instant.now().toEpochMilli(),
+                    Instant.now().toEpochMilli(),
+                    true,
+                    queryMetadata.description
+            );
+
+        } catch (Exception e) {
+            return null;
+        }
+
+        PrometheusMetrics.analyticsQueriesDeployed.inc(1.0);
+
+        return data;
     }
 
     @Override
@@ -192,6 +236,8 @@ public class EsperServiceImpl implements EsperService {
             return null;
         }
 
+        PrometheusMetrics.analyticsQueriesDeployed.inc(1.0);
+
         return data;
     }
 
@@ -230,5 +276,10 @@ public class EsperServiceImpl implements EsperService {
         } catch (Exception e) {
             return e.getMessage();
         }
+    }
+
+    @Override
+    public String changeExistingAnalysisQuery(EsperQueryDTO query) {
+        return "";
     }
 }

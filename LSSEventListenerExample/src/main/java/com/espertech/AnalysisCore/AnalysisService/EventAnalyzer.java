@@ -35,8 +35,6 @@ public class EventAnalyzer {
             var event = SpanEventConverter.convertToSpanEvent(dynatraceRecord);
             TraceContext ctx = traceBuffer.getOrCreate(event.getTraceId());
 
-            //PrometheusMetrics.esperEventCounter.inc();
-
             ctx.addSpan(event);
             esperService.getRuntime().getEventService().sendEventBean(event, "SpanEvent");
         }catch (Exception e) {

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:lss_thesis_ui/ApiEndpoints.dart';
 import 'package:lss_thesis_ui/AppColors.dart';
 import 'package:lss_thesis_ui/AppTextStyles.dart';
+import 'package:lss_thesis_ui/Models/QueryAnalysisMetadata.dart';
 import 'package:lss_thesis_ui/Models/QueryMetadata.dart';
+import 'package:lss_thesis_ui/QueryAnalysisResultDialog.dart';
 import 'package:lss_thesis_ui/QueryField.dart';
 import 'package:lss_thesis_ui/QueryResultsDialog.dart';
 import 'package:lss_thesis_ui/SupportMethods.dart';
@@ -19,6 +21,7 @@ class _QueryPageState extends State<QueryPage> {
   List<String> _consoleOutput = [];
   List<String> _tempOutput = [];
   List<QueryMetadata> _queriesForTable = [];
+  List<QueryAnalysisMetadata> _queriesForAnalysisTable = [];
   bool _showTable = false;
 
   bool _isConsoleVisible = false;
@@ -34,6 +37,26 @@ class _QueryPageState extends State<QueryPage> {
 
     final response = await http.post(
       Uri.parse(ApiEndpoints.onDemand),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'query': query}),
+    );
+
+    if (response.statusCode == 200) {
+      addMsgToConsole('Response: ${response.body}');
+    } else {
+      addMsgToConsole('Error: ${response.statusCode} - ${response.body}');
+    }
+  }
+
+  Future<void> _sendAnalysisQuery(String query) async {
+    if (query.isEmpty) {
+      addMsgToConsole('Query cannot be empty.');
+      return;
+    }
+    addMsgToConsole('Sent Query: $query');
+
+    final response = await http.post(
+      Uri.parse(ApiEndpoints.addAnalysisQuery),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'query': query}),
     );
@@ -97,19 +120,42 @@ class _QueryPageState extends State<QueryPage> {
     }
   }
 
-  Future<List<QueryMetadata>> _existingQueriesAnalytics() async {
+  Future<void> _refreshAndShowAnalysisQueryTable(
+      Future<List<QueryAnalysisMetadata>> Function() fetcher) async {
+    setState(() => _isLoading = true);
+
+    final result = await fetcher();
+
+    setState(() {
+      _queriesForAnalysisTable = result;
+      _showTable = _queriesForAnalysisTable.isNotEmpty;
+      _isLoading = false;
+    });
+
+    if (_showTable) {
+      showDialog(
+        context: context,
+        builder: (_) => QueryAnalysisResultDialog(
+          queries: _queriesForAnalysisTable,
+          onTableRefresh: () => _refreshAndShowAnalysisQueryTable(fetcher),
+        ),
+      );
+    }
+  }
+
+  Future<List<QueryAnalysisMetadata>> _existingQueriesAnalytics() async {
     try {
       final response = await http.post(
-        //Uri.parse(ApiEndpoints.checkExistingQueriesInDatabase),
-        Uri.parse(
-            "http://127.0.0.1:8081/queries/checkExistingQueriesInDatabase"),
+        Uri.parse(ApiEndpoints.checkExistingAnalysisQueriesInDatabase),
       );
 
       if (response.statusCode == 200) {
         if (response.body.isNotEmpty) {
           final List<dynamic> data = jsonDecode(response.body);
           addMsgToConsole('Found ${data.length} queries.');
-          return data.map((json) => QueryMetadata.fromJson(json)).toList();
+          return data
+              .map((json) => QueryAnalysisMetadata.fromJson(json))
+              .toList();
         } else {
           addMsgToConsole('No queries found.');
           return [];
@@ -201,9 +247,10 @@ class _QueryPageState extends State<QueryPage> {
                           style: AppTextStyles.pageQueriesTitles),
                       SizedBox(height: 10),
                       QueryField(
-                        onSend: _sendQuery,
-                        onExistingQueries: () => _refreshAndShowQueryTable(
-                            _existingQueriesAnalytics),
+                        onSend: _sendAnalysisQuery,
+                        onExistingQueries: () =>
+                            _refreshAndShowAnalysisQueryTable(
+                                _existingQueriesAnalytics),
                         // () async {
                         //   final result = await _existingQueriesAnalytics();
                         //   setState(() {

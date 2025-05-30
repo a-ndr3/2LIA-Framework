@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lss_thesis_ui/AppColors.dart';
 import 'package:lss_thesis_ui/AppTextStyles.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -42,18 +43,44 @@ class SupportMethods {
 
   Container menuContainer(context) {
     return Container(
-      width: 460,
+      width: 450,
       color: AppColors.primaryColorBackground,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          HoverableTextButton(
-            child: const Text('QUERIES', style: AppTextStyles.pageMenuText),
-            onPressed: () => Navigator.pushNamed(context, '/'),
-          ),
-          HoverableTextButton(
-            child: const Text('GRAFANA', style: AppTextStyles.pageMenuText),
-            onPressed: () => SupportMethods.openUrl(ApiEndpoints.grafana),
-          )
+          MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: HoverableImageButton(
+                  imageWidget: SvgPicture.asset(
+                    'assets/icons/swagger.svg',
+                    width: 50,
+                    height: 50,
+                  ),
+                  onPressed: () =>
+                      SupportMethods.openUrl(ApiEndpoints.swagger))),
+          SizedBox(width: 30),
+          MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: HoverableImageButton(
+                  imageWidget: SvgPicture.asset(
+                    'assets/icons/grafana1.svg',
+                    width: 60,
+                    height: 60,
+                  ),
+                  onPressed: () =>
+                      SupportMethods.openUrl(ApiEndpoints.grafana))),
+          SizedBox(width: 30),
+          MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: HoverableImageButton(
+                  imageWidget: SvgPicture.asset(
+                    'assets/icons/prometheus.svg',
+                    width: 50,
+                    height: 50,
+                  ),
+                  onPressed: () =>
+                      SupportMethods.openUrl(ApiEndpoints.prometheus))),
+          SizedBox(width: 140),
         ],
       ),
     );
