@@ -25,7 +25,7 @@ class QueryAnalysisMetadata {
   Map<String, dynamic> toJson() => {
         'query': query,
         'category': category,
-        'checkTopology': checkTopology,
+        'description': checkTopology,
         'status': status,
       };
 

@@ -196,3 +196,40 @@ class _HoverableImageButtonState extends State<HoverableImageButton> {
     });
   }
 }
+
+class HoverableIcon extends StatefulWidget {
+  final Icon icon;
+  final double size;
+
+  const HoverableIcon({
+    Key? key,
+    required this.icon,
+    this.size = 24.0,
+  }) : super(key: key);
+
+  @override
+  _HoverableIconState createState() => _HoverableIconState();
+}
+
+class _HoverableIconState extends State<HoverableIcon> {
+  bool _isHovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => _setHovering(true),
+      onExit: (_) => _setHovering(false),
+      child: Transform.scale(
+        scale: _isHovering ? 1.20 : 1,
+        alignment: Alignment.center,
+        child: widget.icon,
+      ),
+    );
+  }
+
+  void _setHovering(bool isHovering) {
+    setState(() {
+      _isHovering = isHovering;
+    });
+  }
+}

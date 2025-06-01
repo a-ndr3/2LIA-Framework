@@ -16,10 +16,7 @@ import com.espertech.esper.runtime.client.*;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class EsperServiceImpl implements EsperService {
@@ -256,7 +253,8 @@ public class EsperServiceImpl implements EsperService {
             try {
                 CompilerArguments compilerArguments = new CompilerArguments(configuration);
                 compilerArguments.getPath().add(runtime.getRuntimePath());
-                compiled = EPCompilerProvider.getCompiler().compileQuery(query.query, compilerArguments);
+                //compiled = EPCompilerProvider.getCompiler().compileQuery(query.query, compilerArguments);
+                compiled = EPCompilerProvider.getCompiler().compile(query.query, compilerArguments);
             } catch (EPCompileException e) {
                 return e.getMessage();
             }
@@ -280,6 +278,54 @@ public class EsperServiceImpl implements EsperService {
 
     @Override
     public String changeExistingAnalysisQuery(EsperQueryDTO query) {
-        return "";
+        EPCompiled compiled;
+        ArrayList<UpdateListener> existingListeners = new ArrayList<>();
+        try {
+            var deploymentName = query.query.split("@name\\('")[1].split("'")[0];
+            var deploymentService = runtime.getDeploymentService();
+            var deploymentsNames = Arrays.stream(deploymentService.getDeployments()).filter(x->x.startsWith("deployment")).toList();
+
+            EPDeployment deployment = null;
+            for (var name : deploymentsNames){
+                var result = Objects.equals(deploymentService.getDeployment(name).getStatements()[0].getName(), deploymentName);
+
+                if (result) {
+                    deployment = deploymentService.getDeployment(name);
+                }
+            }
+
+            var deploymentId = deployment.getDeploymentId();
+            var statementName = deployment.getStatements()[0].getName();
+
+            try {
+                runtime.getDeploymentService().getStatement(deploymentId, statementName).getUpdateListeners().forEachRemaining(existingListeners::add);
+                runtime.getDeploymentService().undeploy(deploymentId);
+            } catch (EPUndeployException | NullPointerException e) {
+                return e.getMessage();
+            }
+
+            try {
+                CompilerArguments compilerArguments = new CompilerArguments(configuration);
+                compilerArguments.getPath().add(runtime.getRuntimePath());
+                compiled = EPCompilerProvider.getCompiler().compile(query.query, compilerArguments);
+            } catch (EPCompileException e) {
+                return e.getMessage();
+            }
+
+            try {
+                runtime.getDeploymentService().deploy(compiled, new DeploymentOptions().setDeploymentId(deploymentId));
+
+                for (var listener : existingListeners) {
+                    runtime.getDeploymentService().getStatement(deploymentId, statementName).addListener(listener);
+                }
+
+            } catch (EPDeployException | IllegalStateException e) {
+                return e.getMessage();
+            }
+
+            return null;
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 }

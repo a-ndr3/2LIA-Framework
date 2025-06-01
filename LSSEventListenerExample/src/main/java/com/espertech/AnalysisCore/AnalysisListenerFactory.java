@@ -56,7 +56,20 @@ public class AnalysisListenerFactory {
 
                                     writeToLog(topic, queryName, meb);
                                 }
-                                else if (topic == IssueTopicHelper.ENDPOINT) {
+                                else if (checkTopology && topic == IssueTopicHelper.ENDPOINT){
+
+                                    var event = e.getUnderlying();
+
+                                    if (!topologyService.isSourceCallsTarget(((HashMap) event).get("origin").toString(), ((HashMap) event).get("affected").toString())) {
+
+                                        PrometheusMetrics.esperQueryMatchCounter
+                                                .labels(queryName, IssueTopicHelper.NETWORK.toString())
+                                                .inc(1.0);
+
+                                        writeToLog(topic, queryName, meb);
+                                    }
+                                }
+                                else if (!checkTopology && topic == IssueTopicHelper.ENDPOINT) {
 
                                     PrometheusMetrics.esperQueryMatchCounter
                                             .labels(queryName, IssueTopicHelper.ENDPOINT.toString())

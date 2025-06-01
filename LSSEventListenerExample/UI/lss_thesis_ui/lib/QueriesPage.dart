@@ -11,6 +11,8 @@ import 'package:lss_thesis_ui/SupportMethods.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:lss_thesis_ui/buttons.dart';
+
 class QueryPage extends StatefulWidget {
   @override
   _QueryPageState createState() => _QueryPageState();
@@ -215,63 +217,65 @@ class _QueryPageState extends State<QueryPage> {
                 flex: 2,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 80),
-                      const Text("AGGREGATION QUERIES",
-                          style: AppTextStyles.pageQueriesTitles),
-                      SizedBox(height: 10),
-                      QueryField(
-                        onSend: _sendQuery,
-                        onExistingQueries: () => _refreshAndShowQueryTable(
-                            _existingQueriesAggregation),
-                        // () async {
-                        //   final result = await _existingQueriesAggregation();
-                        //   setState(() {
-                        //     _queriesForTable = result;
-                        //     _queriesForTable.sort((a, b) {
-                        //       return b.updatedAt.compareTo(a.updatedAt);
-                        //     });
-                        //     _showTable = _queriesForTable.isNotEmpty;
-                        //     showDialog(
-                        //       context: context,
-                        //       builder: (_) =>
-                        //           QueryResultsDialog(queries: _queriesForTable),
-                        //     );
-                        //   });
-                        // },
-                      ),
-                      SizedBox(height: 40),
-                      const Text("ANALYTICS QUERIES",
-                          style: AppTextStyles.pageQueriesTitles),
-                      SizedBox(height: 10),
-                      QueryField(
-                        onSend: _sendAnalysisQuery,
-                        onExistingQueries: () =>
-                            _refreshAndShowAnalysisQueryTable(
-                                _existingQueriesAnalytics),
-                        // () async {
-                        //   final result = await _existingQueriesAnalytics();
-                        //   setState(() {
-                        //     _queriesForTable = result;
-                        //     _showTable = _queriesForTable.isNotEmpty;
-                        //     showDialog(
-                        //       context: context,
-                        //       builder: (_) =>
-                        //           QueryResultsDialog(queries: _queriesForTable),
-                        //     );
-                        //   });
-                        // },
-                      ),
-                      const SizedBox(height: 200),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(width: 150),
-                            supportMethods.menuContainer(context)
-                          ]),
-                    ],
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 80),
+                        const Text("AGGREGATION QUERIES",
+                            style: AppTextStyles.pageQueriesTitles),
+                        SizedBox(height: 10),
+                        QueryField(
+                          onSend: _sendQuery,
+                          onExistingQueries: () => _refreshAndShowQueryTable(
+                              _existingQueriesAggregation),
+                          // () async {
+                          //   final result = await _existingQueriesAggregation();
+                          //   setState(() {
+                          //     _queriesForTable = result;
+                          //     _queriesForTable.sort((a, b) {
+                          //       return b.updatedAt.compareTo(a.updatedAt);
+                          //     });
+                          //     _showTable = _queriesForTable.isNotEmpty;
+                          //     showDialog(
+                          //       context: context,
+                          //       builder: (_) =>
+                          //           QueryResultsDialog(queries: _queriesForTable),
+                          //     );
+                          //   });
+                          // },
+                        ),
+                        SizedBox(height: 40),
+                        const Text("ANALYTICS QUERIES",
+                            style: AppTextStyles.pageQueriesTitles),
+                        SizedBox(height: 10),
+                        QueryField(
+                          onSend: _sendAnalysisQuery,
+                          onExistingQueries: () =>
+                              _refreshAndShowAnalysisQueryTable(
+                                  _existingQueriesAnalytics),
+                          // () async {
+                          //   final result = await _existingQueriesAnalytics();
+                          //   setState(() {
+                          //     _queriesForTable = result;
+                          //     _showTable = _queriesForTable.isNotEmpty;
+                          //     showDialog(
+                          //       context: context,
+                          //       builder: (_) =>
+                          //           QueryResultsDialog(queries: _queriesForTable),
+                          //     );
+                          //   });
+                          // },
+                        ),
+                        const SizedBox(height: 200),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(width: 150),
+                              supportMethods.menuContainer(context)
+                            ]),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -290,26 +294,40 @@ class _QueryPageState extends State<QueryPage> {
                             ? Align(
                                 alignment: Alignment.topLeft,
                                 child: Column(children: [
-                                  GestureDetector(
-                                    onTap: _toggleConsole,
-                                    child: const Icon(Icons.arrow_forward_ios,
-                                        color: AppColors.primaryColorButton),
+                                  MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: GestureDetector(
+                                      onTap: _toggleConsole,
+                                      child: const HoverableIcon(
+                                          icon: Icon(Icons.arrow_forward_ios,
+                                              color: AppColors
+                                                  .primaryColorButton)),
+                                    ),
                                   ),
                                   const SizedBox(height: 20),
-                                  GestureDetector(
-                                    onTap: _clearConsole,
-                                    child: const Icon(Icons.clear,
-                                        color: AppColors.primaryColorButton),
+                                  MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: GestureDetector(
+                                      onTap: _clearConsole,
+                                      child: const HoverableIcon(
+                                          icon: Icon(Icons.clear,
+                                              color: AppColors
+                                                  .primaryColorButton)),
+                                    ),
                                   ),
                                   const SizedBox(height: 20),
                                 ]))
                             : Align(
                                 alignment: Alignment.topLeft,
-                                child: GestureDetector(
-                                  onTap: _toggleConsole,
-                                  child: const Icon(Icons.arrow_back_ios,
-                                      color: AppColors.primaryColorButton),
-                                )),
+                                child: MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: GestureDetector(
+                                      onTap: _toggleConsole,
+                                      child: const HoverableIcon(
+                                          icon: Icon(Icons.arrow_back_ios,
+                                              color: AppColors
+                                                  .primaryColorButton)),
+                                    ))),
                         Expanded(
                           child: ListView(
                             children: _consoleOutput

@@ -133,6 +133,7 @@ public class EsperController {
     @PostMapping("/uploadTestDynatraceQueries")
     public ResponseEntity<String> uploadDynatraceEventQueries() {
         try {
+            clearTable();
             db.insertQueries(getTestAnalyticsQueries());
             db.insertAnalysisQueries(getTestAnalysisQueries());
         } catch (Exception e) {
@@ -186,7 +187,9 @@ public class EsperController {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new ParameterNamesModule());
-            queryMetaDataDTO = objectMapper.readValue(queryData, QueryMetadataDTO.class);
+            var tmp = objectMapper.readValue(queryData, QueryMetadataDTO.class);
+
+            queryMetaDataDTO = new QueryMetadataDTO(tmp.query, tmp.category, (Objects.equals(tmp.description, "true")), tmp.status);
 
             if (queryMetaDataDTO.status) {
                 var result = esperService.changeExistingAnalysisQuery(new EsperQueryDTO(queryMetaDataDTO.query));
@@ -240,10 +243,9 @@ public class EsperController {
             objectMapper.registerModule(new ParameterNamesModule());
             queryMetaDataDTO = objectMapper.readValue(queryData, QueryMetadataDTO.class);
 
-            try{
+            try {
                 esperService.deployAnalysisQueries(List.of(queryMetaDataDTO));
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 return ResponseEntity.badRequest().body("Error deploying query: " + e.getMessage());
             }
 
@@ -815,7 +817,22 @@ public class EsperController {
                 time,
                 time,
                 false,
-                "500 status code select query for Dynatrace records"
+                "Simple call chain check for endpoints"
+        ));
+
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "endpointsIssues-invalidDirectCallDetection",
+                "endpointsIssue-invalidDirectCallDetection",
+                "endpointsIssues-invalidDirectCallDetection",
+                "@name('endpointsIssue-invalidDirectCallDetection') select * from DynatraceRecord (serviceId='SERVICE-BA02F35BE956EDF9');",
+                List.of("DynatraceRecord"),
+                IssueTopicHelper.NETWORK.toString(),
+                time,
+                time,
+                false,
+                "Direct call detection for endpoints"
         ));
 
         return queries;
@@ -845,6 +862,39 @@ public class EsperController {
                 false
         ));
 
+//        queries.add(new QueryMetadataDTO(
+//                """
+//                                @name('IncorrectCallChain1')
+//                                select
+//                                    a.endpointName as step1,
+//                                    b.endpointName as step2,
+//                                    c.endpointName as step3,
+//                                    d.endpointName as step4,
+//                                    e.endpointName as step5,
+//                                    a.serviceId as service
+//                                from pattern [
+//                                    every (
+//                                        a=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
+//                                        b=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
+//                                        c=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
+//                                        d=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
+//                                        e=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777')
+//                                    )
+//                                    where timer:within(10 sec)
+//                                ]
+//                                where (
+//                                    a.endpointName = '/api/cart' and
+//                                    b.endpointName = '/api/cart/update' and
+//                                    c.endpointName = '/api/cart/apply' and
+//                                    d.endpointName = '/api/checkout' and
+//                                    e.endpointName = '/api/checkout/confirm'
+//                                );
+//                        """,
+//                IssueTopicHelper.ENDPOINT.toString(),
+//                false,
+//                false
+//        ));
+
         queries.add(new QueryMetadataDTO(
                 """
                                 @name('IncorrectCallChain')
@@ -872,6 +922,49 @@ public class EsperController {
                                     d.endpointName = '/api/checkout' and
                                     e.endpointName = '/api/checkout/confirm'
                                 );
+                        """,
+                IssueTopicHelper.ENDPOINT.toString(),
+                false,
+                false
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                """
+                        @name('UnexpectedServiceCall')
+                        select
+                            a.traceId as traceId,
+                            a.serviceId as origin,
+                            b.serviceId as affected
+                        from
+                            SpanEvent.win:time_batch(5 sec) as a
+                            inner join SpanEvent.win:time_batch(5 sec) as b
+                        on
+                            a.traceId = b.traceId
+                        where
+                            a.serviceId != b.serviceId;
+                        """,
+                IssueTopicHelper.ENDPOINT.toString(),
+                true,
+                false
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                """
+                        @name('InvalidSequenceDetection')
+                        select
+                            a.traceId as traceId,
+                            a.serviceId as serviceA,
+                            b.serviceId as serviceB,
+                            c.serviceId as serviceC,
+                            'ALERT: Invalid call sequence detected A → B → C' as alert
+                        from pattern [
+                            every (
+                                a=SpanEvent(serviceId= 'SERVICE-D8BE5DA6033DDFE5') ->
+                                b=SpanEvent(serviceId != 'SERVICE-DEA6B0C4A5ABAABF', traceId=a.traceId) ->
+                                c=SpanEvent(serviceId='SERVICE-7FFF55032AE71361', traceId=a.traceId)
+                            )
+                            where timer:within(10 sec)
+                        ];
                         """,
                 IssueTopicHelper.ENDPOINT.toString(),
                 false,

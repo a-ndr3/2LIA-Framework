@@ -93,6 +93,10 @@ public class TopologyService implements ITopology {
         return instance.getCallsBy(idSource).contains(idTarget);
     }
 
+//    @Override boolean isTargetCallsSource(String idTarget, String idSource) {
+//        return instance.getCalledBy(idTarget).contains(idSource);
+//    }
+
     public List<String> getServicesCalls(String serviceName) {
         var calls = callsGraph.get(serviceName);
         if (calls == null) {
