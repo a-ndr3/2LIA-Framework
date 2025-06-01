@@ -37,6 +37,14 @@ class AppTextStyles {
     color: AppColors.consoleColorOutput,
   );
 
+  static const TextStyle consoleTextClickable = TextStyle(
+    fontFamily: 'Inconsolata',
+    fontSize: 14,
+    fontWeight: FontWeight.w700,
+    color: AppColors.consoleColorOutput,
+    decoration: TextDecoration.underline,
+  );
+
   static const TextStyle snackBarText = TextStyle(
     fontFamily: 'Roboto',
     fontSize: 14,

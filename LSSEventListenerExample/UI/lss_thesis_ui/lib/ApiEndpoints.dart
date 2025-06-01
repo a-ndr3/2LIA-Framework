@@ -18,6 +18,8 @@ class ApiEndpoints {
       "$queries/deployAnalysisQueryFromDB";
   static const String deployQueryFromDB = "$queries/deployQueryFromDB";
 
+  static const String undeploy = "$queries/undeployQuery";
+
   static const String pingDB = "$queries/pingDB";
 
   static const String grafana = "http://127.0.0.1:3000/login";

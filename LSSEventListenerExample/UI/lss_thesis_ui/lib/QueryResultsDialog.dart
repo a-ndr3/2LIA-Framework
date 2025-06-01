@@ -69,38 +69,61 @@ class QueryResultsDialog extends StatelessWidget {
                     child: DataTable(
                       columns: [
                         DataColumn(
-                            label: Text('NAME',
-                                style: AppTextStyles.pageQueriesTitles.copyWith(
-                                    color: AppColors.primaryColorButton))),
+                            label: Flexible(
+                                child: Center(
+                                    child: Text('NAME',
+                                        style: AppTextStyles.pageQueriesTitles
+                                            .copyWith(
+                                                color: AppColors
+                                                    .primaryColorButton))))),
                         DataColumn(
-                            label: Text('QUERY',
-                                style: AppTextStyles.pageQueriesTitles.copyWith(
-                                    color: AppColors.primaryColorButton))),
+                            label: Flexible(
+                                child: Center(
+                                    child: Text('QUERY',
+                                        style: AppTextStyles.pageQueriesTitles
+                                            .copyWith(
+                                                color: AppColors
+                                                    .primaryColorButton))))),
+                        // DataColumn(
+                        //     label: Text('DEPLOYMENT ID',
+                        //         style: AppTextStyles.pageQueriesTitles.copyWith(
+                        //             color: AppColors.primaryColorButton))),
+                        // DataColumn(
+                        //     label: Text('STATEMENT',
+                        //         style: AppTextStyles.pageQueriesTitles.copyWith(
+                        //             color: AppColors.primaryColorButton))),
                         DataColumn(
-                            label: Text('DEPLOYMENT ID',
-                                style: AppTextStyles.pageQueriesTitles.copyWith(
-                                    color: AppColors.primaryColorButton))),
+                            label: Flexible(
+                                child: Center(
+                                    child: Text('CLASSES',
+                                        style: AppTextStyles.pageQueriesTitles
+                                            .copyWith(
+                                                color: AppColors
+                                                    .primaryColorButton))))),
                         DataColumn(
-                            label: Text('STATEMENT',
-                                style: AppTextStyles.pageQueriesTitles.copyWith(
-                                    color: AppColors.primaryColorButton))),
+                            label: Flexible(
+                                child: Center(
+                                    child: Text('CATEGORY',
+                                        style: AppTextStyles.pageQueriesTitles
+                                            .copyWith(
+                                                color: AppColors
+                                                    .primaryColorButton))))),
                         DataColumn(
-                            label: Text('CLASSES',
-                                style: AppTextStyles.pageQueriesTitles.copyWith(
-                                    color: AppColors.primaryColorButton))),
-                        DataColumn(
-                            label: Text('CATEGORY',
-                                style: AppTextStyles.pageQueriesTitles.copyWith(
-                                    color: AppColors.primaryColorButton))),
-                        DataColumn(
-                            label: Text('STATUS',
-                                style: AppTextStyles.pageQueriesTitles.copyWith(
-                                    color: AppColors.primaryColorButton))),
+                            label: Flexible(
+                                child: Center(
+                                    child: Text('STATUS',
+                                        style: AppTextStyles.pageQueriesTitles
+                                            .copyWith(
+                                                color: AppColors
+                                                    .primaryColorButton))))),
                       ],
                       rows: queries.map((q) {
                         return DataRow(cells: [
-                          DataCell(
-                              Text(q.name, style: AppTextStyles.consoleText)),
+                          DataCell(Text(
+                              q.name.length > 40
+                                  ? '${q.name.substring(0, 35)}...'
+                                  : q.name,
+                              style: AppTextStyles.consoleText)),
                           DataCell(
                             MouseRegion(
                               cursor: SystemMouseCursors.click,
@@ -208,7 +231,54 @@ class QueryResultsDialog extends StatelessWidget {
                                               ),
                                               TextButton(
                                                 onPressed: q.status
-                                                    ? null
+                                                    ? () async {
+                                                        final result =
+                                                            await http.post(
+                                                          Uri.parse(ApiEndpoints
+                                                              .undeploy),
+                                                          headers: {
+                                                            "Content-Type":
+                                                                "application/json"
+                                                          },
+                                                          body: jsonEncode(
+                                                              q.toJson()),
+                                                        );
+
+                                                        Navigator.pop(context);
+
+                                                        if (result.statusCode ==
+                                                            200) {
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                            SnackBar(
+                                                                content: Text(
+                                                              "✔ Query undeployed successfully!",
+                                                              style: AppTextStyles
+                                                                  .snackBarText
+                                                                  .copyWith(
+                                                                      color: AppColors
+                                                                          .consoleColorOutputSuccess),
+                                                            )),
+                                                          );
+                                                          Navigator.pop(
+                                                              context);
+                                                          onTableRefresh();
+                                                        } else {
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                            SnackBar(
+                                                                content: Text(
+                                                                    "❌ Undeployment failed: ${result.body}",
+                                                                    style: AppTextStyles
+                                                                        .snackBarText
+                                                                        .copyWith(
+                                                                            color:
+                                                                                AppColors.consoleColorOutputError))),
+                                                          );
+                                                        }
+                                                      }
                                                     : () async {
                                                         final result =
                                                             await http.post(
@@ -257,14 +327,12 @@ class QueryResultsDialog extends StatelessWidget {
                                                           );
                                                         }
                                                       },
-                                                child: Text("RUN",
-                                                    style: q.status
-                                                        ? AppTextStyles
-                                                            .buttonText
-                                                            .copyWith(
-                                                                color:
-                                                                    Colors.grey)
-                                                        : AppTextStyles
+                                                child: q.status
+                                                    ? const Text("UNDEPLOY",
+                                                        style: AppTextStyles
+                                                            .buttonText)
+                                                    : const Text("RUN",
+                                                        style: AppTextStyles
                                                             .buttonText),
                                               ),
                                             ],
@@ -278,24 +346,28 @@ class QueryResultsDialog extends StatelessWidget {
                                   q.query.length > 30
                                       ? '${q.query.substring(0, 20)}...'
                                       : q.query,
-                                  style: AppTextStyles.consoleText,
+                                  style: AppTextStyles.consoleTextClickable,
                                 ),
                               ),
                             ),
                           ),
-                          DataCell(Text(q.deploymentId,
-                              style: AppTextStyles.consoleText)),
-                          DataCell(Text(q.queryStatement,
-                              style: AppTextStyles.consoleText)),
+                          // DataCell(Text(q.deploymentId,
+                          //     style: AppTextStyles.consoleText)),
+                          // DataCell(Text(q.queryStatement,
+                          //     style: AppTextStyles.consoleText)),
                           DataCell(Text(q.eventClasses,
                               style: AppTextStyles.consoleText)),
-                          DataCell(Text(q.category,
-                              style: AppTextStyles.consoleText)),
+                          DataCell(Flexible(
+                              child: Center(
+                                  child: Text(q.category,
+                                      style: AppTextStyles.consoleText)))),
                           DataCell(
-                            Icon(
+                            Flexible(
+                                child: Center(
+                                    child: Icon(
                               q.status ? Icons.check_circle : Icons.cancel,
                               color: q.status ? Colors.green : Colors.red,
-                            ),
+                            ))),
                           )
                           // DataCell(Text(
                           //     '${q.createdAt.day.toString().padLeft(2, '0')}.${q.createdAt.month.toString().padLeft(2, '0')}.${q.createdAt.year}',

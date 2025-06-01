@@ -153,6 +153,36 @@ public class EsperController {
         return ResponseEntity.ok("Table cleared successfully");
     }
 
+    @PostMapping("/undeployQuery")
+    public ResponseEntity<String> undeployQuery(@RequestBody String queryData) {
+        QueryMetadataDTO queryMetaDataDTO;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new ParameterNamesModule());
+            queryMetaDataDTO = objectMapper.readValue(queryData, QueryMetadataDTO.class);
+
+            var result = esperService.undeployQuery(new EsperQueryDTO(queryMetaDataDTO.query, queryMetaDataDTO.deploymentId, queryMetaDataDTO.queryStatement, queryMetaDataDTO.id));
+
+            if (!result) {
+                return ResponseEntity.badRequest().body("Error undeploying query!");
+            }
+
+            queryMetaDataDTO.status = false;
+
+            if (queryMetaDataDTO.deploymentId == null || queryMetaDataDTO.deploymentId.isEmpty()){ //analysis query
+                db.saveUpdatedAnalysisQuery(queryMetaDataDTO);
+            }
+            else{ //aggregation query
+                db.updateQueryStatus(queryMetaDataDTO.id, false);
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error undeploying query: " + e.getMessage());
+        }
+
+        return ResponseEntity.ok("Query undeployed successfully");
+    }
+
     @CrossOrigin(origins = "*")
     @PostMapping("/changeQuery")
     public ResponseEntity<String> changeQuery(@RequestBody String queryData) {

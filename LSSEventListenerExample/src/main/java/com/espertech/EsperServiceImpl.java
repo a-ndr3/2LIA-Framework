@@ -277,29 +277,31 @@ public class EsperServiceImpl implements EsperService {
     }
 
     @Override
+    public boolean undeployQuery(EsperQueryDTO query) {
+        try {
+            if (query.deploymentId == null || query.deploymentId.isEmpty()) {
+                var deploymentIdAndStatementName = getDeploymentIdAndStatementName(query);
+                runtime.getDeploymentService().undeploy(deploymentIdAndStatementName.getFirst());
+            } else {
+                runtime.getDeploymentService().undeploy(query.deploymentId);
+            }
+        } catch (EPUndeployException | NullPointerException e) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public String changeExistingAnalysisQuery(EsperQueryDTO query) {
         EPCompiled compiled;
         ArrayList<UpdateListener> existingListeners = new ArrayList<>();
         try {
-            var deploymentName = query.query.split("@name\\('")[1].split("'")[0];
-            var deploymentService = runtime.getDeploymentService();
-            var deploymentsNames = Arrays.stream(deploymentService.getDeployments()).filter(x->x.startsWith("deployment")).toList();
 
-            EPDeployment deployment = null;
-            for (var name : deploymentsNames){
-                var result = Objects.equals(deploymentService.getDeployment(name).getStatements()[0].getName(), deploymentName);
-
-                if (result) {
-                    deployment = deploymentService.getDeployment(name);
-                }
-            }
-
-            var deploymentId = deployment.getDeploymentId();
-            var statementName = deployment.getStatements()[0].getName();
+            var deploymentIdAndStatementName = getDeploymentIdAndStatementName(query);
 
             try {
-                runtime.getDeploymentService().getStatement(deploymentId, statementName).getUpdateListeners().forEachRemaining(existingListeners::add);
-                runtime.getDeploymentService().undeploy(deploymentId);
+                runtime.getDeploymentService().getStatement(deploymentIdAndStatementName.getFirst(), deploymentIdAndStatementName.getSecond()).getUpdateListeners().forEachRemaining(existingListeners::add);
+                runtime.getDeploymentService().undeploy(deploymentIdAndStatementName.getFirst());
             } catch (EPUndeployException | NullPointerException e) {
                 return e.getMessage();
             }
@@ -313,10 +315,10 @@ public class EsperServiceImpl implements EsperService {
             }
 
             try {
-                runtime.getDeploymentService().deploy(compiled, new DeploymentOptions().setDeploymentId(deploymentId));
+                runtime.getDeploymentService().deploy(compiled, new DeploymentOptions().setDeploymentId(deploymentIdAndStatementName.getFirst()));
 
                 for (var listener : existingListeners) {
-                    runtime.getDeploymentService().getStatement(deploymentId, statementName).addListener(listener);
+                    runtime.getDeploymentService().getStatement(deploymentIdAndStatementName.getFirst(), deploymentIdAndStatementName.getSecond()).addListener(listener);
                 }
 
             } catch (EPDeployException | IllegalStateException e) {
@@ -327,5 +329,23 @@ public class EsperServiceImpl implements EsperService {
         } catch (Exception e) {
             return e.getMessage();
         }
+    }
+
+    public Pair<String, String> getDeploymentIdAndStatementName(EsperQueryDTO query) {
+        var deploymentName = query.query.split("@name\\('")[1].split("'")[0];
+        var deploymentService = runtime.getDeploymentService();
+        var deploymentsNames = Arrays.stream(deploymentService.getDeployments()).filter(x -> x.startsWith("deployment")).toList();
+
+        EPDeployment deployment = null;
+        for (var name : deploymentsNames) {
+            var result = Objects.equals(deploymentService.getDeployment(name).getStatements()[0].getName(), deploymentName);
+
+            if (result) {
+                deployment = deploymentService.getDeployment(name);
+                break;
+            }
+        }
+
+        return new Pair<>(deployment.getDeploymentId(), deployment.getStatements()[0].getName());
     }
 }

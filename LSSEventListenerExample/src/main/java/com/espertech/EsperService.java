@@ -26,4 +26,5 @@ public interface EsperService {
     void setListener(UpdateListener listener);
     QueryMetadataDTO deployNewQueryNoDefaultListener(String query, String name, List<String> classes, String category, String description);
     void deployAnalysisQueries(Collection<QueryMetadataDTO> topicEplStatements);
+    boolean undeployQuery(EsperQueryDTO queryMetadata);
 }
