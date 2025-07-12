@@ -1,0 +1,3588 @@
+{
+  "records": [
+    {
+      "entity.name": "astroshop-imageprovider",
+      "id": "SERVICE-BA02F35BE956EDF9",
+      "dt.entity.process_group": null,
+      "dt.entity.process_group_instance": null,
+      "dt.entity.host": null,
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-1C171BD9D79C80C3"
+      ],
+      "called_by_services": [
+        "SERVICE-D8BE5DA6033DDFE5"
+      ],
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-currencyservice",
+      "id": "SERVICE-DEA6B0C4A5ABAABF",
+      "dt.entity.process_group": null,
+      "dt.entity.process_group_instance": null,
+      "dt.entity.host": null,
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-9C518C10C0881860"
+      ],
+      "called_by_services": [
+        "SERVICE-53C7C4CB159DE777"
+      ],
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-flagd",
+      "id": "SERVICE-4E2E8B1495AC6C03",
+      "dt.entity.process_group": null,
+      "dt.entity.process_group_instance": null,
+      "dt.entity.host": null,
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-AD92353232146B44"
+      ],
+      "called_by_services": [
+        "SERVICE-25E40DCF69F15BE9",
+        "SERVICE-3E21AB0F9CB59FAA",
+        "SERVICE-1651B67DA515806B",
+        "SERVICE-FF64C1F1ED092493",
+        "SERVICE-1B6CBEFDD8156105",
+        "SERVICE-1479CD1CC83021E1",
+        "SERVICE-AF7945884ADB8021",
+        "SERVICE-7FFF55032AE71361",
+        "SERVICE-D8BE5DA6033DDFE5"
+      ],
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-cartservice",
+      "id": "SERVICE-FF64C1F1ED092493",
+      "dt.entity.process_group": null,
+      "dt.entity.process_group_instance": null,
+      "dt.entity.host": null,
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-86C0F66866FD6567"
+      ],
+      "called_by_services": [
+        "SERVICE-53C7C4CB159DE777"
+      ],
+      "calls_services": [
+        "SERVICE-4E2E8B1495AC6C03",
+        "SERVICE-3E21AB0F9CB59FAA"
+      ],
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-emailservice",
+      "id": "SERVICE-A4673983182A0195",
+      "dt.entity.process_group": "PROCESS_GROUP-C280A936E3F7C7AF",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-503855D0C7EBEE9E",
+        "PROCESS_GROUP_INSTANCE-733E1EDF4B032ECE"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB",
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-A4ED2F46540076BC"
+      ],
+      "called_by_services": [
+        "SERVICE-25E40DCF69F15BE9"
+      ],
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-flagd",
+      "id": "SERVICE-015BE09AC73E16F3",
+      "dt.entity.process_group": "PROCESS_GROUP-22F8D40D43744A24",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-6EC19C69B1C8534A",
+        "PROCESS_GROUP_INSTANCE-0E0694DB8B47C6BD"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB",
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-AD92353232146B44"
+      ],
+      "called_by_services": [
+        "SERVICE-B3A158CFB4FA96C4",
+        "SERVICE-7FFF55032AE71361"
+      ],
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-live-productcat-ProductAdminLambdaFuncti-EjEqZPXUAHsR in us-east-1",
+      "id": "SERVICE-F4286C9E15939081",
+      "dt.entity.process_group": null,
+      "dt.entity.process_group_instance": null,
+      "dt.entity.host": null,
+      "dt.entity.cloud_application_namespace": null,
+      "dt.entity.cloud_application": null,
+      "called_by_services": null,
+      "calls_services": [
+        "SERVICE-52AC624D70C377BC",
+        "SERVICE-611C2E52B4AF1ECF",
+        "SERVICE-53BF01BF880D4647"
+      ],
+      "dt.entity.kubernetes_cluster": null
+    },
+    {
+      "entity.name": "[aks-live][ingress-nginx] astroshop.live.demoability.dynatracelabs.com:80,443",
+      "id": "SERVICE-D8BE5DA6033DDFE5",
+      "dt.entity.process_group": "PROCESS_GROUP-F0FC33978FF22821",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-981552DF885922EF"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-6B097F5371CA1F30"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-3AED4F74C590C2D7"
+      ],
+      "called_by_services": null,
+      "calls_services": [
+        "SERVICE-4E2E8B1495AC6C03",
+        "SERVICE-71EB91E9D51EFD5F",
+        "SERVICE-BA02F35BE956EDF9",
+        "SERVICE-70C56686E39D60B1",
+        "SERVICE-B1BE5B14F0388F4E",
+        "SERVICE-53C7C4CB159DE777"
+      ],
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-flagd",
+      "id": "SERVICE-6AA5809E47F6A481",
+      "dt.entity.process_group": "PROCESS_GROUP-22F8D40D43744A24",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-6EC19C69B1C8534A",
+        "PROCESS_GROUP_INSTANCE-0E0694DB8B47C6BD"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB",
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-AD92353232146B44"
+      ],
+      "called_by_services": [
+        "SERVICE-25E40DCF69F15BE9"
+      ],
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-frauddetectionservice",
+      "id": "SERVICE-1651B67DA515806B",
+      "dt.entity.process_group": null,
+      "dt.entity.process_group_instance": null,
+      "dt.entity.host": null,
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-15279483FA7667AB"
+      ],
+      "called_by_services": null,
+      "calls_services": [
+        "SERVICE-4E2E8B1495AC6C03"
+      ],
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-adservice",
+      "id": "SERVICE-B3A158CFB4FA96C4",
+      "dt.entity.process_group": "PROCESS_GROUP-44E5B153CED4BFDC",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-FBD51F5CF6F4F1DB"
+      ],
+      "dt.entity.host": [
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-5E5ADAE767943498"
+      ],
+      "called_by_services": null,
+      "calls_services": [
+        "SERVICE-015BE09AC73E16F3"
+      ],
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-currencyservice",
+      "id": "SERVICE-CC2E3146D295BF2D",
+      "dt.entity.process_group": "PROCESS_GROUP-EB7E62CDC04B8B46",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-A3AB41E13B0C3FB0",
+        "PROCESS_GROUP_INSTANCE-A0A017008EB0F5FC"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB",
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-9C518C10C0881860"
+      ],
+      "called_by_services": [
+        "SERVICE-25E40DCF69F15BE9"
+      ],
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-accountingservice",
+      "id": "SERVICE-759B68FC669A911A",
+      "dt.entity.process_group": "PROCESS_GROUP-1271629045BDE094",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-DE7E4D2759EB2B44",
+        "PROCESS_GROUP_INSTANCE-57F9621948590AF4"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB",
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-870A7659B1D7723E"
+      ],
+      "called_by_services": null,
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-cartservice",
+      "id": "SERVICE-1C8F733A339D992C",
+      "dt.entity.process_group": "PROCESS_GROUP-129C3B698AA06B51",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-9EBFA1B6325C0599",
+        "PROCESS_GROUP_INSTANCE-376FDD802928FE0F"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB",
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-86C0F66866FD6567"
+      ],
+      "called_by_services": null,
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-recommendationservice",
+      "id": "SERVICE-1479CD1CC83021E1",
+      "dt.entity.process_group": null,
+      "dt.entity.process_group_instance": null,
+      "dt.entity.host": null,
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-89045FACD1048D3E"
+      ],
+      "called_by_services": [
+        "SERVICE-53C7C4CB159DE777"
+      ],
+      "calls_services": [
+        "SERVICE-4E2E8B1495AC6C03"
+      ],
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-adservice",
+      "id": "SERVICE-7FFF55032AE71361",
+      "dt.entity.process_group": "PROCESS_GROUP-44E5B153CED4BFDC",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-FBD51F5CF6F4F1DB",
+        "PROCESS_GROUP_INSTANCE-DC3F24662D9B6C0C"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB",
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-5E5ADAE767943498"
+      ],
+      "called_by_services": [
+        "SERVICE-53C7C4CB159DE777"
+      ],
+      "calls_services": [
+        "SERVICE-4E2E8B1495AC6C03",
+        "SERVICE-015BE09AC73E16F3"
+      ],
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-frontend",
+      "id": "SERVICE-53C7C4CB159DE777",
+      "dt.entity.process_group": "PROCESS_GROUP-262D9A36292EF59D",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-28C0AB30091D6EA1",
+        "PROCESS_GROUP_INSTANCE-71FA52F0F64A20EF"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB",
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-EACF258998BC5DF2"
+      ],
+      "called_by_services": [
+        "SERVICE-D8BE5DA6033DDFE5"
+      ],
+      "calls_services": [
+        "SERVICE-25E40DCF69F15BE9",
+        "SERVICE-87245A76E40EDA6A",
+        "SERVICE-70C56686E39D60B1",
+        "SERVICE-FF64C1F1ED092493",
+        "SERVICE-AF7945884ADB8021",
+        "SERVICE-C7CDE25478A3BB72",
+        "SERVICE-7FFF55032AE71361",
+        "SERVICE-DEA6B0C4A5ABAABF",
+        "SERVICE-5FEC3AAF43DD109C",
+        "SERVICE-3E21AB0F9CB59FAA",
+        "SERVICE-1B6CBEFDD8156105",
+        "SERVICE-1479CD1CC83021E1",
+        "SERVICE-404EE91D35A9BCB9"
+      ],
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-live-translatio-ReportingServiceFunction-AVtP0Lgkap3S in us-east-1",
+      "id": "SERVICE-FA253C5CAB622202",
+      "dt.entity.process_group": null,
+      "dt.entity.process_group_instance": null,
+      "dt.entity.host": null,
+      "dt.entity.cloud_application_namespace": null,
+      "dt.entity.cloud_application": null,
+      "called_by_services": [
+        "SERVICE-53BF01BF880D4647"
+      ],
+      "calls_services": [
+        "SERVICE-52AC624D70C377BC"
+      ],
+      "dt.entity.kubernetes_cluster": null
+    },
+    {
+      "entity.name": "astroshop-productcatalogservice",
+      "id": "SERVICE-EC20303331C1AEED",
+      "dt.entity.process_group": "PROCESS_GROUP-11B4B9252FB11753",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-59DC46CB103C1E9D",
+        "PROCESS_GROUP_INSTANCE-56777520B22D8DF0"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB",
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-7526860E0C740DAD"
+      ],
+      "called_by_services": [
+        "SERVICE-25E40DCF69F15BE9"
+      ],
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-accountingservice",
+      "id": "SERVICE-310067170EBB2B60",
+      "dt.entity.process_group": "PROCESS_GROUP-1271629045BDE094",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-DE7E4D2759EB2B44",
+        "PROCESS_GROUP_INSTANCE-57F9621948590AF4"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB",
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-870A7659B1D7723E"
+      ],
+      "called_by_services": null,
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-cartservice",
+      "id": "SERVICE-C7CDE25478A3BB72",
+      "dt.entity.process_group": "PROCESS_GROUP-129C3B698AA06B51",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-9EBFA1B6325C0599",
+        "PROCESS_GROUP_INSTANCE-376FDD802928FE0F"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB",
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-86C0F66866FD6567"
+      ],
+      "called_by_services": [
+        "SERVICE-25E40DCF69F15BE9",
+        "SERVICE-53C7C4CB159DE777"
+      ],
+      "calls_services": [
+        "SERVICE-A4E987B3DB57972F"
+      ],
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-checkoutservice",
+      "id": "SERVICE-25E40DCF69F15BE9",
+      "dt.entity.process_group": "PROCESS_GROUP-BAB9EE750FAB6DF0",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-37DFE99AE22C9442",
+        "PROCESS_GROUP_INSTANCE-FE43D742D022A540"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB",
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-F2B54946C48E63DE"
+      ],
+      "called_by_services": [
+        "SERVICE-53C7C4CB159DE777"
+      ],
+      "calls_services": [
+        "SERVICE-7E358F6C682ACFD8",
+        "SERVICE-CC2E3146D295BF2D",
+        "SERVICE-A4673983182A0195",
+        "SERVICE-4E2E8B1495AC6C03",
+        "SERVICE-70C56686E39D60B1",
+        "SERVICE-BA1D9D38F2D94780",
+        "SERVICE-E4A4A72F8A61E783",
+        "SERVICE-B1BE5B14F0388F4E",
+        "SERVICE-AF7945884ADB8021",
+        "SERVICE-C7CDE25478A3BB72",
+        "SERVICE-6AA5809E47F6A481",
+        "SERVICE-EC20303331C1AEED"
+      ],
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-cartservice",
+      "id": "SERVICE-A4E987B3DB57972F",
+      "dt.entity.process_group": "PROCESS_GROUP-129C3B698AA06B51",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-9EBFA1B6325C0599",
+        "PROCESS_GROUP_INSTANCE-376FDD802928FE0F"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB",
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-86C0F66866FD6567"
+      ],
+      "called_by_services": [
+        "SERVICE-C7CDE25478A3BB72"
+      ],
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-live-translatio-RawDataPersistenceFuncti-finnMkrdC0zQ in us-east-1",
+      "id": "SERVICE-53BF01BF880D4647",
+      "dt.entity.process_group": null,
+      "dt.entity.process_group_instance": null,
+      "dt.entity.host": null,
+      "dt.entity.cloud_application_namespace": null,
+      "dt.entity.cloud_application": null,
+      "called_by_services": [
+        "SERVICE-F4286C9E15939081"
+      ],
+      "calls_services": [
+        "SERVICE-AD9435A01C43200C",
+        "SERVICE-FA253C5CAB622202"
+      ],
+      "dt.entity.kubernetes_cluster": null
+    },
+    {
+      "entity.name": "astroshop-shippingservice",
+      "id": "SERVICE-7E358F6C682ACFD8",
+      "dt.entity.process_group": "PROCESS_GROUP-CF986D078D0D2E6D",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-AE526EBCC80B27E4",
+        "PROCESS_GROUP_INSTANCE-4F12E9E4F12DC85C"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB",
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-AD10C4C9ACE78F63"
+      ],
+      "called_by_services": [
+        "SERVICE-25E40DCF69F15BE9"
+      ],
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-quoteservice",
+      "id": "SERVICE-C890FBE122E45FAD",
+      "dt.entity.process_group": null,
+      "dt.entity.process_group_instance": null,
+      "dt.entity.host": null,
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-F352C39DBD038E7E"
+      ],
+      "called_by_services": [
+        "SERVICE-87245A76E40EDA6A",
+        "SERVICE-404EE91D35A9BCB9"
+      ],
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-paymentservice",
+      "id": "SERVICE-C7952DC8C5EEC0F3",
+      "dt.entity.process_group": "PROCESS_GROUP-734E31542DCE13DB",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-CBBCFABCA460ECC5"
+      ],
+      "dt.entity.host": [
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-53C6D858E48298EB"
+      ],
+      "called_by_services": null,
+      "calls_services": [
+        "SERVICE-70C56686E39D60B1"
+      ],
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-emailservice",
+      "id": "SERVICE-5327C77184CFE8E2",
+      "dt.entity.process_group": null,
+      "dt.entity.process_group_instance": null,
+      "dt.entity.host": null,
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-A4ED2F46540076BC"
+      ],
+      "called_by_services": null,
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-cartservice",
+      "id": "SERVICE-E4A4A72F8A61E783",
+      "dt.entity.process_group": "PROCESS_GROUP-129C3B698AA06B51",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-9EBFA1B6325C0599",
+        "PROCESS_GROUP_INSTANCE-376FDD802928FE0F"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB",
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-86C0F66866FD6567"
+      ],
+      "called_by_services": [
+        "SERVICE-25E40DCF69F15BE9"
+      ],
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-paymentservice",
+      "id": "SERVICE-BA1D9D38F2D94780",
+      "dt.entity.process_group": "PROCESS_GROUP-734E31542DCE13DB",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-3AC10C8213515676"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-53C6D858E48298EB"
+      ],
+      "called_by_services": [
+        "SERVICE-25E40DCF69F15BE9"
+      ],
+      "calls_services": null,
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-paymentservice",
+      "id": "SERVICE-AF7945884ADB8021",
+      "dt.entity.process_group": "PROCESS_GROUP-734E31542DCE13DB",
+      "dt.entity.process_group_instance": [
+        "PROCESS_GROUP_INSTANCE-CBBCFABCA460ECC5",
+        "PROCESS_GROUP_INSTANCE-3AC10C8213515676"
+      ],
+      "dt.entity.host": [
+        "HOST-F31256CBEE84D8FB",
+        "HOST-CB3952E0A60BE62D"
+      ],
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-53C6D858E48298EB"
+      ],
+      "called_by_services": [
+        "SERVICE-25E40DCF69F15BE9",
+        "SERVICE-53C7C4CB159DE777"
+      ],
+      "calls_services": [
+        "SERVICE-4E2E8B1495AC6C03",
+        "SERVICE-70C56686E39D60B1",
+        "SERVICE-B1BE5B14F0388F4E"
+      ],
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    },
+    {
+      "entity.name": "astroshop-shippingservice",
+      "id": "SERVICE-87245A76E40EDA6A",
+      "dt.entity.process_group": null,
+      "dt.entity.process_group_instance": null,
+      "dt.entity.host": null,
+      "dt.entity.cloud_application_namespace": [
+        "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914"
+      ],
+      "dt.entity.cloud_application": [
+        "CLOUD_APPLICATION-AD10C4C9ACE78F63"
+      ],
+      "called_by_services": [
+        "SERVICE-53C7C4CB159DE777"
+      ],
+      "calls_services": [
+        "SERVICE-C890FBE122E45FAD"
+      ],
+      "dt.entity.kubernetes_cluster": [
+        "KUBERNETES_CLUSTER-047D3CE50BD91088"
+      ]
+    }
+  ],
+  "types": [
+    {
+      "indexRange": [
+        0,
+        1
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "undefined"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "undefined"
+        },
+        "dt.entity.host": {
+          "type": "undefined"
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "undefined"
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        2,
+        2
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "undefined"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "undefined"
+        },
+        "dt.entity.host": {
+          "type": "undefined"
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                8
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "undefined"
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        3,
+        3
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "undefined"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "undefined"
+        },
+        "dt.entity.host": {
+          "type": "undefined"
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        4,
+        4
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "string"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.host": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "undefined"
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        5,
+        5
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "string"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.host": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "undefined"
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        6,
+        6
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "undefined"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "undefined"
+        },
+        "dt.entity.host": {
+          "type": "undefined"
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "undefined"
+        },
+        "dt.entity.cloud_application": {
+          "type": "undefined"
+        },
+        "called_by_services": {
+          "type": "undefined"
+        },
+        "calls_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                2
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "undefined"
+        }
+      }
+    },
+    {
+      "indexRange": [
+        7,
+        7
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "string"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.host": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "undefined"
+        },
+        "calls_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                5
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        8,
+        8
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "string"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.host": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "undefined"
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        9,
+        9
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "undefined"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "undefined"
+        },
+        "dt.entity.host": {
+          "type": "undefined"
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "undefined"
+        },
+        "calls_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        10,
+        10
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "string"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.host": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "undefined"
+        },
+        "calls_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        11,
+        13
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "string"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.host": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "undefined"
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        14,
+        14
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "undefined"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "undefined"
+        },
+        "dt.entity.host": {
+          "type": "undefined"
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        15,
+        15
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "string"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.host": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        16,
+        16
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "string"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.host": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                12
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        17,
+        17
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "undefined"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "undefined"
+        },
+        "dt.entity.host": {
+          "type": "undefined"
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "undefined"
+        },
+        "dt.entity.cloud_application": {
+          "type": "undefined"
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "undefined"
+        }
+      }
+    },
+    {
+      "indexRange": [
+        18,
+        19
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "string"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.host": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "undefined"
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        20,
+        20
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "string"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.host": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        21,
+        22
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "string"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.host": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                11
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        23,
+        23
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "undefined"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "undefined"
+        },
+        "dt.entity.host": {
+          "type": "undefined"
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "undefined"
+        },
+        "dt.entity.cloud_application": {
+          "type": "undefined"
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "undefined"
+        }
+      }
+    },
+    {
+      "indexRange": [
+        24,
+        24
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "string"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.host": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "undefined"
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        25,
+        25
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "undefined"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "undefined"
+        },
+        "dt.entity.host": {
+          "type": "undefined"
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "undefined"
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        26,
+        27
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "string"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.host": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "undefined"
+        },
+        "calls_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        28,
+        28
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "string"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.host": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "undefined"
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        29,
+        29
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "string"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.host": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "undefined"
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        30,
+        30
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "string"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.host": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                1
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                2
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "indexRange": [
+        31,
+        31
+      ],
+      "mappings": {
+        "entity.name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dt.entity.process_group": {
+          "type": "undefined"
+        },
+        "dt.entity.process_group_instance": {
+          "type": "undefined"
+        },
+        "dt.entity.host": {
+          "type": "undefined"
+        },
+        "dt.entity.cloud_application_namespace": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.cloud_application": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "called_by_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "calls_services": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "dt.entity.kubernetes_cluster": {
+          "type": "array",
+          "types": [
+            {
+              "indexRange": [
+                0,
+                0
+              ],
+              "mappings": {
+                "element": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "grail": {
+      "canonicalQuery": "fetch dt.entity.service\n| filter contains(entity.name, \"astroshop\")\n| fieldsAdd dt.entity.process_group = runs_on[dt.entity.process_group], dt.entity.process_group_instance = runs_on[dt.entity.process_group_instance], dt.entity.host = runs_on[dt.entity.host], dt.entity.cloud_application_namespace = belongs_to[dt.entity.cloud_application_namespace], dt.entity.cloud_application = belongs_to[dt.entity.cloud_application], called_by_services = called_by[dt.entity.service], calls_services = calls[dt.entity.service], dt.entity.kubernetes_cluster = clustered_by[dt.entity.kubernetes_cluster]\n| filterOut contains(entity.name, \"astroshop-live-translation\")",
+      "timezone": "Europe/Madrid",
+      "query": "fetch dt.entity.service\n| filter contains(entity.name, \"astroshop\")\n| fieldsAdd dt.entity.process_group = runs_on[dt.entity.process_group],\n  dt.entity.process_group_instance = runs_on[dt.entity.process_group_instance], \n  dt.entity.host = runs_on[dt.entity.host],\n  dt.entity.cloud_application_namespace = belongs_to[dt.entity.cloud_application_namespace],\n  dt.entity.cloud_application = belongs_to[dt.entity.cloud_application],\n  called_by_services  = called_by[dt.entity.service],\n  calls_services = calls[dt.entity.service],\n  dt.entity.kubernetes_cluster = clustered_by[dt.entity.kubernetes_cluster]\n  \n| filterOut contains(entity.name, \"astroshop-live-translation\")",
+      "scannedRecords": 461,
+      "dqlVersion": "V1_0",
+      "scannedBytes": 0,
+      "scannedDataPoints": 0,
+      "analysisTimeframe": {
+        "start": "2025-04-17T10:37:48.467Z",
+        "end": "2025-04-24T10:37:48.467Z"
+      },
+      "locale": "ca",
+      "executionTimeMilliseconds": 1193,
+      "notifications": [],
+      "queryId": "d375c540-17a7-4fdb-b91a-3df2917e6416",
+      "sampled": false
+    }
+  }
+}

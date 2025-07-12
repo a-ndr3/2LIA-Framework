@@ -11,19 +11,23 @@ import com.espertech.esper.runtime.client.EPStatement;
 import com.espertech.esper.runtime.client.UpdateListener;
 import com.espertech.EventTypes.LSSEvent;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
 
 public class ESPERAnalysisOutputUpdateListener implements UpdateListener {
     private final MessageBrokerProducer producer;
     private final Map<String, List<LSSEvent>> eventBuffers = new ConcurrentHashMap<>();
-
+    private Timer timer = new Timer("ESPERAnalysisOutputUpdateListenerTimer", true);
+    private TimerTask task;
     public ESPERAnalysisOutputUpdateListener(MessageBrokerProducer producer) {
         this.producer = producer;
+        this.task = new TimerTask() { //TODO fix (sent 1 event to kakfa) by introducing timer
+            @Override
+            public void run() { //TODO fix it because it crashes at some point
+                checkBuffer();
+            }
+        };
     }
 
     @Override
@@ -36,9 +40,22 @@ public class ESPERAnalysisOutputUpdateListener implements UpdateListener {
 
                 PrometheusMetrics.esperEventCounter.inc(1.0);
 
-                if (!eventBuffers.get(topic).isEmpty()) {
-                    flushBuffer(topic);
+                try {
+                    timer.schedule(task, 10000);  //TODO fix it because it crashes at some point
                 }
+                catch (Exception ex){
+                    continue;
+                }
+                //if (!eventBuffers.get(topic).isEmpty()) {
+                    //flushBuffer(topic);
+                //}
+            }
+        }
+    }
+    private void checkBuffer() {
+        for (String topic : eventBuffers.keySet()) {
+            if (!eventBuffers.get(topic).isEmpty()) {
+                flushBuffer(topic);
             }
         }
     }

@@ -3,7 +3,6 @@ import 'package:lss_thesis_ui/ApiEndpoints.dart';
 import 'package:lss_thesis_ui/AppColors.dart';
 import 'package:lss_thesis_ui/AppTextStyles.dart';
 import 'package:lss_thesis_ui/Models/QueryAnalysisMetadata.dart';
-import 'package:lss_thesis_ui/Models/QueryMetadata.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 

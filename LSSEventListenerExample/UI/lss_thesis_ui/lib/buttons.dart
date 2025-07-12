@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lss_thesis_ui/AppColors.dart';
 import 'package:lss_thesis_ui/SupportMethods.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class HoverIconButton extends StatefulWidget {
   final Icon icon;

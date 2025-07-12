@@ -1,9 +1,7 @@
 package com.espertech.Kafka;
 
 import com.espertech.AnalysisCore.AnalysisService.EventAnalyzer;
-import com.espertech.AnalysisCore.IssueTopicHelper;
 import com.espertech.AnalysisCore.TopicWatcherService;
-import com.espertech.AnalysisCore.Topology.TopologyService;
 import com.espertech.AnalysisCore.Types.SpanEvent;
 import com.espertech.AnalysisCore.Types.TraceBuffer;
 import com.espertech.Brokers.BrokerType;
@@ -13,7 +11,6 @@ import com.espertech.Brokers.Producers.MessageBrokerProducer;
 import com.espertech.Brokers.Producers.MessageProducerFactory;
 import com.espertech.ESPERQueries.DynatraceAnalysisEsperQueries;
 import com.espertech.ESPERQueries.ComplexEsperQueries;
-import com.espertech.ESPERQueries.IQueryID;
 import com.espertech.ESPERQueries.LSSEsperQueries;
 import com.espertech.EventGenerators.ComplexEventGenerator;
 import com.espertech.EventGenerators.DynatraceEventGenerator;
@@ -22,11 +19,9 @@ import com.espertech.Kafka.config.KafkaEventConfig;
 import com.espertech.Main;
 import com.espertech.QueriesDatabase.Postgres.PostgresDB;
 import com.espertech.QueriesDatabase.QueriesDB;
-import com.espertech.esper.common.internal.collection.Pair;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.KafkaAdminClient;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -34,14 +29,12 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
-import static com.espertech.Main.config;
+import static com.espertech.DynatraceRecordsIssueRecordsInserter.seedErrors;
 import static com.espertech.Main.esperService;
 
 @Service("kafkaEventServiceV1")
@@ -179,9 +172,24 @@ public class KafkaEventService {
             case KafkaEventConfig.ConfigType.Dynatrace:
                 //ClassPathResource timeframe1 = new ClassPathResource("traces_spans_astroshop_timeframe1.json");
                 //ClassPathResource timeframe2 = new ClassPathResource("traces_spans_astroshop_timeframe2.json");
-                ClassPathResource timeframe1 = new ClassPathResource("testAnalysisEvents.json");
-                var eventGen = new DynatraceEventGenerator.Builder(timeframe1.getFile()).setGroupByTraceId(true)
-                        .build();
+                //ClassPathResource timeframe1 = new ClassPathResource("testAnalysisEvents2.json");
+
+                var originalRecordsFileName = "traces_spans_astroshop_timeframe1.json"; //"testAnalysisEvents2.json";
+                DynatraceEventGenerator eventGen;
+
+                var tempFile = seedErrors(originalRecordsFileName, List.of("issueInvalidSequence.json"), Optional.of(3));
+
+                if (tempFile.isEmpty() || tempFile.equals(originalRecordsFileName)){
+                    Main.logger.info("Failed to seed errors, using original file");
+                    eventGen = new DynatraceEventGenerator.Builder(new ClassPathResource(originalRecordsFileName).getFile()).setGroupByTraceId(true).build();
+                }
+                else
+                {
+                    eventGen = new DynatraceEventGenerator.Builder(new File(tempFile)).setGroupByTraceId(true).build();
+                    Main.logger.info("Using seeded file: {}", tempFile);
+                    var result = new File(tempFile).delete();
+                    Main.logger.info("Temporary file was {}", result ? "deleted" : "NOT deleted");
+                }
 
                 var logs = new ArrayList<DynatraceLog>();
                 logs.add(eventGen.log);

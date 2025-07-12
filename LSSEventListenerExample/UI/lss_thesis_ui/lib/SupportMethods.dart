@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lss_thesis_ui/AppColors.dart';
-import 'package:lss_thesis_ui/AppTextStyles.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'ApiEndpoints.dart';
 import 'buttons.dart';

@@ -353,7 +353,7 @@ public class EsperController {
         return ResponseEntity.status(500).body("DB is DOWN");
     }
 
-    private ArrayList<QueryMetadataDTO> getComplexEventsQueries() {
+    public static ArrayList<QueryMetadataDTO> getComplexEventsQueries() {
         var time = System.currentTimeMillis();
         var queries = new ArrayList<QueryMetadataDTO>();
         queries.add(new QueryMetadataDTO(
@@ -372,11 +372,109 @@ public class EsperController {
 
         queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
+                "AnotherSimpleSelect",
+                "my-statement2",
+                "complexSelectQueries2",
+                "@name('my-statement2') select * from ComplexEvent where value > 10 and (eventType = 'Event1' or eventType = 'Event2');",
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Simple select query"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "AnotherSimpleSelect-temp1",
+                "my-statement2-temp1",
+                "complexSelectQueries2-temp1",
+                "@name('my-statement2-temp1') select * from ComplexEvent where value < 100 or eventType = 'Event3';",
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Simple select query"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "AnotherSimpleSelect-temp2",
+                "my-statement2-temp2",
+                "complexSelectQueries2-temp2",
+                "@name('my-statement2-temp2') select * from ComplexEvent where (eventType = 'Event3' or eventType = 'Event4') and destination = 'Dest2';",
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Simple select query"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "AnotherSimpleSelect-temp3",
+                "my-statement2-temp3",
+                "complexSelectQueries2-temp3",
+                "@name('my-statement2-temp3') select * from ComplexEvent where source = 'Source1' and value > 1000;",
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Simple select query"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "AnotherSimpleSelect-temp4",
+                "my-statement2-temp4",
+                "complexSelectQueries2-temp4",
+                "@name('my-statement2-temp4') select * from ComplexEvent where source != 'Source1' and destination != 'Dest1';",
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Simple select query"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "AnotherSimpleSelect-temp5",
+                "my-statement2-temp5",
+                "complexSelectQueries2-temp5",
+                "@name('my-statement2-temp5') select value from ComplexEvent where source = 'Source3' and destination = 'Dest1';",
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Simple select query"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "AnotherSimpleSelect-temp6",
+                "my-statement2-temp6",
+                "complexSelectQueries2-temp6",
+                "@name('my-statement2-temp6') select value from ComplexEvent where (source = 'Source3' and destination = 'Dest1') or (eventType='Event3' and priority = 1);",
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Simple select query"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
                 "timeWindowForDynamicSelection",
                 "",
                 "timeWindowQueries",
                 """
-                        @public create context TestContext initiated @now and pattern [every timer:interval(2 min)] terminated after 2 minutes;
+                        @public create context TestContext initiated @now and pattern [every timer:interval(30 sec)] terminated after 2 minutes;
                         @public create window TestWindow#keepall as select * from ComplexEvent;
                         insert into TestWindow select * from ComplexEvent;
                         """,
@@ -388,13 +486,31 @@ public class EsperController {
                 "Time Window creation"
         ));
 
+//        queries.add(new QueryMetadataDTO(
+//                UUID.randomUUID(),
+//                "timeWindowForDynamicSelection-temp1",
+//                "",
+//                "timeWindowQueries-temp1",
+//                """
+//                        @public create context TestContextCont initiated @now and pattern [every timer:interval(10 sec)] terminated after 3 minutes;
+//                        @public create window TestWindow#keepall as select value from ComplexEvent;
+//                        insert into TestWindow select value from ComplexEvent;
+//                        """,
+//                List.of("ComplexEvent"),
+//                "System",
+//                time,
+//                time,
+//                false,
+//                "Time Window creation"
+//        ));
+
         queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
                 "context",
                 "",
                 "contextCreation",
                 """
-                        @public create context ComplexEventContext start @now end after 5 minutes;
+                        @public create context ComplexEventContext start @now end after 2 minutes;
                         """,
                 List.of("ComplexEvent"),
                 "System",
@@ -442,11 +558,50 @@ public class EsperController {
 
         queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
+                "selectWithinBatchWindow-temp1",
+                "selectWithinBatchWindowStatement-temp1",
+                "selectWithinBatchWindow-temp1",
+                """
+                        @name('selectWithinBatchWindowStatement-temp1')
+                        context ComplexEventContext
+                        select eventId, eventType, source, destination, value from ComplexEvent.win:time_batch(10 sec) where value > 45 and eventType = 'Event2';
+                        """,
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Select within batch time window"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
                 "eventChainCheck",
                 "eventChainCheckStatement",
                 "eventChainCheck",
                 """
                             @name('eventChainCheckStatement')
+                            select a.eventType as aType, a.eventId as aId, b.eventType as bType, b.eventId as bId, a.value as aValue, b.value as bValue
+                            from pattern [
+                                every a=ComplexEvent(eventType='Event1', value > 55.0) ->
+                                (b=ComplexEvent(eventType='Event2', value = 33.0) where timer:within(10 sec))
+                            ];
+                        """,
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Check event chain within 10 seconds"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "eventChainCheck-temp1",
+                "eventChainCheckStatement-temp1",
+                "eventChainCheck-temp1",
+                """
+                            @name('eventChainCheckStatement-temp1')
                             select a.eventType as aType, a.eventId as aId, b.eventType as bType, b.eventId as bId, a.value as aValue, b.value as bValue
                             from pattern [
                                 every a=ComplexEvent(eventType='Event1', value > 55.0) ->
@@ -613,6 +768,50 @@ public class EsperController {
 
         queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
+                "compositeConstraint-temp1",
+                "compositeConstraintStatement-temp1",
+                "compositeConstraint-temp1",
+                """
+                        @name('compositeConstraintStatement-temp1')
+                        select a.eventId as A_ID, b.eventId as B_ID, c.eventId as C_ID, 'ALERT: temp1' as alert
+                        from pattern [
+                            every (a=ComplexEvent(eventType = 'Event1', value < 100) or
+                                   b=ComplexEvent(eventType = 'Event2', priority < 4) or
+                                   c=ComplexEvent(eventType = 'Event5', priority > 2))
+                        ];
+                        """,
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Check composite constraint where any of the events can trigger the alert"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "compositeConstraint-temp2",
+                "compositeConstraintStatement-temp2",
+                "compositeConstraint-temp2",
+                """
+                        @name('compositeConstraintStatement-temp2')
+                        select a.eventId as A_ID, b.eventId as B_ID, c.eventId as C_ID, 'ALERT: temp2' as alert
+                        from pattern [
+                            every (a=ComplexEvent(duration > 2000, value < 100) or
+                                   b=ComplexEvent(eventType = 'Event2', priority = 3) or
+                                   c=ComplexEvent(eventType = 'Event3', priority = 1))
+                        ];
+                        """,
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Check composite constraint where any of the events can trigger the alert"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
                 "multipleDataChecks",
                 "multipleDataChecksStatement",
                 "multipleDataChecks",
@@ -662,6 +861,31 @@ public class EsperController {
 
         queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
+                "crossEventDataAccess-temp1",
+                "crossEventDataStatement-temp1",
+                "crossEventData-temp1",
+                """
+                        @name('crossEventDataStatement-temp1')
+                        select p1.eventId as Point1_ID, p2.eventId as Point2_ID, p3.eventId as Point3_ID,
+                               'ALERT: Cross-event temperature sequence' as alert
+                        from pattern [
+                            every p1=ComplexEvent(eventType='Event3') ->
+                            p2=ComplexEvent(source='Source3', value < p1.value) ->
+                            p3=ComplexEvent(eventType='Event3', value < p2.value)
+                            where timer:within(10 sec)
+                        ];
+                        """,
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Check cross event data access and comparison"
+        ));
+
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
                 "multipleDataChecksForOneEvent",
                 "multipleDataChecksStatement",
                 "multipleDataChecksForOneEvent",
@@ -669,6 +893,60 @@ public class EsperController {
                         @name('multipleDataChecksStatement')
                         select 'ALERT: Multiple data checks for one event' as alert
                         from ComplexEvent where (eventType = "Percentage" and value > 5 and eventId = 2);
+                        """,
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Check multiple conditions for a single event"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "multipleDataChecksForOneEvent-temp1",
+                "multipleDataChecksStatement-temp1",
+                "multipleDataChecksForOneEvent-temp1",
+                """
+                        @name('multipleDataChecksStatement-temp1')
+                        select 'ALERT: Multiple data checks for one event' as alert
+                        from ComplexEvent where (eventType = "Event5" and value > 5 and eventId = 2);
+                        """,
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Check multiple conditions for a single event"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "multipleDataChecksForOneEvent-temp2",
+                "multipleDataChecksStatement-temp2",
+                "multipleDataChecksForOneEvent-temp2",
+                """
+                        @name('multipleDataChecksStatement-temp2')
+                        select 'ALERT: Multiple data checks for one event' as alert
+                        from ComplexEvent where (eventType = "Event1" and source != 'Source1' and eventId > 2);
+                        """,
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Check multiple conditions for a single event"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "multipleDataChecksForOneEvent-temp3",
+                "multipleDataChecksStatement-temp3",
+                "multipleDataChecksForOneEvent-temp3",
+                """
+                        @name('multipleDataChecksStatement-temp3')
+                        select 'ALERT: Multiple data checks for one event' as alert
+                        from ComplexEvent where (eventType = "Event3" and (destination != 'Dest1' and destination != 'Dest2') or eventId > 2);
                         """,
                 List.of("ComplexEvent"),
                 "Thresholds",
@@ -704,6 +982,55 @@ public class EsperController {
 
         queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
+                "eventBasedEvaluationCriteria-temp2",
+                "eventBasedEvaluationCriteriaStatement-temp2",
+                "eventBasedEvaluationCriteria-temp2",
+                """
+                        @name('eventBasedEvaluationCriteriaStatement-temp2')
+                        select 'ALERT: tempAlert' as alert
+                        from pattern [
+                            every a=ComplexEvent(source='Source1') ->
+                            (b=ComplexEvent(value > 0)
+                            and c=ComplexEvent(priority=1)
+                            and d=ComplexEvent(duration=1000))
+                            until nextStart=ComplexEvent(source='Source1')
+                        ];
+                        """,
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Check event sequence completion before next event"
+        ));
+
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "eventBasedEvaluationCriteria-temp1",
+                "eventBasedEvaluationCriteriaStatement-temp1",
+                "eventBasedEvaluationCriteria-temp1",
+                """
+                        @name('eventBasedEvaluationCriteriaStatement-temp1')
+                        select 'ALERT: tempAlert' as alert
+                        from pattern [
+                            every a=ComplexEvent(eventType='Event1') ->
+                            (b=ComplexEvent(eventType='Event2')
+                            and c=ComplexEvent(eventType='Event1')
+                            and d=ComplexEvent(eventType='Event3'))
+                            until nextStart=ComplexEvent(eventType='Event5')
+                        ];
+                        """,
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Check event sequence completion before next event"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
                 "multipleEvaluationCriteria",
                 "multipleEvaluationCriteriaStatement",
                 "multipleEvaluationCriteria",
@@ -720,6 +1047,62 @@ public class EsperController {
                             and c=ComplexEvent(eventType='ProductionEnded'))
                             where timer:within(8 sec))
                             until nextStart=ComplexEvent(eventType='ProductionStarted')
+                        ];
+                        """,
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Check multiple evaluation criteria for a sequence of events"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "multipleEvaluationCriteria-temp2",
+                "multipleEvaluationCriteriaStatement-temp2",
+                "multipleEvaluationCriteria-temp2",
+                """
+                        @name('multipleEvaluationCriteriaStatement-temp2')
+                        select
+                        a.eventId,
+                        b[0].eventId,
+                        c[0].eventId,
+                        'ALERT: tempAlert' as alert
+                        from pattern [
+                            every a=ComplexEvent(source='Source3') ->
+                            ((b=ComplexEvent(source='Source1')
+                            and c=ComplexEvent(priority=5))
+                            where timer:within(2 sec))
+                            until nextStart=ComplexEvent(eventType='Event5')
+                        ];
+                        """,
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Check multiple evaluation criteria for a sequence of events"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "multipleEvaluationCriteria-temp1",
+                "multipleEvaluationCriteriaStatement-temp1",
+                "multipleEvaluationCriteria-temp1",
+                """
+                        @name('multipleEvaluationCriteriaStatement-temp1')
+                        select
+                        a.eventId,
+                        b[0].eventId,
+                        c[0].eventId,
+                        'ALERT: tempAlert' as alert
+                        from pattern [
+                            every a=ComplexEvent(eventType='Event2') ->
+                            ((b=ComplexEvent(eventType='Event1')
+                            and c=ComplexEvent(eventType='Event3'))
+                            where timer:within(8 sec))
+                            until nextStart=ComplexEvent(eventType='Event5')
                         ];
                         """,
                 List.of("ComplexEvent"),
@@ -764,6 +1147,26 @@ public class EsperController {
 
         queries.add(new QueryMetadataDTO(
                 UUID.randomUUID(),
+                "compositeConstraintGeneralEvents-temp1",
+                "compositeConstraintCheckTypeStatement-temp1",
+                "compositeConstraintTypeGeneralEvents-temp1",
+                """
+                            @name('compositeConstraintCheckTypeStatement-temp1')
+                            select 'ALERT: temp!' as alert
+                            from pattern [
+                                every (a=ComplexEvent(eventType = 'Event2') or b=ComplexEvent(source = 'Source1'))
+                            ];
+                        """,
+                List.of("ComplexEvent"),
+                "Thresholds",
+                time,
+                time,
+                false,
+                "Simple check sequence of events of different types"
+        ));
+
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
                 "compositeConstraintGeneralEvents",
                 "compositeConstraintCheckTypeStatement",
                 "compositeConstraintTypeGeneralEvents",
@@ -771,7 +1174,7 @@ public class EsperController {
                             @name('compositeConstraintCheckTypeStatement')
                             select 'ALERT: All constraints violated!' as alert
                             from pattern [
-                                every (a=EventA(type = true) -> b=EventB(type = true) -> c=EventC(type = true))
+                                every (a=EventA(type = true) or b=EventB(type = true) or c=EventC(type = true))
                             ];
                         """,
                 List.of("EventA, EventB, EventC"),
@@ -865,6 +1268,20 @@ public class EsperController {
                 "Direct call detection for endpoints"
         ));
 
+        queries.add(new QueryMetadataDTO(
+                UUID.randomUUID(),
+                "endpointsIssues-invalidSequenceDetection",
+                "endpointsIssue-invalidSequenceDetection",
+                "endpointsIssues-invalidSequenceDetection",
+                "@name('endpointsIssue-invalidSequenceDetection') select * from DynatraceRecord;",
+                List.of("DynatraceRecord"),
+                IssueTopicHelper.NETWORK.toString(),
+                time,
+                time,
+                false,
+                "Invalid sequence call detection for endpoints"
+        ));
+
         return queries;
     }
 
@@ -925,39 +1342,38 @@ public class EsperController {
 //                false
 //        ));
 
-        queries.add(new QueryMetadataDTO(
-                """
-                                @name('IncorrectCallChain')
-                                select
-                                    a.endpointName as step1,
-                                    b.endpointName as step2,
-                                    c.endpointName as step3,
-                                    d.endpointName as step4,
-                                    e.endpointName as step5,
-                                    a.serviceId as service
-                                from pattern [
-                                    every (
-                                        a=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
-                                        b=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
-                                        c=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
-                                        d=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
-                                        e=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777')
-                                    )
-                                    where timer:within(10 sec)
-                                ]
-                                where not (
-                                    a.endpointName = '/api/cart' and
-                                    b.endpointName = '/api/cart/update' and
-                                    c.endpointName = '/api/cart/apply' and
-                                    d.endpointName = '/api/checkout' and
-                                    e.endpointName = '/api/checkout/confirm'
-                                );
-                        """,
-                IssueTopicHelper.ENDPOINT.toString(),
-                false,
-                false
-        ));
-
+//        queries.add(new QueryMetadataDTO(
+//                """
+//                                @name('IncorrectCallChain')
+//                                select
+//                                    a.endpointName as step1,
+//                                    b.endpointName as step2,
+//                                    c.endpointName as step3,
+//                                    d.endpointName as step4,
+//                                    e.endpointName as step5,
+//                                    a.serviceId as service
+//                                from pattern [
+//                                    every (
+//                                        a=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
+//                                        b=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
+//                                        c=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
+//                                        d=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777') ->
+//                                        e=SpanEvent(serviceId='SERVICE-53C7C4CB159DE777')
+//                                    )
+//                                    where timer:within(10 sec)
+//                                ]
+//                                where not (
+//                                    a.endpointName = '/api/cart' and
+//                                    b.endpointName = '/api/cart/update' and
+//                                    c.endpointName = '/api/cart/apply' and
+//                                    d.endpointName = '/api/checkout' and
+//                                    e.endpointName = '/api/checkout/confirm'
+//                                );
+//                        """,
+//                IssueTopicHelper.ENDPOINT.toString(),
+//                false,
+//                false
+//        ));
         queries.add(new QueryMetadataDTO(
                 """
                         @name('UnexpectedServiceCall')
@@ -971,7 +1387,8 @@ public class EsperController {
                         on
                             a.traceId = b.traceId
                         where
-                            a.serviceId != b.serviceId;
+                            a.serviceId != b.serviceId and
+                            a.httpResponseStatusCode != b.httpResponseStatusCode;
                         """,
                 IssueTopicHelper.ENDPOINT.toString(),
                 true,
@@ -989,9 +1406,9 @@ public class EsperController {
                             'ALERT: Invalid call sequence detected A → B → C' as alert
                         from pattern [
                             every (
-                                a=SpanEvent(serviceId= 'SERVICE-D8BE5DA6033DDFE5') ->
+                                a=SpanEvent(serviceId = 'SERVICE-D8BE5DA6033DDFE5') ->
                                 b=SpanEvent(serviceId != 'SERVICE-DEA6B0C4A5ABAABF', traceId=a.traceId) ->
-                                c=SpanEvent(serviceId='SERVICE-7FFF55032AE71361', traceId=a.traceId)
+                                c=SpanEvent(serviceId = 'SERVICE-7FFF55032AE71361', traceId=a.traceId)
                             )
                             where timer:within(10 sec)
                         ];

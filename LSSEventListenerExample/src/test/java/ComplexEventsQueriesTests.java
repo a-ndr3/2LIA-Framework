@@ -1,7 +1,9 @@
 
 import RemindsListeners.*;
 import TestListeners.*;
+import com.espertech.EsperController;
 import com.espertech.EventGenerators.ComplexEventGenerator;
+import com.espertech.EventTypes.Types.dynatrace.DynatraceRecord;
 import com.espertech.QueriesDatabase.Postgres.PostgresDB;
 import com.espertech.QueriesDatabase.QueriesDB;
 import com.espertech.QueriesDatabase.QueryMetadataDTO;
@@ -29,6 +31,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 public class ComplexEventsQueriesTests {
     ArrayList<ComplexEvent> events;
@@ -68,7 +71,19 @@ public class ComplexEventsQueriesTests {
 
     @BeforeAll
     public static void init() {
-        queriesFromDb = testDb.fetchQueries();
+        queriesFromDb = EsperController.getComplexEventsQueries();
+        System.out.println("Amount of queries with ComplexEvent: " + queriesFromDb.stream().filter(q -> q.query.contains("ComplexEvent")).count());
+        System.out.println("Amount of queries with DynatraceRecord: " + queriesFromDb.stream().filter(q -> q.query.contains("DynatraceRecord")).count());
+        System.out.println("Amount of queries with EventA: " + queriesFromDb.stream().filter(q -> q.query.contains("EventA")).count());
+        System.out.println("Amount of queries with EventB: " + queriesFromDb.stream().filter(q -> q.query.contains("EventB")).count());
+        System.out.println("Amount of queries with EventC: " + queriesFromDb.stream().filter(q -> q.query.contains("EventC")).count());
+        System.out.println("Amount of queries with anything else besides above: " + queriesFromDb.stream().filter(q ->
+                !q.query.contains("ComplexEvent") &&
+                !q.query.contains("DynatraceRecord") &&
+                !q.query.contains("EventA") &&
+                !q.query.contains("EventB") &&
+                !q.query.contains("EventC")).count());
+        System.out.println("Total amount of queries: " + queriesFromDb.size());
     }
 
     @BeforeEach
@@ -77,6 +92,7 @@ public class ComplexEventsQueriesTests {
 
         //Config EventTypes
         config.getCommon().addEventType(ComplexEvent.class);
+        config.getCommon().addEventType(DynatraceRecord.class);
 
         //DifferentKindEventsTest
         config.getCommon().addEventType(EventA.class);
@@ -89,13 +105,17 @@ public class ComplexEventsQueriesTests {
         runtime = EPRuntimeProvider.getDefaultRuntime(config);
         runtime.initialize();
 
+        int i = 0;
         for (var query : queriesFromDb) {
+            //if (!query.name.equals("multipleDataChecks")) continue;
+            //if (i == 5) break;
             EPCompiled selectCompiled = null;
             try {
                 var arguments = new CompilerArguments(config);
                 arguments.getPath().add(runtime.getRuntimePath());
                 selectCompiled = EPCompilerProvider.getCompiler().compile(query.query, arguments);
                 runtime.getDeploymentService().deploy(selectCompiled, new DeploymentOptions().setDeploymentId(query.deploymentId));
+                i++;
             } catch (EPDeployException | EPCompileException e) {
                 throw new RuntimeException(e);
             }
@@ -111,57 +131,57 @@ public class ComplexEventsQueriesTests {
         events.add(ComplexEventGenerator.getSpecificEvent("Event2", 33.0));
         events.add(ComplexEventGenerator.getSpecificEvent("Event5", 1.0));
 
-        testListenerChainTimer = new TestListenerChainTimer();
-        testListenerTimeWindow = new TestListenerTimeWindow();
-        testListenerBatchWindow = new TestListenerBatchWindow();
-        testListenerDependency = new TestListenerEventDependencies();
-        testListenerOrder = new TestListenerTwoEventsInOrderBeforeThird();
-        runtime.getDeploymentService().getStatement("eventChainCheck", "eventChainCheckStatement").addListener(testListenerChainTimer);
-        runtime.getDeploymentService().getStatement("selectWithinTimeWindow", "selectWithinTimeWindowStatement").addListener(testListenerTimeWindow);
-        runtime.getDeploymentService().getStatement("selectWithinBatchWindow", "selectWithinBatchWindowStatement").addListener(testListenerBatchWindow);
-        runtime.getDeploymentService().getStatement("eventDependenciesCheck", "eventDependenciesCheckStatement").addListener(testListenerDependency);
-        runtime.getDeploymentService().getStatement("twoEventsInOrder", "twoEventsInOrderStatement").addListener(testListenerOrder);
-
-        //LSS queries
-        testCascadeImpact = new TestListenerCascadeEffect();
-        runtime.getDeploymentService().getStatement("cascadeImpact", "cascadeImpactStatement").addListener(testCascadeImpact);
-
-        testSystemSlowDetect = new TestListenerSlowDownDetect();
-        runtime.getDeploymentService().getStatement("slowDetection", "slowdownDetectionStatement").addListener(testSystemSlowDetect);
-
-        testConflictingEvents = new TestListenerConflictingEvents();
-        runtime.getDeploymentService().getStatement("conflictingEvents", "conflictDetectionStatement").addListener(testConflictingEvents);
-
-        testEventSpikes = new TestListenerEventsSpikes();
-        runtime.getDeploymentService().getStatement("eventSpikes", "eventSpikesStatement").addListener(testEventSpikes);
-
-
-        //Reminds queries
-        testListenerComposite = new TestCompositeConstraintListener();
-        runtime.getDeploymentService().getStatement("compositeConstraint", "compositeConstraintStatement").addListener(testListenerComposite);
-
-        testListenerMultipleData = new TestMultipleDataChecksListener();
-        runtime.getDeploymentService().getStatement("multipleDataChecks", "multipleDataChecksStatement").addListener(testListenerMultipleData);
-
-        testListenerCrossEvent = new TestCrossEventListener();
-        runtime.getDeploymentService().getStatement("crossEventData", "crossEventDataStatement").addListener(testListenerCrossEvent);
-
-        testListenerMultipleDataForOneEvent = new TestMultipleDataChecksForOneEventListener();
-        runtime.getDeploymentService().getStatement("multipleDataChecksForOneEvent", "multipleDataChecksStatement").addListener(testListenerMultipleDataForOneEvent);
-
-        testMultipleEvaluationListener = new TestMultipleEvaluationListener();
-        runtime.getDeploymentService().getStatement("multipleEvaluationCriteria", "multipleEvaluationCriteriaStatement").addListener(testMultipleEvaluationListener);
-
-        testEventBasedEvaluationCriteria = new TestEventBasedEvaluationCriteria();
-        runtime.getDeploymentService().getStatement("eventBasedEvaluationCriteria", "eventBasedEvaluationCriteriaStatement").addListener(testEventBasedEvaluationCriteria);
-
-        testFlexibleEventSequencesListener = new TestFlexibleEventSequencesListener();
-        runtime.getDeploymentService().getStatement("flexibleEventSequences", "flexibleEventSequencesStatement").addListener(testFlexibleEventSequencesListener);
-
-
-        //DifferentKindEventsTest
-        testListenerCompositeTypeDifferentEvents = new TestCompositeConstraintListener();
-        runtime.getDeploymentService().getStatement("compositeConstraintTypeGeneralEvents", "compositeConstraintCheckTypeStatement").addListener(testListenerCompositeTypeDifferentEvents);
+//        testListenerChainTimer = new TestListenerChainTimer();
+//        testListenerTimeWindow = new TestListenerTimeWindow();
+//        testListenerBatchWindow = new TestListenerBatchWindow();
+//        testListenerDependency = new TestListenerEventDependencies();
+//        testListenerOrder = new TestListenerTwoEventsInOrderBeforeThird();
+//        runtime.getDeploymentService().getStatement("eventChainCheck", "eventChainCheckStatement").addListener(testListenerChainTimer);
+//        runtime.getDeploymentService().getStatement("selectWithinTimeWindow", "selectWithinTimeWindowStatement").addListener(testListenerTimeWindow);
+//        runtime.getDeploymentService().getStatement("selectWithinBatchWindow", "selectWithinBatchWindowStatement").addListener(testListenerBatchWindow);
+//        runtime.getDeploymentService().getStatement("eventDependenciesCheck", "eventDependenciesCheckStatement").addListener(testListenerDependency);
+//        runtime.getDeploymentService().getStatement("twoEventsInOrder", "twoEventsInOrderStatement").addListener(testListenerOrder);
+//
+//        //LSS queries
+//        testCascadeImpact = new TestListenerCascadeEffect();
+//        runtime.getDeploymentService().getStatement("cascadeImpact", "cascadeImpactStatement").addListener(testCascadeImpact);
+//
+//        testSystemSlowDetect = new TestListenerSlowDownDetect();
+//        runtime.getDeploymentService().getStatement("slowDetection", "slowdownDetectionStatement").addListener(testSystemSlowDetect);
+//
+//        testConflictingEvents = new TestListenerConflictingEvents();
+//        runtime.getDeploymentService().getStatement("conflictingEvents", "conflictDetectionStatement").addListener(testConflictingEvents);
+//
+//        testEventSpikes = new TestListenerEventsSpikes();
+//        runtime.getDeploymentService().getStatement("eventSpikes", "eventSpikesStatement").addListener(testEventSpikes);
+//
+//
+//        //Reminds queries
+//        testListenerComposite = new TestCompositeConstraintListener();
+//        runtime.getDeploymentService().getStatement("compositeConstraint", "compositeConstraintStatement").addListener(testListenerComposite);
+//
+//        testListenerMultipleData = new TestMultipleDataChecksListener();
+//        runtime.getDeploymentService().getStatement("multipleDataChecks", "multipleDataChecksStatement").addListener(testListenerMultipleData);
+//
+//        testListenerCrossEvent = new TestCrossEventListener();
+//        runtime.getDeploymentService().getStatement("crossEventData", "crossEventDataStatement").addListener(testListenerCrossEvent);
+//
+//        testListenerMultipleDataForOneEvent = new TestMultipleDataChecksForOneEventListener();
+//        runtime.getDeploymentService().getStatement("multipleDataChecksForOneEvent", "multipleDataChecksStatement").addListener(testListenerMultipleDataForOneEvent);
+//
+//        testMultipleEvaluationListener = new TestMultipleEvaluationListener();
+//        runtime.getDeploymentService().getStatement("multipleEvaluationCriteria", "multipleEvaluationCriteriaStatement").addListener(testMultipleEvaluationListener);
+//
+//        testEventBasedEvaluationCriteria = new TestEventBasedEvaluationCriteria();
+//        runtime.getDeploymentService().getStatement("eventBasedEvaluationCriteria", "eventBasedEvaluationCriteriaStatement").addListener(testEventBasedEvaluationCriteria);
+//
+//        testFlexibleEventSequencesListener = new TestFlexibleEventSequencesListener();
+//        runtime.getDeploymentService().getStatement("flexibleEventSequences", "flexibleEventSequencesStatement").addListener(testFlexibleEventSequencesListener);
+//
+//
+//        //DifferentKindEventsTest
+//        testListenerCompositeTypeDifferentEvents = new TestCompositeConstraintListener();
+//        runtime.getDeploymentService().getStatement("compositeConstraintTypeGeneralEvents", "compositeConstraintCheckTypeStatement").addListener(testListenerCompositeTypeDifferentEvents);
     }
 
     private void timer(int seconds) {
@@ -758,9 +778,10 @@ public class ComplexEventsQueriesTests {
         long startTime = System.nanoTime();
 
         for (int i = 0; i < batchSize; i++) {
-            runtime.getEventService().sendEventBean(new EventA(true), "EventA");
-            runtime.getEventService().sendEventBean(new EventB(true), "EventB");
-            runtime.getEventService().sendEventBean(new EventC(true), "EventC");
+            var bool = i % 2 == 0;
+            runtime.getEventService().sendEventBean(new EventA(bool), "EventA");
+            runtime.getEventService().sendEventBean(new EventB(bool), "EventB");
+            runtime.getEventService().sendEventBean(new EventC(bool), "EventC");
         }
 
         long endTime = System.nanoTime();
@@ -768,6 +789,9 @@ public class ComplexEventsQueriesTests {
         double durationSeconds = durationNs / 1_000_000_000.0;
 
         double throughput = batchSize / durationSeconds;
+
+        System.out.printf("Time taken: %.2f seconds%n", durationSeconds);
+        System.out.printf("Deployments: %d%n", runtime.getDeploymentService().getDeployments().length);
         System.out.printf("Esper Throughput: %.2f EventTypes/sec%n", throughput);
 
         Assertions.assertTrue(throughput > 0);
@@ -775,34 +799,21 @@ public class ComplexEventsQueriesTests {
 
     @Test
     public void testMultipleDataChecksThroughput() {
-        int batchSize = 10_000;
-
-        var startEvents = new ArrayList<>();
-        var tempEvents = new ArrayList<>();
-        var qualEvents = new ArrayList<>();
-        var endEvents = new ArrayList<>();
-
-        for (int i = 0; i < batchSize; i++) {
-            startEvents.add(ComplexEventGenerator.getComplexEvent(i));
-            tempEvents.add(ComplexEventGenerator.getComplexEvent(i));
-            qualEvents.add(ComplexEventGenerator.getComplexEvent(i));
-            endEvents.add(ComplexEventGenerator.getComplexEvent(i));
-        }
+        int batchSize = 10_000_000;
 
         long startTime = System.nanoTime();
 
         for (int i = 0; i < batchSize; i++) {
-            runtime.getEventService().sendEventBean(startEvents.get(i), "ComplexEvent");
-            runtime.getEventService().sendEventBean(tempEvents.get(i), "ComplexEvent");
-            runtime.getEventService().sendEventBean(qualEvents.get(i), "ComplexEvent");
-            runtime.getEventService().sendEventBean(endEvents.get(i), "ComplexEvent");
+            runtime.getEventService().sendEventBean(ComplexEventGenerator.getComplexEvent(i), "ComplexEvent");
         }
 
         long endTime = System.nanoTime();
         double durationSeconds = (endTime - startTime) / 1_000_000_000.0;
 
         double throughput = batchSize / durationSeconds;
-        System.out.printf("Esper Throughput for multipleDataChecks: %.2f EventTypes/sec%n", throughput);
+        System.out.printf("Batch size: %d%n", batchSize);
+        System.out.printf("Deployments: %d%n", runtime.getDeploymentService().getDeployments().length);
+        System.out.printf("Esper Throughput for multipleDataChecks: %.2f ComplexEvents/sec%n", throughput);
 
         Assertions.assertTrue(throughput > 0);
     }

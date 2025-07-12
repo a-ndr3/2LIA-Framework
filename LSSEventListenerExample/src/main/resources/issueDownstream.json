@@ -20,7 +20,7 @@
       "dt.entity.service.entity.name": "astroshop-frontend",
       "dt.entity.process_group.entity.name": "frontend astroshop-frontend-*"
     },
-	{
+    {
       "start_time": "2025-04-24T11:20:57.366066000+02:00",
       "endpoint.name": "/api/cart",
       "dt.entity.service": "SERVICE-FF64C1F1ED092493",
@@ -40,7 +40,7 @@
       "dt.entity.service.entity.name": "astroshop-frontend",
       "dt.entity.process_group.entity.name": "frontend astroshop-frontend-*"
     },
-	{
+    {
       "start_time": "2025-04-24T11:20:57.366066000+02:00",
       "endpoint.name": "/api/cart",
       "dt.entity.service": "SERVICE-DEA6B0C4A5ABAABF",
@@ -60,7 +60,7 @@
       "dt.entity.service.entity.name": "astroshop-frontend",
       "dt.entity.process_group.entity.name": "frontend astroshop-frontend-*"
     },
-	{
+    {
       "start_time": "2025-04-24T11:20:58.366066000+02:00",
       "endpoint.name": "/api/cart",
       "dt.entity.service": "SERVICE-53C7C4CB159DE777",
@@ -80,7 +80,7 @@
       "dt.entity.service.entity.name": "astroshop-frontend",
       "dt.entity.process_group.entity.name": "frontend astroshop-frontend-*"
     },
-	{
+    {
       "start_time": "2025-04-24T11:20:58.366066000+02:00",
       "endpoint.name": "/api/cart/update",
       "dt.entity.service": "SERVICE-53C7C4CB159DE777",
@@ -96,86 +96,6 @@
       "dt.agent.module.id": "1db2e5765e271217",
       "span.id": "9438264adab4d717",
       "trace.id": "7293b5f5869f4e10e971",
-      "dt.system.sampling_ratio": "1",
-      "dt.entity.service.entity.name": "astroshop-frontend",
-      "dt.entity.process_group.entity.name": "frontend astroshop-frontend-*"
-    },
-	{
-      "start_time": "2025-04-24T11:20:58.366066000+02:00",
-      "endpoint.name": "/api/cart/apply",
-      "dt.entity.service": "SERVICE-53C7C4CB159DE777",
-      "duration": "16619000",
-      "request.status_code": "Success",
-      "http.response.status_code": "200",
-      "span.source": "OneAgent",
-      "dt.entity.process_group": "PROCESS_GROUP-262D9A36292EF59D",
-      "k8s.workload.name": null,
-      "dt.entity.cloud_application": null,
-      "k8s.namespace.name": "astroshop",
-      "dt.entity.cloud_application_namespace": "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914",
-      "dt.agent.module.id": "1db2e5765e271217",
-      "span.id": "9438264adab4d717",
-      "trace.id": "7293b5f5869f4e10e971",
-      "dt.system.sampling_ratio": "1",
-      "dt.entity.service.entity.name": "astroshop-frontend",
-      "dt.entity.process_group.entity.name": "frontend astroshop-frontend-*"
-    },
-	{
-      "start_time": "2025-04-24T11:20:58.366066000+02:00",
-      "endpoint.name": "/api/checkout",
-      "dt.entity.service": "SERVICE-53C7C4CB159DE777",
-      "duration": "16619000",
-      "request.status_code": "Success",
-      "http.response.status_code": "200",
-      "span.source": "OneAgent",
-      "dt.entity.process_group": "PROCESS_GROUP-262D9A36292EF59D",
-      "k8s.workload.name": null,
-      "dt.entity.cloud_application": null,
-      "k8s.namespace.name": "astroshop",
-      "dt.entity.cloud_application_namespace": "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914",
-      "dt.agent.module.id": "1db2e5765e271217",
-      "span.id": "9438264adab4d717",
-      "trace.id": "7293b5f5869f4e10e971",
-      "dt.system.sampling_ratio": "1",
-      "dt.entity.service.entity.name": "astroshop-frontend",
-      "dt.entity.process_group.entity.name": "frontend astroshop-frontend-*"
-    },
-	{
-      "start_time": "2025-04-24T11:20:58.366066000+02:00",
-      "endpoint.name": "/api/checkout",
-      "dt.entity.service": "SERVICE-53C7C4CB159DE200",
-      "duration": "16619000",
-      "request.status_code": "Success",
-      "http.response.status_code": "504",
-      "span.source": "OneAgent",
-      "dt.entity.process_group": "PROCESS_GROUP-262D9A36292EF59D",
-      "k8s.workload.name": null,
-      "dt.entity.cloud_application": null,
-      "k8s.namespace.name": "astroshop",
-      "dt.entity.cloud_application_namespace": "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914",
-      "dt.agent.module.id": "1db2e5765e271217",
-      "span.id": "9438264adab4d717",
-      "trace.id": "7293b5f5869f4e10e971",
-      "dt.system.sampling_ratio": "1",
-      "dt.entity.service.entity.name": "astroshop-frontend",
-      "dt.entity.process_group.entity.name": "frontend astroshop-frontend-*"
-    },
-	{
-      "start_time": "2025-04-24T11:20:58.366066000+02:00",
-      "endpoint.name": "/api/testCall",
-      "dt.entity.service": "SERVICE-123",
-      "duration": "16619000",
-      "request.status_code": "Success",
-      "http.response.status_code": "200",
-      "span.source": "OneAgent",
-      "dt.entity.process_group": "PROCESS_GROUP-262D9A36292EF59D",
-      "k8s.workload.name": null,
-      "dt.entity.cloud_application": null,
-      "k8s.namespace.name": "astroshop",
-      "dt.entity.cloud_application_namespace": "CLOUD_APPLICATION_NAMESPACE-644D80BDF94CC914",
-      "dt.agent.module.id": "1db2e5765e271217",
-      "span.id": "9438264adab4d717",
-      "trace.id": "7293b5f5869f4e10e97170350d7f933b",
       "dt.system.sampling_ratio": "1",
       "dt.entity.service.entity.name": "astroshop-frontend",
       "dt.entity.process_group.entity.name": "frontend astroshop-frontend-*"
