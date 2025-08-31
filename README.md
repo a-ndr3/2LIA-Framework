@@ -1,17 +1,17 @@
-# Esper - Complex Event Processing, Streaming SQL and Event Series Analysis for Java
+<img src="https://github.com/a-ndr3/2LIA-Framework/blob/dev/LSSEventListenerExample/2lia-logo.png" alt="logo" width="500" height="500">
 
-Esper is a component for complex event processing (CEP), streaming SQL and event series analysis, available for Java as Esper, and for .NET as NEsper.
+# 🚀 2-Layer Impact Analysis (LIA) Framework
 
-Esper's home page and documentation are at http://www.espertech.com/esper
+## Overview
 
-Esper and NEsper are open-source software available under the GNU General Public License (GPL) version 2 (GPL v2).
+This project provides a real-time event analysis framework for Large-Scale Systems. The solution is **powered by Esper 9.0.0** (CEP engine). We do not ship a modified Esper; it is consumed as a Maven dependency. 
+[Esper's home page](http://www.espertech.com/esper) and [documentation](https://esper.espertech.com/release-9.0.0/reference-esper/html/).
 
-This repository tracks changes since release 5.2.0 and as of April 6, 2015. The repository prior to that date was the Codehaus repository which has been discontinued.
+## Tech Stack
 
-Esper and NEsper including documentation are copyrighted and the copyright is owned by EsperTech Inc., unauthorized reproduction or distribution of this copyrighted work is illegal.
+- Esper 9.0.0
+- Apache Kafka
+- PostgreSQL
+- Prometheus & Grafana
+- Flutter
 
-For commercial licensing terms, please contact EsperTech Inc. for any inquiry.
-
-# Note on Master versus Releases
-
-At this time Master tracks version 6.0 and up development. Since version 9.0.0 Esper requires Java 17 (older versions required Java 8).
